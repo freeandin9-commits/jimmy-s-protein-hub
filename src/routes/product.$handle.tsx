@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { fetchProductByHandle, formatPrice } from "@/lib/shopify";
+import { fetchProductByHandle, formatPrice, type ShopifyProductNode, type ShopifyVariant } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
 import { ChevronLeft, Minus, Plus, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
@@ -36,8 +36,8 @@ export const Route = createFileRoute("/product/$handle")({
 });
 
 function ProductPage() {
-  const { product } = Route.useLoaderData();
-  const variants = product.variants.edges.map((e) => e.node);
+  const { product } = Route.useLoaderData() as { product: ShopifyProductNode };
+  const variants: ShopifyVariant[] = product.variants.edges.map((e) => e.node);
   const [variantId, setVariantId] = useState<string>(
     variants.find((v) => v.availableForSale)?.id ?? variants[0]?.id ?? "",
   );
