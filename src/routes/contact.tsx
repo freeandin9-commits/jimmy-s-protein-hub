@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Mail, MessageCircle, Instagram } from "lucide-react";
-import { WHATSAPP_NUMBER } from "@/stores/cartStore";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -16,7 +16,9 @@ export const Route = createFileRoute("/contact")({
 });
 
 function ContactPage() {
-  const waLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi Jimmy's — I have a question about ")}`;
+  const { settings } = useSiteSettings();
+  const waLink = `https://wa.me/${settings.whatsapp_number}?text=${encodeURIComponent("Hi Jimmy's — I have a question about ")}`;
+  const emailHref = `mailto:${settings.contact_email}`;
 
   return (
     <div className="container mx-auto px-4 py-16 md:py-24">
@@ -40,13 +42,13 @@ function ContactPage() {
         </a>
 
         <a
-          href="mailto:hello@jimmysprotein.com"
+          href={emailHref}
           className="group rounded-xl border border-border bg-card p-6 transition-all hover:border-primary hover:shadow-[var(--shadow-glow)]"
         >
           <Mail className="h-8 w-8 text-primary" />
           <h3 className="mt-4 font-display text-2xl uppercase tracking-wide">Email</h3>
           <p className="mt-1 text-sm text-muted-foreground">For wholesale & detailed enquiries.</p>
-          <p className="mt-3 text-sm font-bold text-primary group-hover:underline">hello@jimmysprotein.com</p>
+          <p className="mt-3 text-sm font-bold text-primary group-hover:underline">{settings.contact_email}</p>
         </a>
 
         <a

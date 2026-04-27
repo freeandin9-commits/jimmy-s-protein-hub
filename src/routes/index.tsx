@@ -5,6 +5,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { fetchProducts, type ShopifyProduct } from "@/lib/shopify";
 import { Zap, Shield, Flame, ArrowRight } from "lucide-react";
 import heroImg from "@/assets/hero.jpg";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -23,6 +24,7 @@ export const Route = createFileRoute("/")({
 function HomePage() {
   const [products, setProducts] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  const { settings } = useSiteSettings();
 
   useEffect(() => {
     fetchProducts(6).then((p) => {
@@ -44,12 +46,10 @@ function HomePage() {
               <Zap className="h-3 w-3" /> New batch dropped
             </span>
             <h1 className="font-display text-6xl uppercase leading-[0.9] tracking-wide md:text-7xl lg:text-8xl">
-              Train Like<br />
-              <span className="text-primary">A Beast.</span><br />
-              Eat Like One.
+              {settings.hero_headline}
             </h1>
             <p className="mt-6 max-w-md text-lg text-muted-foreground">
-              25g of clean protein per scoop. Zero junk. Built in the gym, made for the grind.
+              {settings.hero_subtext}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg" className="h-12 bg-primary px-8 font-bold uppercase tracking-wider text-primary-foreground hover:bg-primary/90">
