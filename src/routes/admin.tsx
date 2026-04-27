@@ -72,7 +72,7 @@ function AdminLayout() {
             return (
               <Link
                 key={item.to}
-                to={item.to}
+                to={item.to as any}
                 className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-semibold uppercase tracking-wider transition-colors ${
                   active
                     ? "bg-primary text-primary-foreground"
@@ -125,7 +125,7 @@ function AdminLayout() {
             return (
               <Link
                 key={item.to}
-                to={item.to}
+                to={item.to as any}
                 className={`flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold uppercase tracking-wider ${
                   active ? "bg-primary text-primary-foreground" : "bg-secondary text-foreground/80"
                 }`}
