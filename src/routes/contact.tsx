@@ -42,13 +42,13 @@ function ContactPage() {
         </a>
 
         <a
-          href="mailto:hello@jimmysprotein.com"
+          href={emailHref}
           className="group rounded-xl border border-border bg-card p-6 transition-all hover:border-primary hover:shadow-[var(--shadow-glow)]"
         >
           <Mail className="h-8 w-8 text-primary" />
           <h3 className="mt-4 font-display text-2xl uppercase tracking-wide">Email</h3>
           <p className="mt-1 text-sm text-muted-foreground">For wholesale & detailed enquiries.</p>
-          <p className="mt-3 text-sm font-bold text-primary group-hover:underline">hello@jimmysprotein.com</p>
+          <p className="mt-3 text-sm font-bold text-primary group-hover:underline">{settings.contact_email}</p>
         </a>
 
         <a
