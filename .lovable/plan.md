@@ -1,42 +1,119 @@
-# Jimmy's Protein Powder — Shopify Store
+# Admin Panel — Implementation Plan
 
-A bold, high-energy e-commerce website to sell Jimmy's protein powder line, powered by a brand new Shopify store.
+Jimmy's Protein-inu oru full admin panel build cheyyam, Lovable Cloud (Supabase) backend use cheythu.
 
-## Setup
-- Enable **Shopify** integration and create a **new development store** (free to build on; paid plan only needed when you're ready to actually sell).
-- After store creation, you'll get the option to claim the store (starts a 30-day Shopify free trial).
+## 1. Backend Setup (Lovable Cloud)
 
-## Site structure (multi-page)
-1. **Home (`/`)**
-   - High-impact hero: bold headline, product shot, "Shop Now" CTA
-   - Best sellers / featured products grid (pulled from Shopify)
-   - "Why Jimmy's" benefits strip (protein per scoop, ingredients, no junk)
-   - Social proof / customer transformations section
-   - Newsletter / launch offer signup
-2. **Products (`/products`)**
-   - Full catalog grid (6+ products) with flavor/size variants
-   - Filters (flavor, goal, price)
-   - Individual product detail pages with variant selection, nutrition info, add-to-cart
-3. **About (`/about`)**
-   - Jimmy's story, mission, what makes the brand different
-   - Sourcing / quality commitment
-4. **Contact (`/contact`)**
-   - Contact form, support email, social links, FAQ snippet
-5. **Cart & Checkout**
-   - Slide-out cart drawer accessible from every page
-   - Checkout handled by Shopify
+### Auth
+- **Email + password** authentication enable cheyyum
+- Auto-confirm email ON (no email verification needed for quick admin access)
+- Signup disable cheyyilla, but admin role check vazhi only admins panel access cheyyum
 
-## Visual style — Bold & Energetic
-- Dark background with neon accent color (electric green or volt yellow)
-- Heavy, condensed display typography for headlines; clean sans-serif for body
-- High-contrast product photography, motion on hover, gym/strength energy throughout
-- Sticky header with logo, nav, cart icon with item count
+### Database tables
+- **`user_roles`** — `(user_id, role)` with enum `app_role` ('admin', 'user'). Security definer function `has_role()` for safe RLS checks.
+- **`orders`** — auto-logged WhatsApp orders:
+  - `id`, `created_at`, `customer_name` (nullable), `items` (jsonb: array of `{title, variant, qty, price}`), `total`, `currency`, `status` (enum: pending/confirmed/shipped/delivered/cancelled), `notes`
+- **`site_settings`** — singleton row:
+  - `whatsapp_number`, `hero_headline`, `hero_subtext`, `contact_email`, `contact_phone`, `instagram_url`, etc.
 
-## SEO & Sharing
-- Each page (Home, Products, About, Contact, individual product pages) gets its own title, description, and social share metadata.
+### RLS policies
+- `orders`: public INSERT (so checkout can log without auth), admin-only SELECT/UPDATE/DELETE
+- `site_settings`: public SELECT, admin-only UPDATE
+- `user_roles`: admin-only
 
-## Out of scope for v1
-- Blog, loyalty program, subscriptions (can add later)
-- Custom checkout (using Shopify's secure checkout)
+## 2. Order Auto-Logging
 
-After approval, I'll start by enabling Shopify and creating the new store, then build out all pages and connect them to the catalog.
+`src/stores/cartStore.ts`-il `checkout()` modify cheyyum:
+1. Cart items + total Supabase `orders` table-il INSERT cheyyum (status='pending')
+2. WhatsApp link open cheyyum (existing flow)
+3. Cart clear cheyyum
+
+Failure case: WhatsApp open aakum even if DB log fail aayalum (UX priority).
+
+## 3. Site Settings Integration
+
+- `cartStore.ts`-le hardcoded `WHATSAPP_NUMBER` remove cheyyum
+- New hook `useSiteSettings()` — Supabase-il ninn fetch cheythu cache cheyyum (TanStack Query)
+- Header, Footer, Hero (`index.tsx`), Contact page — ellam settings-il ninn read cheyyum
+- Fallback values code-il vekkum (settings load aayilengil)
+
+## 4. Admin Routes (`/admin/*`)
+
+Auth-protected layout using TanStack Router's `_authenticated` pattern:
+
+```
+src/routes/
+  login.tsx                      # Public login page
+  _admin.tsx                     # Layout: checks auth + admin role, sidebar nav
+  _admin/admin.tsx              # → /admin (dashboard with stats)
+  _admin/admin.orders.tsx       # → /admin/orders (table + status update)
+  _admin/admin.products.tsx     # → /admin/products (list, link to Shopify admin)
+  _admin/admin.settings.tsx     # → /admin/settings (form to edit site_settings)
+  _admin/admin.analytics.tsx    # → /admin/analytics (charts)
+```
+
+`beforeLoad` in `_admin.tsx`:
+- Check session via Supabase
+- Check `has_role(user_id, 'admin')` via server function
+- Redirect to `/login` if either fails
+
+## 5. Admin Pages
+
+### Dashboard (`/admin`)
+- Stat cards: Total orders, Revenue (sum), Pending orders, Today's orders
+- Recent 5 orders quick view
+
+### Orders (`/admin/orders`)
+- Sortable/filterable table: date, customer, items summary, total, status badge
+- Click row → drawer with full item details
+- Status dropdown to update (pending → confirmed → shipped → delivered)
+- Filter by status, date range
+
+### Products (`/admin/products`)
+- Read-only list of Shopify products (existing `fetchProducts`)
+- Each product: thumbnail, title, price, variants count, "Edit in Shopify" button (opens Shopify admin)
+- "Add Product" CTA → opens Shopify admin (since products are managed there)
+- Note: Direct edit in panel skip cheyyunnu — Shopify admin already perfect for this
+
+### Settings (`/admin/settings`)
+- Form: WhatsApp number, hero headline, hero subtext, contact info, social links
+- React Hook Form + Zod validation
+- Save → updates `site_settings` row → invalidates query → site updates
+
+### Analytics (`/admin/analytics`)
+- Recharts: Revenue over time (line), Orders per day (bar), Top products (horizontal bar), Status breakdown (pie)
+- Date range selector (last 7/30/90 days)
+- Powered by `orders` table aggregations
+
+## 6. Login Page (`/login`)
+- Simple email + password form
+- Sign in via Supabase
+- After login: if admin → `/admin`, else → `/` with "not authorized" toast
+- Link in Footer: small "Admin" link (ningalkku mathram ariyam)
+
+## 7. Initial Admin User Setup
+
+First signup-inu shesham, manually `user_roles`-il oru row insert cheyyendi varum (njan migration-il oru placeholder admin email handle cheyyam, allengil signup cheyth shesham instructions tharam).
+
+**Recommendation**: Plan approve aayi backend setup cheytha shesham, ningal signup cheyyu — pinne njan admin role assign cheyyam.
+
+## Files to create/modify
+
+**New:**
+- `src/integrations/supabase/client.ts` (auto-generated by Cloud)
+- `src/hooks/useAuth.tsx`, `src/hooks/useSiteSettings.ts`
+- `src/routes/login.tsx`, `src/routes/_admin.tsx`
+- `src/routes/_admin/admin.tsx`, `admin.orders.tsx`, `admin.products.tsx`, `admin.settings.tsx`, `admin.analytics.tsx`
+- `src/components/admin/Sidebar.tsx`, `OrdersTable.tsx`, `StatCard.tsx`, etc.
+
+**Modified:**
+- `src/stores/cartStore.ts` — log to DB before WhatsApp open, fetch number from settings
+- `src/routes/__root.tsx` — add QueryClientProvider, AuthProvider
+- `src/router.tsx` — QueryClient context
+- `src/components/layout/Header.tsx`, `Footer.tsx`, `src/routes/index.tsx`, `contact.tsx` — read from site settings
+
+## Tech additions
+- `@tanstack/react-query` (caching), `recharts` (charts), `react-hook-form` + `zod` (forms)
+- Lovable Cloud for auth + DB (no Shopify subscription needed)
+
+Approve cheythal: enable Lovable Cloud → migrations run → all pages build cheyyum.
