@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { ShopifyProductNode } from "@/lib/shopify";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface CartItem {
   productId: string;
@@ -70,10 +71,7 @@ export const useCartStore = create<CartStore>()(
   ),
 );
 
-// Placeholder WhatsApp number — replace with the real one
-export const WHATSAPP_NUMBER = "910000000000"; // country code + number, no + or spaces
-
-export function buildWhatsAppOrderUrl(items: CartItem[]) {
+export function buildWhatsAppOrderUrl(items: CartItem[], whatsappNumber: string) {
   const currency = items[0]?.price.currencyCode || "USD";
   const total = items.reduce((s, i) => s + parseFloat(i.price.amount) * i.quantity, 0);
 
@@ -95,7 +93,35 @@ export function buildWhatsAppOrderUrl(items: CartItem[]) {
   ];
 
   const text = encodeURIComponent(lines.join("\n"));
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
+  return `https://wa.me/${whatsappNumber}?text=${text}`;
+}
+
+export async function logOrderToDatabase(items: CartItem[]) {
+  if (items.length === 0) return;
+  const currency = items[0].price.currencyCode || "USD";
+  const total = items.reduce((s, i) => s + parseFloat(i.price.amount) * i.quantity, 0);
+  const payload = {
+    items: items.map((i) => ({
+      productId: i.productId,
+      title: i.productTitle,
+      variantId: i.variantId,
+      variantTitle: i.variantTitle,
+      options: i.selectedOptions.filter((o) => o.value !== "Default Title"),
+      qty: i.quantity,
+      price: parseFloat(i.price.amount),
+      image: i.image ?? null,
+    })),
+    subtotal: total,
+    total,
+    currency,
+    status: "pending" as const,
+  };
+  try {
+    await supabase.from("orders").insert(payload);
+  } catch (err) {
+    // Don't block checkout if logging fails
+    console.error("Order log failed:", err);
+  }
 }
 
 export function pickDefaultItemFromProduct(product: ShopifyProductNode): Omit<CartItem, "quantity"> | null {
