@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Mail, MessageCircle, Instagram } from "lucide-react";
-import { WHATSAPP_NUMBER } from "@/stores/cartStore";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -16,7 +16,9 @@ export const Route = createFileRoute("/contact")({
 });
 
 function ContactPage() {
-  const waLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi Jimmy's — I have a question about ")}`;
+  const { settings } = useSiteSettings();
+  const waLink = `https://wa.me/${settings.whatsapp_number}?text=${encodeURIComponent("Hi Jimmy's — I have a question about ")}`;
+  const emailHref = `mailto:${settings.contact_email}`;
 
   return (
     <div className="container mx-auto px-4 py-16 md:py-24">

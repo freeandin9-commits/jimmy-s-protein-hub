@@ -1,10 +1,13 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useState } from "react";
 
 import appCss from "../styles.css?url";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CartDrawer } from "@/components/layout/CartDrawer";
 import { Toaster } from "@/components/ui/sonner";
+import { AuthProvider } from "@/hooks/useAuth";
 
 function NotFoundComponent() {
   return (
@@ -70,6 +73,33 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: false } },
+  }));
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <AppShell />
+      </AuthProvider>
+    </QueryClientProvider>
+  );
+}
+
+function AppShell() {
+  // Hide store chrome on admin/login routes
+  const path = typeof window !== "undefined" ? window.location.pathname : "";
+  const isAdminRoute = path.startsWith("/admin") || path === "/login";
+
+  if (isAdminRoute) {
+    return (
+      <>
+        <Outlet />
+        <Toaster richColors position="top-center" />
+      </>
+    );
+  }
+
   return (
     <div className="flex min-h-screen flex-col">
       <Header />

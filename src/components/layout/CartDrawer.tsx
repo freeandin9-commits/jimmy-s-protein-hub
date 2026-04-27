@@ -1,17 +1,24 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
-import { useCartStore, buildWhatsAppOrderUrl } from "@/stores/cartStore";
+import { useCartStore, buildWhatsAppOrderUrl, logOrderToDatabase } from "@/stores/cartStore";
 import { formatPrice } from "@/lib/shopify";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 export function CartDrawer() {
-  const { items, isOpen, setOpen, updateQuantity, removeItem } = useCartStore();
+  const { items, isOpen, setOpen, updateQuantity, removeItem, clearCart } = useCartStore();
+  const { settings } = useSiteSettings();
   const currency = items[0]?.price.currencyCode || "USD";
   const total = items.reduce((s, i) => s + parseFloat(i.price.amount) * i.quantity, 0);
 
-  const handleCheckout = () => {
-    const url = buildWhatsAppOrderUrl(items);
+  const handleCheckout = async () => {
+    const itemsSnapshot = [...items];
+    const url = buildWhatsAppOrderUrl(itemsSnapshot, settings.whatsapp_number);
+    // Fire-and-forget log; don't block WhatsApp open
+    logOrderToDatabase(itemsSnapshot);
     window.open(url, "_blank", "noopener,noreferrer");
+    clearCart();
+    setOpen(false);
   };
 
   return (
