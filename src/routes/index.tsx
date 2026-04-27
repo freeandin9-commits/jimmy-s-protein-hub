@@ -5,6 +5,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { fetchProducts, type ShopifyProduct } from "@/lib/shopify";
 import { Zap, Shield, Flame, ArrowRight } from "lucide-react";
 import heroImg from "@/assets/hero.jpg";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 export const Route = createFileRoute("/")({
   head: () => ({
