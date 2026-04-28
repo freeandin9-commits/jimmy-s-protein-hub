@@ -359,14 +359,16 @@ export function CartDrawer() {
               </div>
               <Button
                 type="button"
+                disabled={submitting}
                 onClick={() => finalizeAndSend("whatsapp")}
                 className="h-12 w-full bg-[var(--whatsapp)] text-[var(--whatsapp-foreground)] text-base font-bold uppercase tracking-wider hover:bg-[var(--whatsapp)]/90"
               >
-                <Send className="mr-2 h-4 w-4" /> Send order on WhatsApp
+                <Send className="mr-2 h-4 w-4" /> {submitting ? "Saving…" : "Send order on WhatsApp"}
               </Button>
               <Button
                 type="button"
                 variant="outline"
+                disabled={submitting}
                 onClick={() => finalizeAndSend("copy")}
                 className="h-10 w-full font-semibold uppercase tracking-wider"
               >
