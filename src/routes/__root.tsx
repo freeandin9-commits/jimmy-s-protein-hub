@@ -1,4 +1,4 @@
-import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { Outlet, Link, createRootRoute, HeadContent, Scripts, useRouterState } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 
@@ -88,7 +88,7 @@ function RootComponent() {
 
 function AppShell() {
   // Hide store chrome on admin/login routes
-  const path = typeof window !== "undefined" ? window.location.pathname : "";
+  const path = useRouterState({ select: (s) => s.location.pathname });
   const isAdminRoute = path.startsWith("/admin") || path === "/login";
 
   if (isAdminRoute) {
