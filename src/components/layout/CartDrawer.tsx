@@ -308,7 +308,7 @@ export function CartDrawer() {
               </button>
 
               <div className="rounded-lg border border-border bg-card p-3 text-sm">
-                <div className="font-bold tracking-wider">Order #{orderId}</div>
+                <div className="font-bold tracking-wider text-muted-foreground">Order # will be assigned on submit</div>
                 <div className="text-xs text-muted-foreground">
                   {new Date().toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
                 </div>
