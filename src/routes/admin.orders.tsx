@@ -124,6 +124,23 @@ function OrdersPage() {
                 <div className="text-xs text-muted-foreground">
                   {new Date(selected.created_at).toLocaleString()}
                 </div>
+                {(selected.customer_name || selected.customer_phone) && (
+                  <div className="rounded-lg border border-border p-3 text-sm">
+                    <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">Customer</div>
+                    {selected.customer_name && <div className="font-semibold">{selected.customer_name}</div>}
+                    {selected.customer_phone && (
+                      <a href={`tel:${selected.customer_phone}`} className="text-primary hover:underline">
+                        {selected.customer_phone}
+                      </a>
+                    )}
+                  </div>
+                )}
+                {selected.notes && (
+                  <div className="rounded-lg border border-border p-3 text-sm">
+                    <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">Notes</div>
+                    <pre className="whitespace-pre-wrap font-sans text-xs">{selected.notes}</pre>
+                  </div>
+                )}
                 <div>
                   <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Items</div>
                   <ul className="space-y-2">
