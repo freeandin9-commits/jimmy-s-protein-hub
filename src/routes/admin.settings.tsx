@@ -48,6 +48,7 @@ function SettingsPage() {
         instagram_url: form.instagram_url,
         facebook_url: form.facebook_url,
         address: form.address,
+        business_hours: form.business_hours,
       })
       .eq("id", form.id);
     setSaving(false);

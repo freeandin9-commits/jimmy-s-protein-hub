@@ -78,49 +78,136 @@ export function pickItemFromProduct(p: Product): Omit<CartItem, "quantity"> {
   };
 }
 
+export type DeliveryMethod = "home" | "pickup";
+export type PaymentMethod = "cod" | "upi" | "bank";
+
 export interface CustomerDetails {
   name: string;
   phone: string;
   address: string;
   notes?: string;
+  deliveryMethod: DeliveryMethod;
+  paymentMethod: PaymentMethod;
+  couponCode?: string;
+}
+
+const DELIVERY_LABEL: Record<DeliveryMethod, string> = {
+  home: "Home Delivery",
+  pickup: "Store Pickup",
+};
+
+const PAYMENT_LABEL: Record<PaymentMethod, string> = {
+  cod: "Cash on Delivery",
+  upi: "UPI / Online",
+  bank: "Bank Transfer",
+};
+
+// Generates short order ref like "JP-A8F3"
+export function generateOrderId(): string {
+  const rand = Math.random().toString(36).slice(2, 6).toUpperCase();
+  return `JP-${rand}`;
+}
+
+// Formats Indian phone for display: "+91 98765 43210"
+export function formatIndianPhoneDisplay(raw: string): string {
+  const digits = raw.replace(/\D/g, "").replace(/^91/, "").slice(0, 10);
+  if (digits.length <= 5) return digits;
+  return `${digits.slice(0, 5)} ${digits.slice(5)}`;
+}
+
+// Normalizes to "+919876543210" for storage / WhatsApp
+export function normalizeIndianPhone(raw: string): string {
+  const digits = raw.replace(/\D/g, "").replace(/^91/, "").slice(0, 10);
+  return digits.length === 10 ? `+91${digits}` : raw.trim();
+}
+
+export function isValidIndianPhone(raw: string): boolean {
+  const digits = raw.replace(/\D/g, "").replace(/^91/, "");
+  return /^[6-9]\d{9}$/.test(digits);
+}
+
+export function buildOrderText(
+  items: CartItem[],
+  customer: CustomerDetails,
+  orderId: string,
+  businessHours: string,
+  origin?: string,
+): string {
+  const currency = items[0]?.currency || "INR";
+  const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
+  const itemCount = items.reduce((s, i) => s + i.quantity, 0);
+  const placedOn = new Date().toLocaleString("en-IN", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+  const phoneFmt = normalizeIndianPhone(customer.phone);
+
+  const lines = [
+    `🏋️ *New Order — Jimmy's Protein*`,
+    `*Order #${orderId}*`,
+    `Placed on: ${placedOn}`,
+    "",
+    "*Customer Details*",
+    `Name: ${customer.name}`,
+    `Phone: ${phoneFmt}`,
+    ...(customer.deliveryMethod === "home" ? [`Address: ${customer.address}`] : []),
+    `Delivery: ${DELIVERY_LABEL[customer.deliveryMethod]}`,
+    `Preferred payment: ${PAYMENT_LABEL[customer.paymentMethod]}`,
+    ...(customer.couponCode ? [`Coupon: ${customer.couponCode}`] : []),
+    ...(customer.notes ? [`Notes: ${customer.notes}`] : []),
+    "",
+    `*Order (${itemCount} item${itemCount !== 1 ? "s" : ""})*`,
+    ...items.map((i, idx) => {
+      const sub = (i.price * i.quantity).toFixed(2);
+      const link = origin ? `\n   Link: ${origin}/product/${i.productId}` : "";
+      return `${idx + 1}. *${i.productTitle}*\n   Qty: ${i.quantity} × ${i.currency} ${i.price.toFixed(2)} = ${i.currency} ${sub}${link}`;
+    }),
+    "",
+    `*Total: ${currency} ${total.toFixed(2)}*`,
+    "",
+    `Estimated delivery: 2-4 business days`,
+    `We confirm orders within business hours (${businessHours}).`,
+    "",
+    "Please confirm availability and share payment details.",
+  ];
+
+  return lines.join("\n");
 }
 
 export function buildWhatsAppOrderUrl(
   items: CartItem[],
   whatsappNumber: string,
   customer: CustomerDetails,
+  orderId: string,
+  businessHours: string,
+  origin?: string,
 ) {
-  const currency = items[0]?.currency || "INR";
-  const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
-
-  const lines = [
-    "🏋️ *New Order — Jimmy's Protein*",
-    "",
-    "*Customer Details*",
-    `Name: ${customer.name}`,
-    `Phone: ${customer.phone}`,
-    `Address: ${customer.address}`,
-    ...(customer.notes ? [`Notes: ${customer.notes}`] : []),
-    "",
-    "*Order*",
-    ...items.map((i, idx) => {
-      const sub = (i.price * i.quantity).toFixed(2);
-      return `${idx + 1}. *${i.productTitle}*\n   Qty: ${i.quantity} × ${i.currency} ${i.price.toFixed(2)} = ${i.currency} ${sub}`;
-    }),
-    "",
-    `*Total: ${currency} ${total.toFixed(2)}*`,
-    "",
-    "Please confirm availability and share payment details.",
-  ];
-
-  const text = encodeURIComponent(lines.join("\n"));
+  const text = encodeURIComponent(
+    buildOrderText(items, customer, orderId, businessHours, origin),
+  );
   return `https://wa.me/${whatsappNumber}?text=${text}`;
 }
 
-export async function logOrderToDatabase(items: CartItem[], customer: CustomerDetails) {
+export async function logOrderToDatabase(
+  items: CartItem[],
+  customer: CustomerDetails,
+  orderId: string,
+) {
   if (items.length === 0) return;
   const currency = items[0].currency || "INR";
   const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
+
+  const notesParts: string[] = [
+    `Order #${orderId}`,
+    `Delivery: ${DELIVERY_LABEL[customer.deliveryMethod]}`,
+    `Payment: ${PAYMENT_LABEL[customer.paymentMethod]}`,
+  ];
+  if (customer.couponCode) notesParts.push(`Coupon: ${customer.couponCode}`);
+  if (customer.deliveryMethod === "home" && customer.address) {
+    notesParts.push(`Address: ${customer.address}`);
+  }
+  if (customer.notes) notesParts.push(`Notes: ${customer.notes}`);
+
   const payload = {
     items: items.map((i) => ({
       productId: i.productId,
@@ -134,10 +221,8 @@ export async function logOrderToDatabase(items: CartItem[], customer: CustomerDe
     currency,
     status: "pending" as const,
     customer_name: customer.name,
-    customer_phone: customer.phone,
-    notes: [customer.address && `Address: ${customer.address}`, customer.notes]
-      .filter(Boolean)
-      .join("\n") || null,
+    customer_phone: normalizeIndianPhone(customer.phone),
+    notes: notesParts.join("\n").slice(0, 1000),
   };
   try {
     await supabase.from("orders").insert(payload);

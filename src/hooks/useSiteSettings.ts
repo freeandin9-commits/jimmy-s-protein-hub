@@ -11,6 +11,7 @@ export interface SiteSettings {
   instagram_url: string;
   facebook_url: string;
   address: string;
+  business_hours: string;
 }
 
 const FALLBACK: SiteSettings = {
@@ -23,6 +24,7 @@ const FALLBACK: SiteSettings = {
   instagram_url: "",
   facebook_url: "",
   address: "",
+  business_hours: "Mon-Sat 10am-8pm",
 };
 
 export function useSiteSettings() {
