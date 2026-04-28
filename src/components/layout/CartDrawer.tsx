@@ -11,7 +11,6 @@ import {
   buildWhatsAppOrderUrl,
   buildOrderText,
   logOrderToDatabase,
-  generateOrderId,
   formatIndianPhoneDisplay,
   isValidIndianPhone,
   type CustomerDetails,
@@ -39,7 +38,7 @@ export function CartDrawer() {
   const { settings } = useSiteSettings();
   const [step, setStep] = useState<Step>("cart");
   const [form, setForm] = useState<CustomerDetails>(initialForm);
-  const [orderId, setOrderId] = useState<string>("");
+  const [submitting, setSubmitting] = useState(false);
 
   const currency = items[0]?.currency || "INR";
   const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
@@ -48,7 +47,7 @@ export function CartDrawer() {
   const reset = () => {
     setForm(initialForm);
     setStep("cart");
-    setOrderId("");
+    setSubmitting(false);
   };
 
   const handleClose = (v: boolean) => {
@@ -64,12 +63,12 @@ export function CartDrawer() {
       return toast.error("Please enter a valid 10-digit Indian mobile number");
     if (form.deliveryMethod === "home" && form.address.trim().length < 5)
       return toast.error("Please enter your delivery address");
-    setOrderId(generateOrderId());
     setStep("review");
   };
 
   const finalizeAndSend = async (mode: "whatsapp" | "copy") => {
-    if (!orderId) return;
+    if (submitting) return;
+    setSubmitting(true);
     const customer: CustomerDetails = {
       ...form,
       name: form.name.trim().slice(0, 200),
@@ -81,13 +80,18 @@ export function CartDrawer() {
     const origin = typeof window !== "undefined" ? window.location.origin : "";
     const businessHours = settings.business_hours || "Mon-Sat 10am-8pm";
 
-    await logOrderToDatabase(itemsSnapshot, customer, orderId);
+    const { orderRef } = await logOrderToDatabase(itemsSnapshot, customer);
+    if (!orderRef) {
+      setSubmitting(false);
+      toast.error("Could not save the order. Please try again.");
+      return;
+    }
 
     if (mode === "copy") {
-      const text = buildOrderText(itemsSnapshot, customer, orderId, businessHours, origin);
+      const text = buildOrderText(itemsSnapshot, customer, orderRef, businessHours, origin);
       try {
         await navigator.clipboard.writeText(text);
-        toast.success("Order text copied to clipboard");
+        toast.success(`Order ${orderRef} copied to clipboard`);
       } catch {
         toast.error("Could not copy. Please try the WhatsApp button.");
       }
@@ -96,7 +100,7 @@ export function CartDrawer() {
         itemsSnapshot,
         settings.whatsapp_number,
         customer,
-        orderId,
+        orderRef,
         businessHours,
         origin,
       );
@@ -304,7 +308,7 @@ export function CartDrawer() {
               </button>
 
               <div className="rounded-lg border border-border bg-card p-3 text-sm">
-                <div className="font-bold tracking-wider">Order #{orderId}</div>
+                <div className="font-bold tracking-wider text-muted-foreground">Order # will be assigned on submit</div>
                 <div className="text-xs text-muted-foreground">
                   {new Date().toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
                 </div>
@@ -355,14 +359,16 @@ export function CartDrawer() {
               </div>
               <Button
                 type="button"
+                disabled={submitting}
                 onClick={() => finalizeAndSend("whatsapp")}
                 className="h-12 w-full bg-[var(--whatsapp)] text-[var(--whatsapp-foreground)] text-base font-bold uppercase tracking-wider hover:bg-[var(--whatsapp)]/90"
               >
-                <Send className="mr-2 h-4 w-4" /> Send order on WhatsApp
+                <Send className="mr-2 h-4 w-4" /> {submitting ? "Saving…" : "Send order on WhatsApp"}
               </Button>
               <Button
                 type="button"
                 variant="outline"
+                disabled={submitting}
                 onClick={() => finalizeAndSend("copy")}
                 className="h-10 w-full font-semibold uppercase tracking-wider"
               >

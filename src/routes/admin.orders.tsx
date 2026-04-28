@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPrice } from "@/lib/products";
+import { formatOrderRef } from "@/stores/cartStore";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { toast } from "sonner";
@@ -87,8 +88,9 @@ function OrdersPage() {
               (data ?? []).map((o: any) => {
                 const items = (o.items as any[]) ?? [];
                 const summary = items.map((i) => `${i.qty}× ${i.title}`).join(", ");
-                const refMatch = typeof o.notes === "string" ? o.notes.match(/Order #(JP-[A-Z0-9]+)/) : null;
-                const orderRef = refMatch ? refMatch[1] : `#${String(o.id).slice(0, 8)}`;
+                const orderRef = typeof o.order_number === "number"
+                  ? formatOrderRef(o.order_number)
+                  : `#${String(o.id).slice(0, 8)}`;
                 return (
                   <tr key={o.id} className="border-b border-border hover:bg-secondary/20 cursor-pointer" onClick={() => setSelected(o)}>
                     <td className="p-3 font-mono text-xs">{orderRef}</td>
