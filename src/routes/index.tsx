@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/ProductCard";
-import { fetchProducts, type ShopifyProduct } from "@/lib/shopify";
+import { fetchProducts, type Product } from "@/lib/products";
 import { Zap, Shield, Flame, ArrowRight } from "lucide-react";
 import heroImg from "@/assets/hero.jpg";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
@@ -22,7 +22,7 @@ export const Route = createFileRoute("/")({
 });
 
 function HomePage() {
-  const [products, setProducts] = useState<ShopifyProduct[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const { settings } = useSiteSettings();
 
@@ -119,7 +119,7 @@ function HomePage() {
           </div>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {products.map((p) => <ProductCard key={p.node.id} product={p} />)}
+            {products.map((p) => <ProductCard key={p.id} product={p} />)}
           </div>
         )}
       </section>

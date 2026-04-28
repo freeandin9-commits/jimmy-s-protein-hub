@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ProductCard } from "@/components/ProductCard";
-import { fetchProducts, type ShopifyProduct } from "@/lib/shopify";
+import { fetchProducts, type Product } from "@/lib/products";
 
 export const Route = createFileRoute("/products")({
   head: () => ({
@@ -16,7 +16,7 @@ export const Route = createFileRoute("/products")({
 });
 
 function ProductsPage() {
-  const [products, setProducts] = useState<ShopifyProduct[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -46,12 +46,12 @@ function ProductsPage() {
         <div className="rounded-xl border border-dashed border-border p-16 text-center">
           <h2 className="font-display text-3xl uppercase tracking-wide">No products yet</h2>
           <p className="mt-3 text-muted-foreground">
-            Tell us what to add — name, price, flavors — and we'll create it in the store.
+            Add products from the admin panel to see them here.
           </p>
         </div>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {products.map((p) => <ProductCard key={p.node.id} product={p} />)}
+          {products.map((p) => <ProductCard key={p.id} product={p} />)}
         </div>
       )}
     </div>
