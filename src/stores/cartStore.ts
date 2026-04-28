@@ -78,13 +78,31 @@ export function pickItemFromProduct(p: Product): Omit<CartItem, "quantity"> {
   };
 }
 
-export function buildWhatsAppOrderUrl(items: CartItem[], whatsappNumber: string) {
+export interface CustomerDetails {
+  name: string;
+  phone: string;
+  address: string;
+  notes?: string;
+}
+
+export function buildWhatsAppOrderUrl(
+  items: CartItem[],
+  whatsappNumber: string,
+  customer: CustomerDetails,
+) {
   const currency = items[0]?.currency || "INR";
   const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
 
   const lines = [
     "🏋️ *New Order — Jimmy's Protein*",
     "",
+    "*Customer Details*",
+    `Name: ${customer.name}`,
+    `Phone: ${customer.phone}`,
+    `Address: ${customer.address}`,
+    ...(customer.notes ? [`Notes: ${customer.notes}`] : []),
+    "",
+    "*Order*",
     ...items.map((i, idx) => {
       const sub = (i.price * i.quantity).toFixed(2);
       return `${idx + 1}. *${i.productTitle}*\n   Qty: ${i.quantity} × ${i.currency} ${i.price.toFixed(2)} = ${i.currency} ${sub}`;
@@ -99,7 +117,7 @@ export function buildWhatsAppOrderUrl(items: CartItem[], whatsappNumber: string)
   return `https://wa.me/${whatsappNumber}?text=${text}`;
 }
 
-export async function logOrderToDatabase(items: CartItem[]) {
+export async function logOrderToDatabase(items: CartItem[], customer: CustomerDetails) {
   if (items.length === 0) return;
   const currency = items[0].currency || "INR";
   const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
@@ -115,6 +133,11 @@ export async function logOrderToDatabase(items: CartItem[]) {
     total,
     currency,
     status: "pending" as const,
+    customer_name: customer.name,
+    customer_phone: customer.phone,
+    notes: [customer.address && `Address: ${customer.address}`, customer.notes]
+      .filter(Boolean)
+      .join("\n") || null,
   };
   try {
     await supabase.from("orders").insert(payload);
