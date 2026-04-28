@@ -20,14 +20,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const checkAdmin = async () => {
-    const { data, error } = await supabase.rpc("is_current_user_admin");
+  const checkAdmin = async (userId: string) => {
+    const { data, error } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .maybeSingle();
     if (error) {
       console.error("Admin role check failed", error);
       setIsAdmin(false);
       return;
     }
-    setIsAdmin(data === true);
+    setIsAdmin(data?.role === "admin");
   };
 
   useEffect(() => {
@@ -37,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(newSession?.user ?? null);
       if (newSession?.user) {
         // Defer the admin check to avoid blocking the auth callback
-        setTimeout(() => checkAdmin(), 0);
+        setTimeout(() => checkAdmin(newSession.user.id), 0);
       } else {
         setIsAdmin(false);
       }
@@ -48,7 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(existing);
       setUser(existing?.user ?? null);
       if (existing?.user) {
-        checkAdmin().finally(() => setLoading(false));
+        checkAdmin(existing.user.id).finally(() => setLoading(false));
       } else {
         setLoading(false);
       }
