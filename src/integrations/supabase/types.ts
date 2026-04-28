@@ -56,6 +56,45 @@ export type Database = {
         }
         Relationships: []
       }
+      products: {
+        Row: {
+          created_at: string
+          currency: string
+          description: string
+          id: string
+          image_url: string
+          in_stock: boolean
+          price: number
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          description?: string
+          id?: string
+          image_url?: string
+          in_stock?: boolean
+          price?: number
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          description?: string
+          id?: string
+          image_url?: string
+          in_stock?: boolean
+          price?: number
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           address: string
