@@ -48,6 +48,7 @@ function SettingsPage() {
         instagram_url: form.instagram_url,
         facebook_url: form.facebook_url,
         address: form.address,
+        business_hours: form.business_hours,
       })
       .eq("id", form.id);
     setSaving(false);
@@ -103,6 +104,11 @@ function SettingsPage() {
         <div>
           <Label htmlFor="addr">Address</Label>
           <Textarea id="addr" value={form.address} onChange={(e) => update("address", e.target.value)} rows={2} className="mt-1" />
+        </div>
+        <div>
+          <Label htmlFor="bh">Business Hours</Label>
+          <Input id="bh" value={form.business_hours ?? ""} onChange={(e) => update("business_hours", e.target.value)} placeholder="Mon-Sat 10am-8pm" className="mt-1" />
+          <p className="mt-1 text-xs text-muted-foreground">Shown to customers in the cart and on WhatsApp messages.</p>
         </div>
         <Button type="submit" disabled={saving} className="bg-primary font-bold uppercase tracking-wider text-primary-foreground hover:bg-primary/90">
           {saving ? "Saving…" : "Save Settings"}

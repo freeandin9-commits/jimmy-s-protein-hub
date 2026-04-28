@@ -69,7 +69,9 @@ function OrdersPage() {
         <table className="w-full text-sm">
           <thead className="border-b border-border bg-secondary/30">
             <tr className="text-left">
+              <th className="p-3 font-semibold uppercase tracking-wider text-xs">Order #</th>
               <th className="p-3 font-semibold uppercase tracking-wider text-xs">Date</th>
+              <th className="p-3 font-semibold uppercase tracking-wider text-xs">Customer</th>
               <th className="p-3 font-semibold uppercase tracking-wider text-xs">Items</th>
               <th className="p-3 font-semibold uppercase tracking-wider text-xs">Total</th>
               <th className="p-3 font-semibold uppercase tracking-wider text-xs">Status</th>
@@ -78,16 +80,23 @@ function OrdersPage() {
           </thead>
           <tbody>
             {isLoading ? (
-              <tr><td colSpan={5} className="p-6 text-center text-muted-foreground">Loading…</td></tr>
+              <tr><td colSpan={7} className="p-6 text-center text-muted-foreground">Loading…</td></tr>
             ) : (data ?? []).length === 0 ? (
-              <tr><td colSpan={5} className="p-6 text-center text-muted-foreground">No orders yet.</td></tr>
+              <tr><td colSpan={7} className="p-6 text-center text-muted-foreground">No orders yet.</td></tr>
             ) : (
               (data ?? []).map((o: any) => {
                 const items = (o.items as any[]) ?? [];
                 const summary = items.map((i) => `${i.qty}× ${i.title}`).join(", ");
+                const refMatch = typeof o.notes === "string" ? o.notes.match(/Order #(JP-[A-Z0-9]+)/) : null;
+                const orderRef = refMatch ? refMatch[1] : `#${String(o.id).slice(0, 8)}`;
                 return (
                   <tr key={o.id} className="border-b border-border hover:bg-secondary/20 cursor-pointer" onClick={() => setSelected(o)}>
+                    <td className="p-3 font-mono text-xs">{orderRef}</td>
                     <td className="p-3 text-xs">{new Date(o.created_at).toLocaleString()}</td>
+                    <td className="p-3 text-xs">
+                      <div className="font-semibold">{o.customer_name || "—"}</div>
+                      <div className="text-muted-foreground">{o.customer_phone || ""}</div>
+                    </td>
                     <td className="p-3 max-w-xs truncate">{summary}</td>
                     <td className="p-3 font-bold">{formatPrice(Number(o.total), o.currency)}</td>
                     <td className="p-3">
@@ -115,6 +124,23 @@ function OrdersPage() {
                 <div className="text-xs text-muted-foreground">
                   {new Date(selected.created_at).toLocaleString()}
                 </div>
+                {(selected.customer_name || selected.customer_phone) && (
+                  <div className="rounded-lg border border-border p-3 text-sm">
+                    <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">Customer</div>
+                    {selected.customer_name && <div className="font-semibold">{selected.customer_name}</div>}
+                    {selected.customer_phone && (
+                      <a href={`tel:${selected.customer_phone}`} className="text-primary hover:underline">
+                        {selected.customer_phone}
+                      </a>
+                    )}
+                  </div>
+                )}
+                {selected.notes && (
+                  <div className="rounded-lg border border-border p-3 text-sm">
+                    <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">Notes</div>
+                    <pre className="whitespace-pre-wrap font-sans text-xs">{selected.notes}</pre>
+                  </div>
+                )}
                 <div>
                   <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Items</div>
                   <ul className="space-y-2">

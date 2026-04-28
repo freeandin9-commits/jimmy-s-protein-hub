@@ -98,6 +98,7 @@ export type Database = {
       site_settings: {
         Row: {
           address: string
+          business_hours: string
           contact_email: string
           contact_phone: string
           facebook_url: string
@@ -110,6 +111,7 @@ export type Database = {
         }
         Insert: {
           address?: string
+          business_hours?: string
           contact_email?: string
           contact_phone?: string
           facebook_url?: string
@@ -122,6 +124,7 @@ export type Database = {
         }
         Update: {
           address?: string
+          business_hours?: string
           contact_email?: string
           contact_phone?: string
           facebook_url?: string

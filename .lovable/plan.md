@@ -1,119 +1,111 @@
-# Admin Panel — Implementation Plan
+## Goal
+WhatsApp checkout flow + admin orders pageil 13 useful features add cheyyuka.
 
-Jimmy's Protein-inu oru full admin panel build cheyyam, Lovable Cloud (Supabase) backend use cheythu.
+---
 
-## 1. Backend Setup (Lovable Cloud)
+## Features & Implementation
 
-### Auth
-- **Email + password** authentication enable cheyyum
-- Auto-confirm email ON (no email verification needed for quick admin access)
-- Signup disable cheyyilla, but admin role check vazhi only admins panel access cheyyum
+### 1. Order ID / Reference number
+- `cartStore.ts`-il `generateOrderId()` helper: `JP-` + 4-char base36 random (e.g. `JP-A8F3`).
+- ID WhatsApp message top-il + DB `notes` field-il store cheyyum (separate column venda — notes prefix-il "Order #JP-A8F3" ennu cherkkum).
+- Admin orders pageil DB `id` (uuid) short form (first 8 chars) display cheyyum.
 
-### Database tables
-- **`user_roles`** — `(user_id, role)` with enum `app_role` ('admin', 'user'). Security definer function `has_role()` for safe RLS checks.
-- **`orders`** — auto-logged WhatsApp orders:
-  - `id`, `created_at`, `customer_name` (nullable), `items` (jsonb: array of `{title, variant, qty, price}`), `total`, `currency`, `status` (enum: pending/confirmed/shipped/delivered/cancelled), `notes`
-- **`site_settings`** — singleton row:
-  - `whatsapp_number`, `hero_headline`, `hero_subtext`, `contact_email`, `contact_phone`, `instagram_url`, etc.
+### 2. Order date & time
+- WhatsApp message-il "Placed on: 28 Apr 2026, 10:45 PM" line cherkkum (`toLocaleString('en-IN')`).
 
-### RLS policies
-- `orders`: public INSERT (so checkout can log without auth), admin-only SELECT/UPDATE/DELETE
-- `site_settings`: public SELECT, admin-only UPDATE
-- `user_roles`: admin-only
+### 3. Product link in message
+- Each item-num product page URL include cheyyum: `${window.location.origin}/product/${handle}`.
+- `CartItem` interface-il `handle?: string` add cheyyum, `pickItemFromProduct`-il populate cheyyum.
 
-## 2. Order Auto-Logging
+### 4. Delivery method selector
+- Checkout form-il radio group: **Home Delivery** / **Store Pickup**.
+- Pickup select cheytha customer-num address optional aakum.
+- WhatsApp message-il "Delivery: Home / Pickup" line.
 
-`src/stores/cartStore.ts`-il `checkout()` modify cheyyum:
-1. Cart items + total Supabase `orders` table-il INSERT cheyyum (status='pending')
-2. WhatsApp link open cheyyum (existing flow)
-3. Cart clear cheyyum
+### 5. Payment method preference
+- Radio group: **Cash on Delivery** / **UPI/Online** / **Bank Transfer**.
+- WhatsApp message-il "Preferred payment: ___" line.
 
-Failure case: WhatsApp open aakum even if DB log fail aayalum (UX priority).
+### 6. Coupon code field
+- Optional input "Coupon code" (free text — validation server-il pinneed cheyyam).
+- Currently coupon-num discount apply cheyyilla, just admin-num arivanam ennullath kondu message-il forward cheyyum.
+- Future-proof: `coupons` table later add cheyyaam, ippol just text capture.
 
-## 3. Site Settings Integration
+### 7. Order summary preview before submit
+- "Send order on WhatsApp" click cheyyumbol munpu oru read-only confirmation card (items + customer + total + delivery + payment) kaanum.
+- Two-step → three-step flow: `cart` → `details` → `review` → submit.
 
-- `cartStore.ts`-le hardcoded `WHATSAPP_NUMBER` remove cheyyum
-- New hook `useSiteSettings()` — Supabase-il ninn fetch cheythu cache cheyyum (TanStack Query)
-- Header, Footer, Hero (`index.tsx`), Contact page — ellam settings-il ninn read cheyyum
-- Fallback values code-il vekkum (settings load aayilengil)
+### 8. Total item count
+- Cart total-num munpil "X items" line both UI-ilum WhatsApp message-ilum.
 
-## 4. Admin Routes (`/admin/*`)
+### 9. Business hours note
+- `site_settings`-il pudiya optional column `business_hours` (text, default `"Mon-Sat 10am-8pm"`).
+- Cart drawer footer-il small text + WhatsApp message-il bottom line: "We confirm orders within business hours".
+- Admin settings page-il edit cheyyaan field add cheyyum.
 
-Auth-protected layout using TanStack Router's `_authenticated` pattern:
+### 10. "Copy order" fallback button
+- Review step-il "Send on WhatsApp" + "Copy order text" rendu buttons.
+- Copy click cheytha clipboard-il full order text + toast "Order copied".
 
-```
-src/routes/
-  login.tsx                      # Public login page
-  _admin.tsx                     # Layout: checks auth + admin role, sidebar nav
-  _admin/admin.tsx              # → /admin (dashboard with stats)
-  _admin/admin.orders.tsx       # → /admin/orders (table + status update)
-  _admin/admin.products.tsx     # → /admin/products (list, link to Shopify admin)
-  _admin/admin.settings.tsx     # → /admin/settings (form to edit site_settings)
-  _admin/admin.analytics.tsx    # → /admin/analytics (charts)
-```
+### 11. Auto-format Indian phone numbers
+- Phone input onChange-il digits maathram extract → 10 digits aanenkil display "+91 98765 43210" pattern.
+- Validation: `+91` prefix + 10 digits stricter regex.
+- Submit cheyumbol normalized form (`+919876543210`) save cheyyum.
 
-`beforeLoad` in `_admin.tsx`:
-- Check session via Supabase
-- Check `has_role(user_id, 'admin')` via server function
-- Redirect to `/login` if either fails
+### 12. Image/thumbnail in message (text link only)
+- WhatsApp text message-il image embed cheyyaan pattilla, athu kondu product link (#3) thanne ee role serve cheyyum.
+- Already #3-il covered.
 
-## 5. Admin Pages
+### 13. Estimated delivery line
+- Static line in WhatsApp message: "Estimated delivery: 2-4 business days" (settings-il future-il configurable aakaam, ippol hardcode).
 
-### Dashboard (`/admin`)
-- Stat cards: Total orders, Revenue (sum), Pending orders, Today's orders
-- Recent 5 orders quick view
+---
 
-### Orders (`/admin/orders`)
-- Sortable/filterable table: date, customer, items summary, total, status badge
-- Click row → drawer with full item details
-- Status dropdown to update (pending → confirmed → shipped → delivered)
-- Filter by status, date range
+## Files to Edit
 
-### Products (`/admin/products`)
-- Read-only list of Shopify products (existing `fetchProducts`)
-- Each product: thumbnail, title, price, variants count, "Edit in Shopify" button (opens Shopify admin)
-- "Add Product" CTA → opens Shopify admin (since products are managed there)
-- Note: Direct edit in panel skip cheyyunnu — Shopify admin already perfect for this
+- **`src/stores/cartStore.ts`**
+  - `CartItem` add `handle?: string`
+  - `CustomerDetails` add `deliveryMethod`, `paymentMethod`, `couponCode?`
+  - `generateOrderId()` helper
+  - `formatIndianPhone()` helper
+  - `buildWhatsAppOrderUrl()` rewrite to include order ID, date, item count, links, delivery, payment, coupon, business hours, ETA
+  - `logOrderToDatabase()` notes-il order ID + delivery + payment + coupon prefix
 
-### Settings (`/admin/settings`)
-- Form: WhatsApp number, hero headline, hero subtext, contact info, social links
-- React Hook Form + Zod validation
-- Save → updates `site_settings` row → invalidates query → site updates
+- **`src/components/layout/CartDrawer.tsx`**
+  - 3-step flow (`cart` → `details` → `review`)
+  - Delivery/payment radio groups (use existing `RadioGroup` ui)
+  - Coupon input
+  - Phone auto-format onChange
+  - Review screen with full summary
+  - "Copy order" button alongside WhatsApp button
+  - Show item count + business hours note
 
-### Analytics (`/admin/analytics`)
-- Recharts: Revenue over time (line), Orders per day (bar), Top products (horizontal bar), Status breakdown (pie)
-- Date range selector (last 7/30/90 days)
-- Powered by `orders` table aggregations
+- **`src/lib/products.ts`** (verify `handle` field exists; if not, use product `id` for URL)
 
-## 6. Login Page (`/login`)
-- Simple email + password form
-- Sign in via Supabase
-- After login: if admin → `/admin`, else → `/` with "not authorized" toast
-- Link in Footer: small "Admin" link (ningalkku mathram ariyam)
+- **`src/hooks/useSiteSettings.ts`** + **`src/routes/admin.settings.tsx`**
+  - Add `business_hours` field
 
-## 7. Initial Admin User Setup
+- **Migration**: `ALTER TABLE site_settings ADD COLUMN business_hours text NOT NULL DEFAULT 'Mon-Sat 10am-8pm';`
 
-First signup-inu shesham, manually `user_roles`-il oru row insert cheyyendi varum (njan migration-il oru placeholder admin email handle cheyyam, allengil signup cheyth shesham instructions tharam).
+- **`src/routes/admin.orders.tsx`**
+  - Display short order ID (first 8 chars of uuid)
+  - Show parsed delivery/payment from notes (or display notes as-is — simpler)
 
-**Recommendation**: Plan approve aayi backend setup cheytha shesham, ningal signup cheyyu — pinne njan admin role assign cheyyam.
+---
 
-## Files to create/modify
+## Technical Notes
 
-**New:**
-- `src/integrations/supabase/client.ts` (auto-generated by Cloud)
-- `src/hooks/useAuth.tsx`, `src/hooks/useSiteSettings.ts`
-- `src/routes/login.tsx`, `src/routes/_admin.tsx`
-- `src/routes/_admin/admin.tsx`, `admin.orders.tsx`, `admin.products.tsx`, `admin.settings.tsx`, `admin.analytics.tsx`
-- `src/components/admin/Sidebar.tsx`, `OrdersTable.tsx`, `StatCard.tsx`, etc.
+- All new WhatsApp text built client-side, URL-encoded same as current.
+- Coupon validation skipped now → just text passthrough; no DB table created.
+- Phone normalization uses regex: `value.replace(/\D/g, '').slice(0, 10)`, format with template literal.
+- Order ID generated at submit time, NOT stored as separate column (kept inside `notes` to avoid migration churn). Admin still has uuid `id` for true uniqueness.
+- RLS on `orders` already allows anon insert with current schema — no policy changes needed.
+- Review step uses same form state, just toggles a `step` value — no extra store needed.
 
-**Modified:**
-- `src/stores/cartStore.ts` — log to DB before WhatsApp open, fetch number from settings
-- `src/routes/__root.tsx` — add QueryClientProvider, AuthProvider
-- `src/router.tsx` — QueryClient context
-- `src/components/layout/Header.tsx`, `Footer.tsx`, `src/routes/index.tsx`, `contact.tsx` — read from site settings
+---
 
-## Tech additions
-- `@tanstack/react-query` (caching), `recharts` (charts), `react-hook-form` + `zod` (forms)
-- Lovable Cloud for auth + DB (no Shopify subscription needed)
-
-Approve cheythal: enable Lovable Cloud → migrations run → all pages build cheyyum.
+## Out of Scope (explicitly NOT doing)
+- Real coupon discount logic / coupons table
+- Image embedding in WhatsApp (not supported by wa.me text API)
+- Server-side email/SMS notifications
+- Stock decrement on order placement
