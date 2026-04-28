@@ -22,7 +22,7 @@ export const Route = createFileRoute("/")({
 });
 
 function HomePage() {
-  const [products, setProducts] = useState<ShopifyProduct[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const { settings } = useSiteSettings();
 
