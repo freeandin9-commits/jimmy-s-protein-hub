@@ -1,30 +1,65 @@
+import { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
-import { useCartStore, buildWhatsAppOrderUrl, logOrderToDatabase } from "@/stores/cartStore";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft } from "lucide-react";
+import {
+  useCartStore,
+  buildWhatsAppOrderUrl,
+  logOrderToDatabase,
+  type CustomerDetails,
+} from "@/stores/cartStore";
 import { formatPrice } from "@/lib/products";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { toast } from "sonner";
 
 export function CartDrawer() {
   const { items, isOpen, setOpen, updateQuantity, removeItem, clearCart } = useCartStore();
   const { settings } = useSiteSettings();
+  const [step, setStep] = useState<"cart" | "details">("cart");
+  const [form, setForm] = useState<CustomerDetails>({ name: "", phone: "", address: "", notes: "" });
   const currency = items[0]?.currency || "INR";
   const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
 
-  const handleCheckout = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const name = form.name.trim();
+    const phone = form.phone.trim();
+    const address = form.address.trim();
+    if (name.length < 2) return toast.error("Please enter your name");
+    if (!/^[+\d][\d\s-]{6,20}$/.test(phone)) return toast.error("Please enter a valid phone number");
+    if (address.length < 5) return toast.error("Please enter your delivery address");
+
+    const customer: CustomerDetails = {
+      name: name.slice(0, 200),
+      phone: phone.slice(0, 50),
+      address: address.slice(0, 500),
+      notes: form.notes?.trim().slice(0, 500) || undefined,
+    };
     const itemsSnapshot = [...items];
-    const url = buildWhatsAppOrderUrl(itemsSnapshot, settings.whatsapp_number);
-    logOrderToDatabase(itemsSnapshot);
+    const url = buildWhatsAppOrderUrl(itemsSnapshot, settings.whatsapp_number, customer);
+    logOrderToDatabase(itemsSnapshot, customer);
     window.open(url, "_blank", "noopener,noreferrer");
     clearCart();
+    setForm({ name: "", phone: "", address: "", notes: "" });
+    setStep("cart");
     setOpen(false);
   };
 
+  const handleClose = (v: boolean) => {
+    setOpen(v);
+    if (!v) setStep("cart");
+  };
+
   return (
-    <Sheet open={isOpen} onOpenChange={setOpen}>
+    <Sheet open={isOpen} onOpenChange={handleClose}>
       <SheetContent className="flex h-full w-full flex-col bg-background sm:max-w-lg">
         <SheetHeader>
-          <SheetTitle className="font-display text-2xl tracking-wider">YOUR CART</SheetTitle>
+          <SheetTitle className="font-display text-2xl tracking-wider">
+            {step === "cart" ? "YOUR CART" : "YOUR DETAILS"}
+          </SheetTitle>
         </SheetHeader>
 
         {items.length === 0 ? (
@@ -32,7 +67,7 @@ export function CartDrawer() {
             <ShoppingBag className="h-12 w-12" />
             <p>Your cart is empty</p>
           </div>
-        ) : (
+        ) : step === "cart" ? (
           <>
             <div className="flex-1 overflow-y-auto py-4 pr-2">
               <ul className="space-y-4">
@@ -79,16 +114,63 @@ export function CartDrawer() {
                 <span className="font-bold">{formatPrice(total, currency)}</span>
               </div>
               <Button
-                onClick={handleCheckout}
-                className="h-12 w-full bg-[var(--whatsapp)] text-[var(--whatsapp-foreground)] text-base font-bold uppercase tracking-wider hover:bg-[var(--whatsapp)]/90"
+                onClick={() => setStep("details")}
+                className="h-12 w-full bg-primary text-primary-foreground text-base font-bold uppercase tracking-wider hover:bg-primary/90"
               >
-                Order on WhatsApp
+                Continue to checkout
               </Button>
-              <p className="text-center text-xs text-muted-foreground">
-                You'll be redirected to WhatsApp to confirm your order with us directly.
-              </p>
             </div>
           </>
+        ) : (
+          <form onSubmit={handleSubmit} className="flex flex-1 flex-col overflow-hidden">
+            <div className="flex-1 space-y-4 overflow-y-auto py-4 pr-2">
+              <button
+                type="button"
+                onClick={() => setStep("cart")}
+                className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+              >
+                <ArrowLeft className="h-3 w-3" /> Back to cart
+              </button>
+
+              <div className="space-y-2">
+                <Label htmlFor="cust-name">Full name *</Label>
+                <Input id="cust-name" required maxLength={200} value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="cust-phone">Phone number *</Label>
+                <Input id="cust-phone" required type="tel" maxLength={50} placeholder="+91 98xxxxxxxx"
+                  value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="cust-address">Delivery address *</Label>
+                <Textarea id="cust-address" required maxLength={500} rows={3}
+                  placeholder="House / Street, City, Pincode"
+                  value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="cust-notes">Notes (optional)</Label>
+                <Textarea id="cust-notes" maxLength={500} rows={2}
+                  value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
+              </div>
+            </div>
+
+            <div className="space-y-3 border-t border-border pt-4">
+              <div className="flex justify-between text-lg">
+                <span className="font-display tracking-wider">TOTAL</span>
+                <span className="font-bold">{formatPrice(total, currency)}</span>
+              </div>
+              <Button
+                type="submit"
+                className="h-12 w-full bg-[var(--whatsapp)] text-[var(--whatsapp-foreground)] text-base font-bold uppercase tracking-wider hover:bg-[var(--whatsapp)]/90"
+              >
+                Send order on WhatsApp
+              </Button>
+              <p className="text-center text-xs text-muted-foreground">
+                Your details will be shared with us via WhatsApp to confirm your order.
+              </p>
+            </div>
+          </form>
         )}
       </SheetContent>
     </Sheet>
