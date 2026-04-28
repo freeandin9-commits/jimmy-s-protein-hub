@@ -32,6 +32,14 @@ export function Header() {
 
         <div className="flex items-center gap-2">
           <Button
+            asChild
+            variant="outline"
+            size="sm"
+            className="hidden sm:inline-flex font-bold uppercase tracking-wider"
+          >
+            <Link to="/login">Admin</Link>
+          </Button>
+          <Button
             variant="ghost"
             size="icon"
             onClick={open}
