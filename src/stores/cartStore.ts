@@ -102,10 +102,9 @@ const PAYMENT_LABEL: Record<PaymentMethod, string> = {
   bank: "Bank Transfer",
 };
 
-// Generates short order ref like "JP-A8F3"
-export function generateOrderId(): string {
-  const rand = Math.random().toString(36).slice(2, 6).toUpperCase();
-  return `JP-${rand}`;
+// Format a numeric order number as "JP-0042"
+export function formatOrderRef(n: number): string {
+  return `JP-${String(n).padStart(4, "0")}`;
 }
 
 // Formats Indian phone for display: "+91 98765 43210"
@@ -191,14 +190,12 @@ export function buildWhatsAppOrderUrl(
 export async function logOrderToDatabase(
   items: CartItem[],
   customer: CustomerDetails,
-  orderId: string,
-) {
-  if (items.length === 0) return;
+): Promise<{ orderNumber: number | null; orderRef: string }> {
+  if (items.length === 0) return { orderNumber: null, orderRef: "" };
   const currency = items[0].currency || "INR";
   const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
 
   const notesParts: string[] = [
-    `Order #${orderId}`,
     `Delivery: ${DELIVERY_LABEL[customer.deliveryMethod]}`,
     `Payment: ${PAYMENT_LABEL[customer.paymentMethod]}`,
   ];
@@ -225,8 +222,17 @@ export async function logOrderToDatabase(
     notes: notesParts.join("\n").slice(0, 1000),
   };
   try {
-    await supabase.from("orders").insert(payload);
+    const { data, error } = await supabase
+      .from("orders")
+      .insert(payload)
+      .select("order_number")
+      .single();
+    if (error) throw error;
+    const num = (data as { order_number: number } | null)?.order_number ?? null;
+    return { orderNumber: num, orderRef: num != null ? formatOrderRef(num) : "" };
   } catch (err) {
     console.error("Order log failed:", err);
+    return { orderNumber: null, orderRef: "" };
   }
 }
+
