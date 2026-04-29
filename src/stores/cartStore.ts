@@ -222,13 +222,17 @@ export async function logOrderToDatabase(
     notes: notesParts.join("\n").slice(0, 1000),
   };
   try {
-    const { data, error } = await supabase
-      .from("orders")
-      .insert(payload)
-      .select("order_number")
-      .single();
+    const { data, error } = await supabase.rpc("place_order", {
+      p_items: payload.items as any,
+      p_subtotal: payload.subtotal,
+      p_total: payload.total,
+      p_currency: payload.currency,
+      p_customer_name: payload.customer_name,
+      p_customer_phone: payload.customer_phone,
+      p_notes: payload.notes,
+    });
     if (error) throw error;
-    const num = (data as { order_number: number } | null)?.order_number ?? null;
+    const num = typeof data === "number" ? data : null;
     return { orderNumber: num, orderRef: num != null ? formatOrderRef(num) : "" };
   } catch (err) {
     console.error("Order log failed:", err);
