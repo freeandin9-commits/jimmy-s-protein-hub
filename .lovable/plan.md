@@ -1,69 +1,115 @@
 ## Goal
-Order ID-yude random style (`JP-A8F3`) ozhivakki sequential numbering aakkuka (`JP-0001`, `JP-0002`, ...). Every order DB-il auto-increment cheyyum.
 
-## Database migration
+Replace the single "Delivery address" textarea with structured address fields, including dropdowns for **State** and **District** (auto-filtered by selected state, focused on India / Kerala-first).
 
-```sql
-CREATE SEQUENCE IF NOT EXISTS public.order_number_seq START 1;
+## New address fields
 
-ALTER TABLE public.orders
-  ADD COLUMN IF NOT EXISTS order_number integer;
+For **Home Delivery**, the form will collect:
 
--- Backfill existing rows in chronological order
-WITH ordered AS (
-  SELECT id, ROW_NUMBER() OVER (ORDER BY created_at ASC) AS rn
-  FROM public.orders
-  WHERE order_number IS NULL
-)
-UPDATE public.orders o
-SET order_number = ordered.rn::int
-FROM ordered
-WHERE o.id = ordered.id;
+1. House / Building name & number (text)
+2. Street / Area / Landmark (text)
+3. City / Town (text)
+4. District (dropdown — filtered by state)
+5. State (dropdown — all 28 Indian states + 8 UTs, Kerala default)
+6. Pincode (6-digit numeric, validated)
 
-SELECT setval(
-  'public.order_number_seq',
-  GREATEST(COALESCE((SELECT MAX(order_number) FROM public.orders), 0), 1)
-);
+For **Store Pickup**, no address fields are shown (unchanged).
 
-ALTER TABLE public.orders
-  ALTER COLUMN order_number SET DEFAULT nextval('public.order_number_seq'),
-  ALTER COLUMN order_number SET NOT NULL;
+## UI changes — `src/components/layout/CartDrawer.tsx`
 
-ALTER SEQUENCE public.order_number_seq OWNED BY public.orders.order_number;
+- Remove the single `address` Textarea.
+- Add 6 new inputs in a clean two-column layout on wider screens:
+  ```text
+  [ House / Building          ] [ Pincode (6 digits) ]
+  [ Street / Area / Landmark                         ]
+  [ City / Town               ] [ State   ▾ ]
+  [ District   ▾ (depends on State)                  ]
+  ```
+- Use existing shadcn `Select` for State + District dropdowns.
+- District dropdown is disabled until a state is selected and resets when state changes.
+- Pincode: `inputMode="numeric"`, max 6 digits, validate `/^[1-9]\d{5}$/`.
+- Review step shows a nicely formatted multi-line address block.
 
-CREATE UNIQUE INDEX IF NOT EXISTS orders_order_number_key
-  ON public.orders(order_number);
+## Data model changes — `src/stores/cartStore.ts`
+
+Replace single `address: string` with a structured object:
+
+```ts
+export interface AddressDetails {
+  house: string;       // House / Building
+  street: string;      // Street / Area / Landmark
+  city: string;
+  district: string;
+  state: string;
+  pincode: string;
+}
+
+export interface CustomerDetails {
+  name: string;
+  phone: string;
+  address: AddressDetails;   // structured now
+  notes?: string;
+  deliveryMethod: DeliveryMethod;
+  paymentMethod: PaymentMethod;
+  couponCode?: string;
+}
 ```
 
-The existing INSERT RLS policy already allows anonymous inserts and doesn't restrict `order_number` (uses default), so no policy change needed.
+Add helpers:
+- `formatAddressLines(a: AddressDetails): string[]` → one line per non-empty field, used in WhatsApp text and Review.
+- `formatAddressOneLine(a: AddressDetails): string` → comma-joined version for DB notes / admin table.
+- `isValidPincode(p: string): boolean`.
 
-## Code changes
+Update `buildOrderText` and `logOrderToDatabase` (notes section) to use the new formatter so WhatsApp message + admin notes show the full structured address.
 
-### `src/stores/cartStore.ts`
-- Remove `generateOrderId()`.
-- Add `formatOrderRef(n: number): string` → returns `JP-` + zero-padded 4-digit number.
-- Change `logOrderToDatabase(items, customer)` signature: drop `orderId` argument, return `{ orderNumber, orderRef }` from the inserted row using `.select("order_number").single()`.
-- Drop `Order #...` from the notes prefix (no longer needed — column has it).
+The `orders` table itself is **not** changed — the structured address is serialized into the existing `notes` column (and into the WhatsApp text). No DB migration needed.
 
-### `src/components/layout/CartDrawer.tsx`
-- Remove the `orderId` state and `generateOrderId()` call in `goReview`.
-- Review screen: show "Order # will be assigned on submit" instead of a fake ID.
-- `finalizeAndSend()` flow:
-  1. Call `logOrderToDatabase(items, customer)` first → get `{ orderRef }`.
-  2. Use that `orderRef` to build WhatsApp text / copy text.
-  3. If insert fails (no orderRef), show toast error and abort — do NOT open WhatsApp without a real order number.
+## State & District data — new file `src/lib/india-locations.ts`
 
-### `src/routes/admin.orders.tsx`
-- Stop parsing `Order #...` from `notes`.
-- Use `o.order_number` directly: display as `formatOrderRef(o.order_number)` (i.e., `JP-0042`).
-- Sort/filter unchanged.
+A static map of Indian States/UTs to their districts, with Kerala fully populated (all 14 districts) and all other states/UTs listed by name with their districts. Shape:
 
-## Files modified
-- Migration (new SQL)
-- `src/stores/cartStore.ts`
-- `src/components/layout/CartDrawer.tsx`
-- `src/routes/admin.orders.tsx`
+```ts
+export const INDIA_LOCATIONS: Record<string, string[]> = {
+  "Kerala": ["Thiruvananthapuram", "Kollam", "Pathanamthitta", "Alappuzha",
+    "Kottayam", "Idukki", "Ernakulam", "Thrissur", "Palakkad", "Malappuram",
+    "Kozhikode", "Wayanad", "Kannur", "Kasaragod"],
+  "Tamil Nadu": [...],
+  "Karnataka": [...],
+  // ... all 28 states + 8 UTs
+};
+export const INDIAN_STATES = Object.keys(INDIA_LOCATIONS).sort();
+```
+
+Kerala will be the default selected state (since this is a Kerala-based business based on the Manglish usage). Districts list updates reactively when state changes.
+
+## Validation (in `goReview`)
+
+For Home Delivery, each of these must be filled:
+- house (≥ 2 chars)
+- street (≥ 2 chars)
+- city (≥ 2 chars)
+- state (selected)
+- district (selected)
+- pincode (valid 6-digit)
+
+Toast a clear message identifying the first missing/invalid field.
+
+## Persisted form state
+
+The drawer's `initialForm` is updated to:
+```ts
+address: { house: "", street: "", city: "", district: "", state: "Kerala", pincode: "" }
+```
+
+## Files to change
+
+- `src/stores/cartStore.ts` — type, helpers, builder & DB notes update
+- `src/components/layout/CartDrawer.tsx` — new fields, Select dropdowns, review block, validation
+- `src/lib/india-locations.ts` — **new** static state→districts map
+
+No database migration. No changes to admin pages (they already render `notes`).
 
 ## Out of scope
-- Changing the `JP-` prefix or padding width (configurable later if needed).
-- Per-year reset (e.g., `JP-2026-0001`) — keeping it simple, monotonic forever.
+
+- Adding `address` as separate columns in the `orders` table (can be a follow-up if needed for filtering/reporting).
+- Pincode → district auto-lookup via API (kept manual to stay offline-friendly).
