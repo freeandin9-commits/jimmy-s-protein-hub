@@ -81,15 +81,35 @@ export function pickItemFromProduct(p: Product): Omit<CartItem, "quantity"> {
 export type DeliveryMethod = "home" | "pickup";
 export type PaymentMethod = "cod" | "upi" | "bank";
 
+export interface AddressDetails {
+  house: string;
+  street: string;
+  city: string;
+  district: string;
+  state: string;
+  pincode: string;
+  landmark?: string;
+}
+
 export interface CustomerDetails {
   name: string;
   phone: string;
-  address: string;
+  address: AddressDetails;
   notes?: string;
   deliveryMethod: DeliveryMethod;
   paymentMethod: PaymentMethod;
   couponCode?: string;
 }
+
+export const emptyAddress: AddressDetails = {
+  house: "",
+  street: "",
+  city: "",
+  district: "",
+  state: "",
+  pincode: "",
+  landmark: "",
+};
 
 const DELIVERY_LABEL: Record<DeliveryMethod, string> = {
   home: "Home Delivery",
@@ -102,12 +122,39 @@ const PAYMENT_LABEL: Record<PaymentMethod, string> = {
   bank: "Bank Transfer",
 };
 
+export function formatAddressLines(a: AddressDetails): string[] {
+  const lines: string[] = [];
+  const line1 = [a.house, a.street].filter(Boolean).join(", ");
+  if (line1) lines.push(line1);
+  if (a.landmark) lines.push(`Landmark: ${a.landmark}`);
+  const cityDist = [a.city, a.district].filter(Boolean).join(", ");
+  if (cityDist) lines.push(cityDist);
+  const stateLine = [a.state, a.pincode].filter(Boolean).join(" - ");
+  if (stateLine) lines.push(stateLine);
+  return lines;
+}
+
+export function formatAddressOneLine(a: AddressDetails): string {
+  return formatAddressLines(a).join(", ");
+}
+
+export function isAddressComplete(a: AddressDetails): boolean {
+  return (
+    a.house.trim().length > 0 &&
+    a.street.trim().length > 0 &&
+    a.city.trim().length > 0 &&
+    a.district.trim().length > 0 &&
+    a.state.trim().length > 0 &&
+    /^[1-9]\d{5}$/.test(a.pincode.trim())
+  );
+}
+
 // Format a numeric order number as "JP-0042"
 export function formatOrderRef(n: number): string {
   return `JP-${String(n).padStart(4, "0")}`;
 }
 
-// Formats Indian phone for display: "+91 98765 43210"
+// Formats Indian phone for display: "98765 43210"
 export function formatIndianPhoneDisplay(raw: string): string {
   const digits = raw.replace(/\D/g, "").replace(/^91/, "").slice(0, 10);
   if (digits.length <= 5) return digits;
@@ -141,6 +188,11 @@ export function buildOrderText(
   });
   const phoneFmt = normalizeIndianPhone(customer.phone);
 
+  const addressBlock =
+    customer.deliveryMethod === "home"
+      ? ["*Delivery Address*", ...formatAddressLines(customer.address), ""]
+      : [];
+
   const lines = [
     `🏋️ *New Order — Jimmy's Protein*`,
     `*Order #${orderId}*`,
@@ -149,12 +201,12 @@ export function buildOrderText(
     "*Customer Details*",
     `Name: ${customer.name}`,
     `Phone: ${phoneFmt}`,
-    ...(customer.deliveryMethod === "home" ? [`Address: ${customer.address}`] : []),
     `Delivery: ${DELIVERY_LABEL[customer.deliveryMethod]}`,
     `Preferred payment: ${PAYMENT_LABEL[customer.paymentMethod]}`,
     ...(customer.couponCode ? [`Coupon: ${customer.couponCode}`] : []),
     ...(customer.notes ? [`Notes: ${customer.notes}`] : []),
     "",
+    ...addressBlock,
     `*Order (${itemCount} item${itemCount !== 1 ? "s" : ""})*`,
     ...items.map((i, idx) => {
       const sub = (i.price * i.quantity).toFixed(2);
@@ -200,8 +252,9 @@ export async function logOrderToDatabase(
     `Payment: ${PAYMENT_LABEL[customer.paymentMethod]}`,
   ];
   if (customer.couponCode) notesParts.push(`Coupon: ${customer.couponCode}`);
-  if (customer.deliveryMethod === "home" && customer.address) {
-    notesParts.push(`Address: ${customer.address}`);
+  if (customer.deliveryMethod === "home") {
+    const addr = formatAddressOneLine(customer.address);
+    if (addr) notesParts.push(`Address: ${addr}`);
   }
   if (customer.notes) notesParts.push(`Notes: ${customer.notes}`);
 
@@ -239,4 +292,3 @@ export async function logOrderToDatabase(
     return { orderNumber: null, orderRef: "" };
   }
 }
-

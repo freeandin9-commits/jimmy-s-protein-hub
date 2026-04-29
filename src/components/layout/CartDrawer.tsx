@@ -1,10 +1,17 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft, Copy, Send } from "lucide-react";
 import {
   useCartStore,
@@ -13,10 +20,15 @@ import {
   logOrderToDatabase,
   formatIndianPhoneDisplay,
   isValidIndianPhone,
+  isAddressComplete,
+  formatAddressLines,
+  emptyAddress,
   type CustomerDetails,
+  type AddressDetails,
   type DeliveryMethod,
   type PaymentMethod,
 } from "@/stores/cartStore";
+import { INDIA_STATES, getDistricts, PINCODE_REGEX } from "@/lib/india-locations";
 import { formatPrice } from "@/lib/products";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { toast } from "sonner";
@@ -26,7 +38,7 @@ type Step = "cart" | "details" | "review";
 const initialForm: CustomerDetails = {
   name: "",
   phone: "",
-  address: "",
+  address: { ...emptyAddress },
   notes: "",
   deliveryMethod: "home",
   paymentMethod: "cod",
@@ -44,8 +56,13 @@ export function CartDrawer() {
   const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
   const itemCount = items.reduce((s, i) => s + i.quantity, 0);
 
+  const districts = useMemo(() => getDistricts(form.address.state), [form.address.state]);
+
+  const updateAddress = (patch: Partial<AddressDetails>) =>
+    setForm((f) => ({ ...f, address: { ...f.address, ...patch } }));
+
   const reset = () => {
-    setForm(initialForm);
+    setForm({ ...initialForm, address: { ...emptyAddress } });
     setStep("cart");
     setSubmitting(false);
   };
@@ -61,8 +78,17 @@ export function CartDrawer() {
     if (name.length < 2) return toast.error("Please enter your name");
     if (!isValidIndianPhone(form.phone))
       return toast.error("Please enter a valid 10-digit Indian mobile number");
-    if (form.deliveryMethod === "home" && form.address.trim().length < 5)
-      return toast.error("Please enter your delivery address");
+    if (form.deliveryMethod === "home") {
+      const a = form.address;
+      if (!a.house.trim()) return toast.error("Please enter house / flat / building");
+      if (!a.street.trim()) return toast.error("Please enter street / area");
+      if (!a.city.trim()) return toast.error("Please enter city / town / village");
+      if (!a.state) return toast.error("Please select your state");
+      if (!a.district) return toast.error("Please select your district");
+      if (!PINCODE_REGEX.test(a.pincode.trim()))
+        return toast.error("Please enter a valid 6-digit pincode");
+      if (!isAddressComplete(a)) return toast.error("Please complete your address");
+    }
     setStep("review");
   };
 
@@ -72,7 +98,15 @@ export function CartDrawer() {
     const customer: CustomerDetails = {
       ...form,
       name: form.name.trim().slice(0, 200),
-      address: form.address.trim().slice(0, 500),
+      address: {
+        house: form.address.house.trim().slice(0, 120),
+        street: form.address.street.trim().slice(0, 200),
+        city: form.address.city.trim().slice(0, 100),
+        district: form.address.district.trim().slice(0, 100),
+        state: form.address.state.trim().slice(0, 100),
+        pincode: form.address.pincode.trim().slice(0, 6),
+        landmark: form.address.landmark?.trim().slice(0, 120) || "",
+      },
       notes: form.notes?.trim().slice(0, 500) || undefined,
       couponCode: form.couponCode?.trim().slice(0, 50) || undefined,
     };
@@ -241,11 +275,107 @@ export function CartDrawer() {
               </div>
 
               {form.deliveryMethod === "home" && (
-                <div className="space-y-2">
-                  <Label htmlFor="cust-address">Delivery address *</Label>
-                  <Textarea id="cust-address" required maxLength={500} rows={3}
-                    placeholder="House / Street, City, Pincode"
-                    value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
+                <div className="space-y-3 rounded-lg border border-border p-3">
+                  <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                    Delivery Address
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="addr-house">House / Flat / Building *</Label>
+                    <Input
+                      id="addr-house"
+                      required
+                      maxLength={120}
+                      placeholder="e.g. Flat 3B, Sunrise Apartments"
+                      value={form.address.house}
+                      onChange={(e) => updateAddress({ house: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="addr-street">Street / Area / Locality *</Label>
+                    <Input
+                      id="addr-street"
+                      required
+                      maxLength={200}
+                      placeholder="e.g. MG Road, Panampilly Nagar"
+                      value={form.address.street}
+                      onChange={(e) => updateAddress({ street: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="addr-landmark">Landmark (optional)</Label>
+                    <Input
+                      id="addr-landmark"
+                      maxLength={120}
+                      placeholder="Near…"
+                      value={form.address.landmark || ""}
+                      onChange={(e) => updateAddress({ landmark: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="addr-city">City / Town / Village *</Label>
+                    <Input
+                      id="addr-city"
+                      required
+                      maxLength={100}
+                      value={form.address.city}
+                      onChange={(e) => updateAddress({ city: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label>State *</Label>
+                      <Select
+                        value={form.address.state}
+                        onValueChange={(v) => updateAddress({ state: v, district: "" })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select state" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {INDIA_STATES.map((s) => (
+                            <SelectItem key={s} value={s}>{s}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>District *</Label>
+                      <Select
+                        value={form.address.district}
+                        onValueChange={(v) => updateAddress({ district: v })}
+                        disabled={!form.address.state}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder={form.address.state ? "Select district" : "Select state first"} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {districts.map((d) => (
+                            <SelectItem key={d} value={d}>{d}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="addr-pincode">Pincode *</Label>
+                    <Input
+                      id="addr-pincode"
+                      required
+                      inputMode="numeric"
+                      maxLength={6}
+                      placeholder="6-digit pincode"
+                      value={form.address.pincode}
+                      onChange={(e) =>
+                        updateAddress({ pincode: e.target.value.replace(/\D/g, "").slice(0, 6) })
+                      }
+                    />
+                  </div>
                 </div>
               )}
 
@@ -319,7 +449,11 @@ export function CartDrawer() {
                 <div>{form.name}</div>
                 <div className="text-muted-foreground">+91 {formatIndianPhoneDisplay(form.phone)}</div>
                 {form.deliveryMethod === "home" && (
-                  <div className="text-muted-foreground">{form.address}</div>
+                  <div className="pt-1 text-muted-foreground">
+                    {formatAddressLines(form.address).map((ln, idx) => (
+                      <div key={idx}>{ln}</div>
+                    ))}
+                  </div>
                 )}
                 <div className="pt-1 text-xs">
                   Delivery: <span className="font-semibold">{form.deliveryMethod === "home" ? "Home Delivery" : "Store Pickup"}</span>
