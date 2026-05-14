@@ -25,6 +25,7 @@ function HomePage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const { settings } = useSiteSettings();
+  const phone = settings.whatsapp_number || "";
 
   useEffect(() => {
     fetchProducts(6).then((p) => {
