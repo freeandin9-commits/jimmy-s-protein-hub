@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/ProductCard";
 import { fetchProducts, type Product } from "@/lib/products";
-import { Zap, Shield, Flame, ArrowRight } from "lucide-react";
+import { Zap, Shield, Flame, ArrowRight, Phone, Dumbbell } from "lucide-react";
 import heroImg from "@/assets/hero.jpg";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 
@@ -25,6 +25,7 @@ function HomePage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const { settings } = useSiteSettings();
+  const phone = settings.whatsapp_number || "";
 
   useEffect(() => {
     fetchProducts(6).then((p) => {
@@ -35,39 +36,67 @@ function HomePage() {
 
   return (
     <div>
-      {/* HERO */}
-      <section
-        className="relative overflow-hidden"
-        style={{ background: "var(--gradient-hero)" }}
-      >
-        <div className="container mx-auto grid gap-8 px-4 py-16 md:grid-cols-2 md:py-24 lg:py-32">
-          <div className="flex flex-col justify-center">
-            <span className="mb-4 inline-flex w-fit items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-primary">
-              <Zap className="h-3 w-3" /> New batch dropped
+      {/* HERO — Light bg with dark teardrop shape (Purefit-style) */}
+      <section className="relative overflow-hidden bg-background">
+        {/* Dark teardrop shape */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -left-[8%] -top-[12%] h-[130%] w-[68%] bg-[var(--dark-surface)]"
+          style={{ clipPath: "ellipse(72% 92% at 28% 38%)" }}
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -left-[8%] -top-[12%] h-[130%] w-[68%]"
+          style={{
+            clipPath: "ellipse(72% 92% at 28% 38%)",
+            background:
+              "linear-gradient(120deg, transparent 0%, transparent 99.4%, oklch(0.68 0.21 38) 99.4%, oklch(0.68 0.21 38) 100%)",
+          }}
+        />
+
+        <div className="container relative mx-auto grid min-h-[620px] gap-8 px-4 py-12 md:grid-cols-2 md:py-16 lg:py-20">
+          <div className="relative z-10 flex flex-col justify-center text-white">
+            <span className="mb-5 inline-flex w-fit items-center gap-2 text-[11px] font-bold uppercase tracking-[0.3em] text-primary">
+              <Dumbbell className="h-4 w-4" /> 100% Premium Quality
             </span>
-            <h1 className="font-display text-6xl uppercase leading-[0.9] tracking-wide md:text-7xl lg:text-8xl">
+            <h1 className="font-display text-5xl uppercase leading-[0.95] tracking-wide md:text-6xl lg:text-7xl xl:text-[5.5rem]">
               {settings.hero_headline}
             </h1>
-            <p className="mt-6 max-w-md text-lg text-muted-foreground">
+            <p className="mt-6 max-w-md text-base text-white/70 md:text-lg">
               {settings.hero_subtext}
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Button asChild size="lg" className="h-12 bg-primary px-8 font-bold uppercase tracking-wider text-primary-foreground hover:bg-primary/90">
+            <div className="mt-10 flex flex-wrap items-center gap-6">
+              <Button
+                asChild
+                size="lg"
+                className="h-12 rounded-none bg-primary px-8 font-bold uppercase tracking-[0.2em] text-primary-foreground shadow-[6px_6px_0_0_oklch(0.68_0.21_38_/_0.35)] hover:bg-primary/90"
+              >
                 <Link to="/products">
-                  Shop Now <ArrowRight className="h-4 w-4" />
+                  Buy Now <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="h-12 border-foreground/20 px-8 font-bold uppercase tracking-wider hover:bg-foreground/10">
-                <Link to="/about">Our Story</Link>
-              </Button>
+              {phone && (
+                <a href={`tel:${phone}`} className="flex items-center gap-3 text-white">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                    <Phone className="h-5 w-5" />
+                  </span>
+                  <span className="text-left">
+                    <span className="block text-[10px] font-bold uppercase tracking-[0.25em] text-white/60">
+                      Contact Us Daily
+                    </span>
+                    <span className="block font-display text-xl tracking-wide">{phone}</span>
+                  </span>
+                </a>
+              )}
             </div>
           </div>
-          <div className="relative flex items-center justify-center">
-            <div className="absolute inset-0 rounded-full bg-primary/20 blur-3xl" />
+
+          <div className="relative z-10 flex items-center justify-center">
+            <div className="absolute inset-0 rounded-full bg-primary/30 blur-3xl" />
             <img
               src={heroImg}
               alt="Jimmy's Protein tub"
-              className="relative max-h-[500px] w-auto rounded-2xl object-cover shadow-2xl"
+              className="relative max-h-[520px] w-auto rounded-2xl object-cover shadow-2xl"
             />
           </div>
         </div>
