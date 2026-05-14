@@ -3,6 +3,7 @@ import { ShoppingCart, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { useCartStore } from "@/stores/cartStore";
 import { Button } from "@/components/ui/button";
+import logoImg from "@/assets/logo.jpg";
 
 export function Header() {
   const items = useCartStore((s) => s.items);
