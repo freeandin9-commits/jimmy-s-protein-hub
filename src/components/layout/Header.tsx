@@ -3,6 +3,7 @@ import { ShoppingCart, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { useCartStore } from "@/stores/cartStore";
 import { Button } from "@/components/ui/button";
+import logoImg from "@/assets/logo.jpg";
 
 export function Header() {
   const items = useCartStore((s) => s.items);
@@ -18,9 +19,8 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link to="/" className="flex items-center gap-2">
-          <span className="font-display text-2xl tracking-wider text-primary">JIMMY'S</span>
-          <span className="hidden font-display text-2xl tracking-wider text-foreground sm:inline">PROTEIN</span>
+        <Link to="/" className="flex items-center gap-2" aria-label="Nutrin Sports home">
+          <img src={logoImg} alt="Nutrin Sports" className="h-10 w-auto md:h-12" />
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
