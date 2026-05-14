@@ -61,7 +61,7 @@ function HomePage() {
               <Button
                 asChild
                 size="lg"
-                className="h-12 rounded-none bg-primary px-8 font-bold uppercase tracking-[0.2em] text-primary-foreground shadow-[6px_6px_0_0_oklch(0.68_0.21_38_/_0.35)] hover:bg-primary/90"
+                className="h-12 rounded-none bg-primary px-8 font-bold uppercase tracking-[0.2em] text-primary-foreground shadow-[6px_6px_0_0_oklch(0.86_0.18_92_/_0.4)] hover:bg-primary/90"
               >
                 <Link to="/products">
                   Buy Now <ArrowRight className="h-4 w-4" />
