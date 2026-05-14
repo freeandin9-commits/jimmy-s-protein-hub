@@ -11,7 +11,7 @@ export function Footer() {
     <footer className="border-t border-border/60 bg-background">
       <div className="container mx-auto grid gap-8 px-4 py-12 md:grid-cols-4">
         <div>
-          <h3 className="font-display text-2xl tracking-wider text-primary">JIMMY'S PROTEIN</h3>
+          <h3 className="font-display text-2xl tracking-wider text-primary">NUTRIN SPORTS</h3>
           <p className="mt-2 text-sm text-muted-foreground">
             Real fuel. No junk. Built for athletes who train hard.
           </p>
