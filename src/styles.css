@@ -1,6 +1,7 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+@import url("https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap");
 
 @custom-variant dark (&:is(.dark *));
 
@@ -31,54 +32,49 @@
   --color-ring-offset-background: var(--background);
   --color-whatsapp: var(--whatsapp);
   --color-whatsapp-foreground: var(--whatsapp-foreground);
+  --color-dark-surface: var(--dark-surface);
+  --color-dark-surface-foreground: var(--dark-surface-foreground);
 
-  --font-display: "Bebas Neue", "Impact", system-ui, sans-serif;
-  --font-sans: "Inter", system-ui, sans-serif;
+  --font-display: "Anton", "Impact", system-ui, sans-serif;
+  --font-sans: "Barlow Condensed", "Inter", system-ui, sans-serif;
 }
 
 :root {
-  /* Light + bold orange accent (Purefit-inspired) */
-  --radius: 0.5rem;
-  --background: oklch(0.93 0.003 270);
-  --foreground: oklch(0.18 0.01 270);
-  --card: oklch(0.99 0.002 270);
-  --card-foreground: oklch(0.18 0.01 270);
-  --popover: oklch(0.99 0.002 270);
-  --popover-foreground: oklch(0.18 0.01 270);
-  /* Bold orange-red */
-  --primary: oklch(0.68 0.21 38);
-  --primary-foreground: oklch(0.99 0.005 270);
-  --secondary: oklch(0.96 0.004 270);
-  --secondary-foreground: oklch(0.18 0.01 270);
-  --muted: oklch(0.95 0.004 270);
-  --muted-foreground: oklch(0.45 0.015 270);
-  --accent: oklch(0.68 0.21 38);
-  --accent-foreground: oklch(0.99 0.005 270);
+  /* Nutrin Sports — Black + Golden Yellow */
+  --radius: 0.25rem;
+  --background: oklch(0.13 0.005 90);
+  --foreground: oklch(0.97 0.01 95);
+  --card: oklch(0.18 0.008 90);
+  --card-foreground: oklch(0.97 0.01 95);
+  --popover: oklch(0.18 0.008 90);
+  --popover-foreground: oklch(0.97 0.01 95);
+  /* Golden yellow */
+  --primary: oklch(0.86 0.18 92);
+  --primary-foreground: oklch(0.13 0.005 90);
+  --secondary: oklch(0.22 0.008 90);
+  --secondary-foreground: oklch(0.97 0.01 95);
+  --muted: oklch(0.2 0.008 90);
+  --muted-foreground: oklch(0.7 0.02 95);
+  --accent: oklch(0.86 0.18 92);
+  --accent-foreground: oklch(0.13 0.005 90);
   --destructive: oklch(0.62 0.24 27);
-  --destructive-foreground: oklch(0.99 0.005 270);
-  --border: oklch(0.86 0.005 270);
-  --input: oklch(0.92 0.005 270);
-  --ring: oklch(0.68 0.21 38);
-  /* Dark surface for hero / footer panels */
-  --dark-surface: oklch(0.18 0.012 270);
-  --dark-surface-foreground: oklch(0.99 0.005 270);
-  /* WhatsApp green */
+  --destructive-foreground: oklch(0.97 0.01 95);
+  --border: oklch(0.28 0.01 90);
+  --input: oklch(0.22 0.008 90);
+  --ring: oklch(0.86 0.18 92);
+  --dark-surface: oklch(0.1 0.005 90);
+  --dark-surface-foreground: oklch(0.97 0.01 95);
   --whatsapp: oklch(0.7 0.18 152);
-  --whatsapp-foreground: oklch(0.99 0.005 270);
+  --whatsapp-foreground: oklch(0.13 0.005 90);
 
-  --gradient-hero: radial-gradient(ellipse at top left, oklch(0.68 0.21 38 / 0.15), transparent 60%),
-    linear-gradient(180deg, oklch(0.18 0.012 270), oklch(0.13 0.012 270));
-  --shadow-glow: 0 20px 50px -15px oklch(0.68 0.21 38 / 0.45);
+  --gradient-hero: radial-gradient(ellipse at top left, oklch(0.86 0.18 92 / 0.18), transparent 60%),
+    linear-gradient(180deg, oklch(0.13 0.005 90), oklch(0.09 0.005 90));
+  --shadow-glow: 0 20px 60px -15px oklch(0.86 0.18 92 / 0.55);
 }
 
 .dark {
-  --background: oklch(0.14 0.01 270);
-  --foreground: oklch(0.98 0.005 270);
-}
-
-@theme inline {
-  --color-dark-surface: var(--dark-surface);
-  --color-dark-surface-foreground: var(--dark-surface-foreground);
+  --background: oklch(0.13 0.005 90);
+  --foreground: oklch(0.97 0.01 95);
 }
 
 @layer base {
