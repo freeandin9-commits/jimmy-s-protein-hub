@@ -36,22 +36,14 @@ function HomePage() {
 
   return (
     <div>
-      {/* HERO — Light bg with dark teardrop shape (Purefit-style) */}
-      <section className="relative overflow-hidden bg-background">
-        {/* Dark teardrop shape */}
+      {/* HERO — Black + golden yellow */}
+      <section
+        className="relative overflow-hidden"
+        style={{ background: "var(--gradient-hero)" }}
+      >
         <div
           aria-hidden
-          className="pointer-events-none absolute -left-[8%] -top-[12%] h-[130%] w-[68%] bg-[var(--dark-surface)]"
-          style={{ clipPath: "ellipse(72% 92% at 28% 38%)" }}
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -left-[8%] -top-[12%] h-[130%] w-[68%]"
-          style={{
-            clipPath: "ellipse(72% 92% at 28% 38%)",
-            background:
-              "linear-gradient(120deg, transparent 0%, transparent 99.4%, oklch(0.68 0.21 38) 99.4%, oklch(0.68 0.21 38) 100%)",
-          }}
+          className="pointer-events-none absolute -right-32 top-1/2 h-[600px] w-[600px] -translate-y-1/2 rounded-full bg-primary/10 blur-3xl"
         />
 
         <div className="container relative mx-auto grid min-h-[620px] gap-8 px-4 py-12 md:grid-cols-2 md:py-16 lg:py-20">
