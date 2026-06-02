@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { fetchProductById, formatPrice, type Product } from "@/lib/products";
+import { fetchProductById, formatPrice, productGallery, type Product } from "@/lib/products";
 import { useCartStore, pickItemFromProduct } from "@/stores/cartStore";
 import { ChevronLeft, Minus, Plus, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
@@ -44,8 +44,20 @@ export const Route = createFileRoute("/product/$handle")({
 function ProductPage() {
   const { product } = Route.useLoaderData() as { product: Product };
   const [qty, setQty] = useState(1);
+  const [active, setActive] = useState(0);
   const addItem = useCartStore((s) => s.addItem);
   const open = useCartStore((s) => s.open);
+
+  const gallery = productGallery(product);
+
+  // Auto-rotate the main gallery image every 3.5s
+  useEffect(() => {
+    if (gallery.length < 2) return;
+    const id = setInterval(() => {
+      setActive((i) => (i + 1) % gallery.length);
+    }, 3500);
+    return () => clearInterval(id);
+  }, [gallery.length]);
 
   const handleAdd = () => {
     if (!product.in_stock) return;
@@ -54,6 +66,12 @@ function ProductPage() {
     open();
   };
 
+  const hasCompare =
+    product.compare_at_price != null && product.compare_at_price > product.price;
+  const discountPct = hasCompare
+    ? Math.round(((product.compare_at_price! - product.price) / product.compare_at_price!) * 100)
+    : 0;
+
   return (
     <div className="container mx-auto px-4 py-8 md:py-12">
       <Link to="/products" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary">
@@ -61,19 +79,69 @@ function ProductPage() {
       </Link>
 
       <div className="mt-6 grid gap-10 md:grid-cols-2">
-        <div className="overflow-hidden rounded-2xl bg-card">
-          {product.image_url ? (
-            <img src={product.image_url} alt={product.title} className="aspect-square w-full object-cover" />
-          ) : (
-            <div className="flex aspect-square items-center justify-center text-muted-foreground">No image</div>
+        {/* Gallery */}
+        <div className="flex gap-3">
+          {gallery.length > 1 && (
+            <div className="flex flex-col gap-2">
+              {gallery.map((src, i) => (
+                <button
+                  key={src + i}
+                  type="button"
+                  onClick={() => setActive(i)}
+                  aria-label={`Show image ${i + 1}`}
+                  className={`h-16 w-16 overflow-hidden rounded-md border-2 transition-all md:h-20 md:w-20 ${
+                    i === active
+                      ? "border-primary shadow-[var(--shadow-glow)]"
+                      : "border-border opacity-70 hover:opacity-100"
+                  }`}
+                >
+                  <img src={src} alt="" className="h-full w-full object-cover" />
+                </button>
+              ))}
+            </div>
           )}
+
+          <div className="relative flex-1 overflow-hidden rounded-2xl bg-card">
+            {gallery.length === 0 ? (
+              <div className="flex aspect-square items-center justify-center text-muted-foreground">No image</div>
+            ) : (
+              gallery.map((src, i) => (
+                <img
+                  key={src + i}
+                  src={src}
+                  alt={`${product.title} — view ${i + 1}`}
+                  className={`aspect-square w-full object-cover transition-opacity duration-700 ease-in-out ${
+                    i === active ? "opacity-100" : "pointer-events-none absolute inset-0 opacity-0"
+                  }`}
+                />
+              ))
+            )}
+
+            {hasCompare && (
+              <span className="absolute left-3 top-3 rounded-full bg-primary px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary-foreground shadow-lg">
+                -{discountPct}% Off
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="flex flex-col">
           <h1 className="font-display text-4xl uppercase leading-tight tracking-wide md:text-5xl">{product.title}</h1>
-          <p className="mt-3 text-3xl font-bold text-primary">
-            {formatPrice(product.price, product.currency)}
-          </p>
+          <div className="mt-3 flex flex-wrap items-baseline gap-3">
+            <p className="text-3xl font-bold text-primary">
+              {formatPrice(product.price, product.currency)}
+            </p>
+            {hasCompare && (
+              <>
+                <p className="text-xl text-muted-foreground line-through">
+                  {formatPrice(product.compare_at_price!, product.currency)}
+                </p>
+                <span className="rounded-md bg-primary/15 px-2 py-0.5 text-xs font-bold uppercase tracking-wider text-primary">
+                  Save {discountPct}%
+                </span>
+              </>
+            )}
+          </div>
           <p className="mt-6 whitespace-pre-line text-muted-foreground">{product.description}</p>
 
           <div className="mt-8 flex items-center gap-3">

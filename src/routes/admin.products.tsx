@@ -20,9 +20,12 @@ interface FormState {
   id?: string;
   title: string;
   description: string;
-  price: string;
+  price: string;            // Best / selling price
+  compare_at_price: string; // Original (MRP) — shown crossed out
   currency: string;
   image_url: string;
+  image_2: string;
+  image_3: string;
   in_stock: boolean;
   sort_order: string;
 }
@@ -31,8 +34,11 @@ const empty: FormState = {
   title: "",
   description: "",
   price: "",
+  compare_at_price: "",
   currency: "INR",
   image_url: "",
+  image_2: "",
+  image_3: "",
   in_stock: true,
   sort_order: "0",
 };
@@ -59,8 +65,11 @@ function ProductsAdminPage() {
       title: p.title,
       description: p.description,
       price: String(p.price),
+      compare_at_price: p.compare_at_price != null ? String(p.compare_at_price) : "",
       currency: p.currency,
       image_url: p.image_url,
+      image_2: p.images?.[0] ?? "",
+      image_3: p.images?.[1] ?? "",
       in_stock: p.in_stock,
       sort_order: String(p.sort_order),
     });
@@ -76,16 +85,35 @@ function ProductsAdminPage() {
     }
     const priceNum = parseFloat(form.price);
     if (isNaN(priceNum) || priceNum < 0) {
-      toast.error("Enter a valid price");
+      toast.error("Enter a valid best price");
       return;
     }
+    let compareNum: number | null = null;
+    if (form.compare_at_price.trim() !== "") {
+      const n = parseFloat(form.compare_at_price);
+      if (isNaN(n) || n < 0) {
+        toast.error("Enter a valid original price");
+        return;
+      }
+      if (n <= priceNum) {
+        toast.error("Original price must be higher than the best price");
+        return;
+      }
+      compareNum = n;
+    }
+    const extraImages = [form.image_2, form.image_3]
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0);
+
     setSaving(true);
     const payload = {
       title: form.title.trim(),
       description: form.description,
       price: priceNum,
+      compare_at_price: compareNum,
       currency: form.currency.trim() || "INR",
       image_url: form.image_url.trim(),
+      images: extraImages,
       in_stock: form.in_stock,
       sort_order: parseInt(form.sort_order) || 0,
     };
@@ -166,7 +194,14 @@ function ProductsAdminPage() {
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-muted-foreground">{formatPrice(p.price, p.currency)}</p>
+                <p className="text-sm text-muted-foreground">
+                  {formatPrice(p.price, p.currency)}
+                  {p.compare_at_price != null && (
+                    <span className="ml-2 line-through opacity-60">
+                      {formatPrice(p.compare_at_price, p.currency)}
+                    </span>
+                  )}
+                </p>
                 <div className="mt-3 flex gap-2">
                   <Button size="sm" variant="outline" onClick={() => openEdit(p)} className="flex-1">
                     <Pencil className="h-3 w-3" /> Edit
@@ -199,20 +234,49 @@ function ProductsAdminPage() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label htmlFor="price">Price</Label>
-                <Input id="price" type="number" step="0.01" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
+                <Label htmlFor="price">Best Price</Label>
+                <Input id="price" type="number" step="0.01" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="e.g. 1499" />
+                <p className="mt-1 text-[11px] text-muted-foreground">Selling price shown to customers.</p>
               </div>
               <div>
-                <Label htmlFor="currency">Currency</Label>
-                <Input id="currency" value={form.currency} onChange={(e) => setForm({ ...form, currency: e.target.value })} placeholder="INR" />
+                <Label htmlFor="compare">Original Price</Label>
+                <Input
+                  id="compare"
+                  type="number"
+                  step="0.01"
+                  value={form.compare_at_price}
+                  onChange={(e) => setForm({ ...form, compare_at_price: e.target.value })}
+                  placeholder="e.g. 1999"
+                />
+                <p className="mt-1 text-[11px] text-muted-foreground">Optional. Shown crossed out next to best price.</p>
               </div>
             </div>
             <div>
-              <Label htmlFor="image">Image URL</Label>
-              <Input id="image" value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} placeholder="https://..." />
-              {form.image_url && (
-                <img src={form.image_url} alt="preview" className="mt-2 h-32 w-32 rounded-md border border-border object-cover" />
-              )}
+              <Label htmlFor="currency">Currency</Label>
+              <Input id="currency" value={form.currency} onChange={(e) => setForm({ ...form, currency: e.target.value })} placeholder="INR" />
+            </div>
+            <div className="space-y-3">
+              <div>
+                <Label htmlFor="image">Main Image URL</Label>
+                <Input id="image" value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} placeholder="https://..." />
+                {form.image_url && (
+                  <img src={form.image_url} alt="preview" className="mt-2 h-24 w-24 rounded-md border border-border object-cover" />
+                )}
+              </div>
+              <div>
+                <Label htmlFor="image2">Side Image 1 (Optional)</Label>
+                <Input id="image2" value={form.image_2} onChange={(e) => setForm({ ...form, image_2: e.target.value })} placeholder="https://..." />
+                {form.image_2 && (
+                  <img src={form.image_2} alt="preview 2" className="mt-2 h-24 w-24 rounded-md border border-border object-cover" />
+                )}
+              </div>
+              <div>
+                <Label htmlFor="image3">Side Image 2 (Optional)</Label>
+                <Input id="image3" value={form.image_3} onChange={(e) => setForm({ ...form, image_3: e.target.value })} placeholder="https://..." />
+                {form.image_3 && (
+                  <img src={form.image_3} alt="preview 3" className="mt-2 h-24 w-24 rounded-md border border-border object-cover" />
+                )}
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>

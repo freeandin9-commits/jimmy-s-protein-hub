@@ -5,8 +5,10 @@ export interface Product {
   title: string;
   description: string;
   price: number;
+  compare_at_price: number | null;
   currency: string;
   image_url: string;
+  images: string[];
   in_stock: boolean;
   sort_order: number;
   created_at: string;
@@ -41,4 +43,10 @@ export function formatPrice(amount: string | number, currency = "INR") {
   } catch {
     return `${currency} ${n.toFixed(2)}`;
   }
+}
+
+/** Combine the primary image_url with extra images, deduped, dropping empties. */
+export function productGallery(p: Pick<Product, "image_url" | "images">): string[] {
+  const all = [p.image_url, ...(p.images ?? [])].filter((u) => !!u && u.trim().length > 0);
+  return Array.from(new Set(all));
 }
