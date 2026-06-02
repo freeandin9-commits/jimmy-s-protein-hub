@@ -42,8 +42,15 @@ export function ProductCard({ product }: { product: Product }) {
         <h3 className="font-display text-xl uppercase tracking-wide">{product.title}</h3>
         <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{product.description}</p>
         <div className="mt-4 flex items-center justify-between">
-          <span className="text-xl font-bold text-primary">
-            {formatPrice(product.price, product.currency)}
+          <span className="flex items-baseline gap-2">
+            <span className="text-xl font-bold text-primary">
+              {formatPrice(product.price, product.currency)}
+            </span>
+            {product.compare_at_price != null && product.compare_at_price > product.price && (
+              <span className="text-sm text-muted-foreground line-through">
+                {formatPrice(product.compare_at_price, product.currency)}
+              </span>
+            )}
           </span>
           <Button
             onClick={handleAdd}
