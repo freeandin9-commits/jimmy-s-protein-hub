@@ -61,11 +61,13 @@ export type Database = {
       }
       products: {
         Row: {
+          compare_at_price: number | null
           created_at: string
           currency: string
           description: string
           id: string
           image_url: string
+          images: string[]
           in_stock: boolean
           price: number
           sort_order: number
@@ -73,11 +75,13 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          compare_at_price?: number | null
           created_at?: string
           currency?: string
           description?: string
           id?: string
           image_url?: string
+          images?: string[]
           in_stock?: boolean
           price?: number
           sort_order?: number
@@ -85,11 +89,13 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          compare_at_price?: number | null
           created_at?: string
           currency?: string
           description?: string
           id?: string
           image_url?: string
+          images?: string[]
           in_stock?: boolean
           price?: number
           sort_order?: number
