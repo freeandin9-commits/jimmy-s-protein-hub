@@ -474,8 +474,21 @@ export function CartDrawer() {
                 <ArrowLeft className="h-3 w-3" /> Edit details
               </button>
 
+              {confirmed && (
+                <div className="rounded-lg border border-green-500/40 bg-green-500/10 p-4 text-center">
+                  <CheckCircle className="mx-auto h-8 w-8 text-green-500" />
+                  <h3 className="mt-2 font-display text-xl tracking-wider text-green-500">ORDER CONFIRMED</h3>
+                  <p className="mt-1 text-sm font-semibold">{confirmedRef}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Your order has been saved. Share it with us via WhatsApp or copy the details below.
+                  </p>
+                </div>
+              )}
+
               <div className="rounded-lg border border-border bg-card p-3 text-sm">
-                <div className="font-bold tracking-wider text-muted-foreground">Order # will be assigned on submit</div>
+                <div className="font-bold tracking-wider text-muted-foreground">
+                  {confirmed ? "Order confirmed" : "Order # will be assigned on submit"}
+                </div>
                 <div className="text-xs text-muted-foreground">
                   {new Date().toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
                 </div>
