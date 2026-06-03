@@ -67,6 +67,8 @@ export function CartDrawer() {
     setForm({ ...initialForm, address: { ...emptyAddress } });
     setStep("cart");
     setSubmitting(false);
+    setConfirmed(false);
+    setConfirmedRef("");
   };
 
   const handleClose = (v: boolean) => {
