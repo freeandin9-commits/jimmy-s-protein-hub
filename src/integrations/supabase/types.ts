@@ -192,6 +192,19 @@ export type Database = {
         }
         Returns: number
       }
+      track_order: {
+        Args: { p_order_number: number; p_phone: string }
+        Returns: {
+          created_at: string
+          currency: string
+          customer_name: string
+          items: Json
+          order_number: number
+          status: Database["public"]["Enums"]["order_status"]
+          total: number
+          updated_at: string
+        }[]
+      }
     }
     Enums: {
       app_role: "admin" | "user"
