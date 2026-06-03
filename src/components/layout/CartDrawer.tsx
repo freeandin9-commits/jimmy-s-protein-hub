@@ -51,6 +51,8 @@ export function CartDrawer() {
   const [step, setStep] = useState<Step>("cart");
   const [form, setForm] = useState<CustomerDetails>(initialForm);
   const [submitting, setSubmitting] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
+  const [confirmedRef, setConfirmedRef] = useState("");
 
   const currency = items[0]?.currency || "INR";
   const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
