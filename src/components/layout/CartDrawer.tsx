@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft, Copy, Send } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft, Copy, Send, CheckCircle } from "lucide-react";
 import {
   useCartStore,
   buildWhatsAppOrderUrl,
