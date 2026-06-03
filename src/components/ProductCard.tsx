@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { useCartStore, pickItemFromProduct } from "@/stores/cartStore";
-import { formatPrice, type Product } from "@/lib/products";
+import { formatPrice, productGallery, type Product } from "@/lib/products";
 import { Minus, Plus, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
 
@@ -10,6 +10,41 @@ export function ProductCard({ product }: { product: Product }) {
   const addItem = useCartStore((s) => s.addItem);
   const open = useCartStore((s) => s.open);
   const [qty, setQty] = useState(1);
+
+  const gallery = productGallery(product);
+  const hasMultiple = gallery.length > 1;
+  const [imgIdx, setImgIdx] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const touchStartX = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (!hasMultiple || paused) return;
+    const t = setInterval(() => {
+      setImgIdx((i) => (i + 1) % gallery.length);
+    }, 3000);
+    return () => clearInterval(t);
+  }, [hasMultiple, paused, gallery.length]);
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    setPaused(true);
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current == null || !hasMultiple) {
+      setPaused(false);
+      return;
+    }
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    if (Math.abs(dx) > 30) {
+      e.preventDefault();
+      e.stopPropagation();
+      setImgIdx((i) =>
+        dx < 0 ? (i + 1) % gallery.length : (i - 1 + gallery.length) % gallery.length,
+      );
+    }
+    touchStartX.current = null;
+    setTimeout(() => setPaused(false), 1500);
+  };
 
   const hasCompare =
     product.compare_at_price != null && product.compare_at_price > product.price;
@@ -43,22 +78,54 @@ export function ProductCard({ product }: { product: Product }) {
       params={{ handle: product.id }}
       className="group relative flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-all hover:border-primary hover:shadow-[var(--shadow-glow)]"
     >
-      <div className="relative aspect-square overflow-hidden bg-secondary">
-        {product.image_url ? (
-          <img
-            src={product.image_url}
-            alt={product.title}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
+      <div
+        className="relative aspect-square overflow-hidden bg-secondary"
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+      >
+        {gallery.length > 0 ? (
+          gallery.map((src, i) => (
+            <img
+              key={src + i}
+              src={src}
+              alt={product.title}
+              className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
+                i === imgIdx ? "opacity-100" : "opacity-0"
+              } group-hover:scale-105`}
+            />
+          ))
         ) : (
           <div className="flex h-full items-center justify-center text-muted-foreground">
             No image
           </div>
         )}
         {hasCompare && (
-          <span className="absolute right-3 top-3 rounded-full bg-primary px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary-foreground shadow-lg">
+          <span className="absolute right-3 top-3 z-10 rounded-full bg-primary px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary-foreground shadow-lg">
             -{discountPct}% Off
           </span>
+        )}
+        {hasMultiple && (
+          <div className="absolute bottom-2 left-1/2 z-10 flex -translate-x-1/2 gap-1.5">
+            {gallery.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setImgIdx(i);
+                  setPaused(true);
+                  setTimeout(() => setPaused(false), 2500);
+                }}
+                aria-label={`Show image ${i + 1}`}
+                className={`h-1.5 rounded-full transition-all ${
+                  i === imgIdx ? "w-5 bg-primary" : "w-1.5 bg-background/70"
+                }`}
+              />
+            ))}
+          </div>
         )}
       </div>
       <div className="flex flex-1 flex-col p-4">
