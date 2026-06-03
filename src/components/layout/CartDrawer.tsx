@@ -96,6 +96,35 @@ export function CartDrawer() {
     setStep("review");
   };
 
+  const handleConfirm = async () => {
+    if (submitting) return;
+    setSubmitting(true);
+    const customer: CustomerDetails = {
+      ...form,
+      name: form.name.trim().slice(0, 200),
+      address: {
+        house: form.address.house.trim().slice(0, 120),
+        street: form.address.street.trim().slice(0, 200),
+        city: form.address.city.trim().slice(0, 100),
+        district: form.address.district.trim().slice(0, 100),
+        state: form.address.state.trim().slice(0, 100),
+        pincode: form.address.pincode.trim().slice(0, 6),
+        landmark: form.address.landmark?.trim().slice(0, 120) || "",
+      },
+      notes: form.notes?.trim().slice(0, 500) || undefined,
+      couponCode: form.couponCode?.trim().slice(0, 50) || undefined,
+    };
+    const { orderRef } = await logOrderToDatabase([...items], customer);
+    setSubmitting(false);
+    if (!orderRef) {
+      toast.error("Could not save the order. Please try again.");
+      return;
+    }
+    setConfirmedRef(orderRef);
+    setConfirmed(true);
+    toast.success(`Order ${orderRef} confirmed!`);
+  };
+
   const finalizeAndSend = async (mode: "whatsapp" | "copy") => {
     if (submitting) return;
     setSubmitting(true);
@@ -118,7 +147,11 @@ export function CartDrawer() {
     const origin = typeof window !== "undefined" ? window.location.origin : "";
     const businessHours = settings.business_hours || "Mon-Sat 10am-8pm";
 
-    const { orderRef } = await logOrderToDatabase(itemsSnapshot, customer);
+    let orderRef = confirmedRef;
+    if (!orderRef) {
+      const result = await logOrderToDatabase(itemsSnapshot, customer);
+      orderRef = result.orderRef;
+    }
     if (!orderRef) {
       setSubmitting(false);
       toast.error("Could not save the order. Please try again.");
