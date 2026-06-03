@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft, Copy, Send } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft, Copy, Send, CheckCircle } from "lucide-react";
 import {
   useCartStore,
   buildWhatsAppOrderUrl,
@@ -51,6 +51,8 @@ export function CartDrawer() {
   const [step, setStep] = useState<Step>("cart");
   const [form, setForm] = useState<CustomerDetails>(initialForm);
   const [submitting, setSubmitting] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
+  const [confirmedRef, setConfirmedRef] = useState("");
 
   const currency = items[0]?.currency || "INR";
   const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
@@ -65,6 +67,8 @@ export function CartDrawer() {
     setForm({ ...initialForm, address: { ...emptyAddress } });
     setStep("cart");
     setSubmitting(false);
+    setConfirmed(false);
+    setConfirmedRef("");
   };
 
   const handleClose = (v: boolean) => {
@@ -92,6 +96,35 @@ export function CartDrawer() {
     setStep("review");
   };
 
+  const handleConfirm = async () => {
+    if (submitting) return;
+    setSubmitting(true);
+    const customer: CustomerDetails = {
+      ...form,
+      name: form.name.trim().slice(0, 200),
+      address: {
+        house: form.address.house.trim().slice(0, 120),
+        street: form.address.street.trim().slice(0, 200),
+        city: form.address.city.trim().slice(0, 100),
+        district: form.address.district.trim().slice(0, 100),
+        state: form.address.state.trim().slice(0, 100),
+        pincode: form.address.pincode.trim().slice(0, 6),
+        landmark: form.address.landmark?.trim().slice(0, 120) || "",
+      },
+      notes: form.notes?.trim().slice(0, 500) || undefined,
+      couponCode: form.couponCode?.trim().slice(0, 50) || undefined,
+    };
+    const { orderRef } = await logOrderToDatabase([...items], customer);
+    setSubmitting(false);
+    if (!orderRef) {
+      toast.error("Could not save the order. Please try again.");
+      return;
+    }
+    setConfirmedRef(orderRef);
+    setConfirmed(true);
+    toast.success(`Order ${orderRef} confirmed!`);
+  };
+
   const finalizeAndSend = async (mode: "whatsapp" | "copy") => {
     if (submitting) return;
     setSubmitting(true);
@@ -114,7 +147,11 @@ export function CartDrawer() {
     const origin = typeof window !== "undefined" ? window.location.origin : "";
     const businessHours = settings.business_hours || "Mon-Sat 10am-8pm";
 
-    const { orderRef } = await logOrderToDatabase(itemsSnapshot, customer);
+    let orderRef = confirmedRef;
+    if (!orderRef) {
+      const result = await logOrderToDatabase(itemsSnapshot, customer);
+      orderRef = result.orderRef;
+    }
     if (!orderRef) {
       setSubmitting(false);
       toast.error("Could not save the order. Please try again.");
@@ -437,8 +474,21 @@ export function CartDrawer() {
                 <ArrowLeft className="h-3 w-3" /> Edit details
               </button>
 
+              {confirmed && (
+                <div className="rounded-lg border border-green-500/40 bg-green-500/10 p-4 text-center">
+                  <CheckCircle className="mx-auto h-8 w-8 text-green-500" />
+                  <h3 className="mt-2 font-display text-xl tracking-wider text-green-500">ORDER CONFIRMED</h3>
+                  <p className="mt-1 text-sm font-semibold">{confirmedRef}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Your order has been saved. Share it with us via WhatsApp or copy the details below.
+                  </p>
+                </div>
+              )}
+
               <div className="rounded-lg border border-border bg-card p-3 text-sm">
-                <div className="font-bold tracking-wider text-muted-foreground">Order # will be assigned on submit</div>
+                <div className="font-bold tracking-wider text-muted-foreground">
+                  {confirmed ? "Order confirmed" : "Order # will be assigned on submit"}
+                </div>
                 <div className="text-xs text-muted-foreground">
                   {new Date().toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
                 </div>
@@ -491,6 +541,17 @@ export function CartDrawer() {
                 <span className="font-display tracking-wider">TOTAL</span>
                 <span className="font-bold">{formatPrice(total, currency)}</span>
               </div>
+              {!confirmed && (
+                <Button
+                  type="button"
+                  disabled={submitting}
+                  onClick={handleConfirm}
+                  className="h-12 w-full bg-primary text-primary-foreground text-base font-bold uppercase tracking-wider hover:bg-primary/90"
+                >
+                  <CheckCircle className="mr-2 h-4 w-4" />
+                  {submitting ? "Confirming…" : "Confirm Order"}
+                </Button>
+              )}
               <Button
                 type="button"
                 disabled={submitting}
@@ -509,7 +570,9 @@ export function CartDrawer() {
                 <Copy className="mr-2 h-4 w-4" /> Copy order text
               </Button>
               <p className="text-center text-xs text-muted-foreground">
-                Your order will be saved and shared with us via WhatsApp.
+                {confirmed
+                  ? "Order confirmed! Share it with us on WhatsApp or copy the details."
+                  : "Your order will be saved and shared with us via WhatsApp."}
               </p>
             </div>
           </div>
