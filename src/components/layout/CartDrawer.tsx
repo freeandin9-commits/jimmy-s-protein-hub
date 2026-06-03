@@ -541,6 +541,17 @@ export function CartDrawer() {
                 <span className="font-display tracking-wider">TOTAL</span>
                 <span className="font-bold">{formatPrice(total, currency)}</span>
               </div>
+              {!confirmed && (
+                <Button
+                  type="button"
+                  disabled={submitting}
+                  onClick={handleConfirm}
+                  className="h-12 w-full bg-primary text-primary-foreground text-base font-bold uppercase tracking-wider hover:bg-primary/90"
+                >
+                  <CheckCircle className="mr-2 h-4 w-4" />
+                  {submitting ? "Confirming…" : "Confirm Order"}
+                </Button>
+              )}
               <Button
                 type="button"
                 disabled={submitting}
@@ -559,7 +570,9 @@ export function CartDrawer() {
                 <Copy className="mr-2 h-4 w-4" /> Copy order text
               </Button>
               <p className="text-center text-xs text-muted-foreground">
-                Your order will be saved and shared with us via WhatsApp.
+                {confirmed
+                  ? "Order confirmed! Share it with us on WhatsApp or copy the details."
+                  : "Your order will be saved and shared with us via WhatsApp."}
               </p>
             </div>
           </div>
