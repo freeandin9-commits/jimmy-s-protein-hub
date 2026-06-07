@@ -6,6 +6,9 @@ import { fetchProducts, type Product } from "@/lib/products";
 import { Zap, Shield, Flame, ArrowRight, Phone, Dumbbell } from "lucide-react";
 import heroImg from "@/assets/hero.jpg";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { AdsStrip } from "@/components/AdsStrip";
+import { SearchBar } from "@/components/SearchBar";
+import { CategoriesSection } from "@/components/CategoriesSection";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -36,6 +39,8 @@ function HomePage() {
 
   return (
     <div>
+      <SearchBar />
+      <AdsStrip />
       {/* HERO — Black + golden yellow */}
       <section
         className="relative overflow-hidden"

@@ -14,6 +14,84 @@ export type Database = {
   }
   public: {
     Tables: {
+      ads: {
+        Row: {
+          active: boolean
+          created_at: string
+          fit_mode: string
+          focal_x: number
+          focal_y: number
+          id: string
+          image_url: string
+          link_url: string | null
+          sort_order: number
+          title: string
+          updated_at: string
+          zoom: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          fit_mode?: string
+          focal_x?: number
+          focal_y?: number
+          id?: string
+          image_url: string
+          link_url?: string | null
+          sort_order?: number
+          title?: string
+          updated_at?: string
+          zoom?: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          fit_mode?: string
+          focal_x?: number
+          focal_y?: number
+          id?: string
+          image_url?: string
+          link_url?: string | null
+          sort_order?: number
+          title?: string
+          updated_at?: string
+          zoom?: number
+        }
+        Relationships: []
+      }
+      categories: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          image_url: string | null
+          name: string
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          name: string
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          name?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           created_at: string
@@ -61,6 +139,7 @@ export type Database = {
       }
       products: {
         Row: {
+          category_id: string | null
           compare_at_price: number | null
           created_at: string
           currency: string
@@ -75,6 +154,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          category_id?: string | null
           compare_at_price?: number | null
           created_at?: string
           currency?: string
@@ -89,6 +169,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          category_id?: string | null
           compare_at_price?: number | null
           created_at?: string
           currency?: string
@@ -102,7 +183,15 @@ export type Database = {
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       site_settings: {
         Row: {
@@ -115,6 +204,7 @@ export type Database = {
           hero_subtext: string
           id: string
           instagram_url: string
+          logo_url: string | null
           updated_at: string
           whatsapp_number: string
         }
@@ -128,6 +218,7 @@ export type Database = {
           hero_subtext?: string
           id?: string
           instagram_url?: string
+          logo_url?: string | null
           updated_at?: string
           whatsapp_number?: string
         }
@@ -141,6 +232,7 @@ export type Database = {
           hero_subtext?: string
           id?: string
           instagram_url?: string
+          logo_url?: string | null
           updated_at?: string
           whatsapp_number?: string
         }

@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { Upload, Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/admin/settings")({
   component: SettingsPage,
@@ -25,6 +26,7 @@ function SettingsPage() {
 
   const [form, setForm] = useState<any>(null);
   const [saving, setSaving] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
 
   useEffect(() => {
     if (data && !form) setForm(data);
@@ -32,7 +34,46 @@ function SettingsPage() {
 
   if (isLoading || !form) return <div className="text-sm text-muted-foreground">Loading…</div>;
 
-  const update = (k: string, v: string) => setForm({ ...form, [k]: v });
+  const update = (k: string, v: string | null) => setForm({ ...form, [k]: v });
+
+  const onLogoFile = async (file: File) => {
+    setUploadingLogo(true);
+    try {
+      const ext = file.name.split(".").pop() || "png";
+      const path = `logos/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error: upErr } = await supabase.storage.from("ads").upload(path, file, {
+        contentType: file.type,
+        upsert: false,
+      });
+      if (upErr) throw upErr;
+      const { data: signed } = await supabase.storage.from("ads").createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
+      if (!signed?.signedUrl) throw new Error("Failed to get URL");
+      const { error } = await supabase
+        .from("site_settings")
+        .update({ logo_url: signed.signedUrl })
+        .eq("id", form.id);
+      if (error) throw error;
+      setForm({ ...form, logo_url: signed.signedUrl });
+      qc.invalidateQueries({ queryKey: ["site_settings"] });
+      toast.success("Logo updated");
+    } catch (e: any) {
+      toast.error(e.message ?? "Upload failed");
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
+
+  const deleteLogo = async () => {
+    if (!confirm("Remove the logo? The default will be shown.")) return;
+    const { error } = await supabase
+      .from("site_settings")
+      .update({ logo_url: null })
+      .eq("id", form.id);
+    if (error) return toast.error(error.message);
+    setForm({ ...form, logo_url: null });
+    qc.invalidateQueries({ queryKey: ["site_settings"] });
+    toast.success("Logo removed");
+  };
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,6 +107,41 @@ function SettingsPage() {
         <h1 className="font-display text-4xl uppercase tracking-wide">Settings</h1>
         <p className="text-sm text-muted-foreground">Edit your site content and contact info. Changes go live immediately.</p>
       </div>
+
+      <div className="space-y-3 rounded-xl border border-border bg-card p-6">
+        <div>
+          <h2 className="font-display text-2xl uppercase tracking-wide">Logo</h2>
+          <p className="text-sm text-muted-foreground">Shown in the site header. Recommended: transparent PNG, max ~200px tall.</p>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="flex h-20 w-40 items-center justify-center rounded-md border border-border bg-muted/40 p-2">
+            {form.logo_url ? (
+              <img src={form.logo_url} alt="Logo" className="max-h-full max-w-full object-contain" />
+            ) : (
+              <span className="text-xs text-muted-foreground">No logo (default)</span>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <label className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-md border border-input bg-background px-3 text-sm font-semibold hover:bg-secondary">
+              <Upload className="h-4 w-4" />
+              {uploadingLogo ? "Uploading…" : form.logo_url ? "Change / Upload" : "Upload Logo"}
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => e.target.files?.[0] && onLogoFile(e.target.files[0])}
+              />
+            </label>
+            {form.logo_url && (
+              <Button type="button" variant="outline" onClick={deleteLogo}>
+                <Trash2 className="mr-2 h-4 w-4" /> Delete
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+
+
 
       <form onSubmit={save} className="space-y-5 rounded-xl border border-border bg-card p-6">
         <div>

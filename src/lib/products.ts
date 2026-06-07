@@ -11,6 +11,7 @@ export interface Product {
   images: string[];
   in_stock: boolean;
   sort_order: number;
+  category_id: string | null;
   created_at: string;
   updated_at: string;
 }

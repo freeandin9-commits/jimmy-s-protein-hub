@@ -1,9 +1,21 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
+import { z } from "zod";
+import { zodValidator, fallback } from "@tanstack/zod-adapter";
+import { useQuery } from "@tanstack/react-query";
 import { ProductCard } from "@/components/ProductCard";
+import { SearchBar } from "@/components/SearchBar";
 import { fetchProducts, type Product } from "@/lib/products";
+import { supabase } from "@/integrations/supabase/client";
+import { X } from "lucide-react";
+
+const productsSearchSchema = z.object({
+  q: fallback(z.string(), "").default(""),
+  category: fallback(z.string(), "").default(""),
+});
 
 export const Route = createFileRoute("/products")({
+  validateSearch: zodValidator(productsSearchSchema),
   head: () => ({
     meta: [
       { title: "Shop Protein — Jimmy's Protein" },
@@ -15,45 +27,103 @@ export const Route = createFileRoute("/products")({
   component: ProductsPage,
 });
 
+type Category = { id: string; name: string; slug: string };
+
 function ProductsPage() {
+  const { q, category } = Route.useSearch();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchProducts(50).then((p) => {
+    fetchProducts(200).then((p) => {
       setProducts(p);
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);
 
-  return (
-    <div className="container mx-auto px-4 py-12 md:py-16">
-      <header className="mb-10">
-        <p className="text-sm font-bold uppercase tracking-widest text-primary">The Lineup</p>
-        <h1 className="mt-2 font-display text-5xl uppercase tracking-wide md:text-6xl">Shop All</h1>
-        <p className="mt-3 max-w-xl text-muted-foreground">
-          Every flavor. Every size. Built for the grind.
-        </p>
-      </header>
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories", "public"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("categories")
+        .select("id, name, slug")
+        .eq("active", true)
+        .order("sort_order", { ascending: true });
+      if (error) throw error;
+      return data as Category[];
+    },
+  });
 
-      {loading ? (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {[...Array(8)].map((_, i) => (
-            <div key={i} className="aspect-[3/4] animate-pulse rounded-xl bg-card" />
-          ))}
-        </div>
-      ) : products.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-border p-16 text-center">
-          <h2 className="font-display text-3xl uppercase tracking-wide">No products yet</h2>
-          <p className="mt-3 text-muted-foreground">
-            Add products from the admin panel to see them here.
+  const activeCategory = useMemo(
+    () => categories.find((c) => c.slug === category) || null,
+    [categories, category],
+  );
+
+  const filtered = useMemo(() => {
+    const term = q.trim().toLowerCase();
+    return products.filter((p) => {
+      if (activeCategory && p.category_id !== activeCategory.id) return false;
+      if (term) {
+        const hay = `${p.title} ${p.description}`.toLowerCase();
+        if (!hay.includes(term)) return false;
+      }
+      return true;
+    });
+  }, [products, q, activeCategory]);
+
+  return (
+    <>
+      <SearchBar />
+      <div className="container mx-auto px-4 py-12 md:py-16">
+        <header className="mb-8">
+          <p className="text-sm font-bold uppercase tracking-widest text-primary">The Lineup</p>
+          <h1 className="mt-2 font-display text-5xl uppercase tracking-wide md:text-6xl">
+            {activeCategory ? activeCategory.name : q ? `Results for "${q}"` : "Shop All"}
+          </h1>
+          <p className="mt-3 max-w-xl text-muted-foreground">
+            Every flavor. Every size. Built for the grind.
           </p>
-        </div>
-      ) : (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {products.map((p) => <ProductCard key={p.id} product={p} />)}
-        </div>
-      )}
-    </div>
+          {(q || activeCategory) && (
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              {q && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-3 py-1 text-xs">
+                  Search: {q}
+                  <Link to="/products" search={{ q: "", category }} aria-label="Clear search">
+                    <X className="h-3 w-3" />
+                  </Link>
+                </span>
+              )}
+              {activeCategory && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-3 py-1 text-xs">
+                  Category: {activeCategory.name}
+                  <Link to="/products" search={{ q, category: "" }} aria-label="Clear category">
+                    <X className="h-3 w-3" />
+                  </Link>
+                </span>
+              )}
+            </div>
+          )}
+        </header>
+
+        {loading ? (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="aspect-[3/4] animate-pulse rounded-xl bg-card" />
+            ))}
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-border p-16 text-center">
+            <h2 className="font-display text-3xl uppercase tracking-wide">No products found</h2>
+            <p className="mt-3 text-muted-foreground">
+              {q || activeCategory ? "Try a different search or category." : "Add products from the admin panel to see them here."}
+            </p>
+          </div>
+        ) : (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {filtered.map((p) => <ProductCard key={p.id} product={p} />)}
+          </div>
+        )}
+      </div>
+    </>
   );
 }

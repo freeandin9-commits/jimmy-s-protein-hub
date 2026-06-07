@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Link as LinkIcon, Copy } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin/products")({
@@ -28,6 +28,7 @@ interface FormState {
   image_3: string;
   in_stock: boolean;
   sort_order: string;
+  category_id: string;
 }
 
 const empty: FormState = {
@@ -41,6 +42,7 @@ const empty: FormState = {
   image_3: "",
   in_stock: true,
   sort_order: "0",
+  category_id: "",
 };
 
 function ProductsAdminPage() {
@@ -48,6 +50,17 @@ function ProductsAdminPage() {
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "products"],
     queryFn: () => fetchProducts(200),
+  });
+  const { data: categories = [] } = useQuery({
+    queryKey: ["admin", "categories", "select"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("categories")
+        .select("id, name")
+        .order("sort_order", { ascending: true });
+      if (error) throw error;
+      return data as { id: string; name: string }[];
+    },
   });
 
   const [open, setOpen] = useState(false);
@@ -72,6 +85,7 @@ function ProductsAdminPage() {
       image_3: p.images?.[1] ?? "",
       in_stock: p.in_stock,
       sort_order: String(p.sort_order),
+      category_id: p.category_id ?? "",
     });
     setOpen(true);
   };
@@ -116,6 +130,7 @@ function ProductsAdminPage() {
       images: extraImages,
       in_stock: form.in_stock,
       sort_order: parseInt(form.sort_order) || 0,
+      category_id: form.category_id || null,
     };
     try {
       if (form.id) {
@@ -145,6 +160,15 @@ function ProductsAdminPage() {
     }
     toast.success("Deleted");
     refresh();
+  };
+
+  const copyProductLink = (productId: string) => {
+    const url = `${window.location.origin}/product/${productId}`;
+    navigator.clipboard.writeText(url).then(() => {
+      toast.success("Product link copied!");
+    }).catch(() => {
+      toast.error("Failed to copy link");
+    });
   };
 
   const products = data ?? [];
@@ -202,6 +226,20 @@ function ProductsAdminPage() {
                     </span>
                   )}
                 </p>
+                <div className="mt-2 flex items-center gap-1 rounded-md border border-border bg-muted/40 px-2 py-1">
+                  <LinkIcon className="h-3 w-3 shrink-0 text-muted-foreground" />
+                  <span className="text-[11px] text-muted-foreground truncate select-all" title={`/product/${p.id}`}>
+                    /product/{p.id}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => copyProductLink(p.id)}
+                    className="ml-auto shrink-0 rounded p-0.5 text-muted-foreground hover:bg-muted hover:text-primary transition-colors"
+                    title="Copy product link"
+                  >
+                    <Copy className="h-3 w-3" />
+                  </button>
+                </div>
                 <div className="mt-3 flex gap-2">
                   <Button size="sm" variant="outline" onClick={() => openEdit(p)} className="flex-1">
                     <Pencil className="h-3 w-3" /> Edit
@@ -251,9 +289,25 @@ function ProductsAdminPage() {
                 <p className="mt-1 text-[11px] text-muted-foreground">Optional. Shown crossed out next to best price.</p>
               </div>
             </div>
-            <div>
-              <Label htmlFor="currency">Currency</Label>
-              <Input id="currency" value={form.currency} onChange={(e) => setForm({ ...form, currency: e.target.value })} placeholder="INR" />
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label htmlFor="currency">Currency</Label>
+                <Input id="currency" value={form.currency} onChange={(e) => setForm({ ...form, currency: e.target.value })} placeholder="INR" />
+              </div>
+              <div>
+                <Label htmlFor="category">Category</Label>
+                <select
+                  id="category"
+                  value={form.category_id}
+                  onChange={(e) => setForm({ ...form, category_id: e.target.value })}
+                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                >
+                  <option value="">— None —</option>
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
             </div>
             <div className="space-y-3">
               <div>

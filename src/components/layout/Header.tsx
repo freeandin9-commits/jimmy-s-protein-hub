@@ -3,6 +3,7 @@ import { ShoppingCart, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { useCartStore } from "@/stores/cartStore";
 import { Button } from "@/components/ui/button";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 import logoImg from "@/assets/logo.jpg";
 
 export function Header() {
@@ -10,6 +11,8 @@ export function Header() {
   const open = useCartStore((s) => s.open);
   const totalItems = items.reduce((s, i) => s + i.quantity, 0);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { settings } = useSiteSettings();
+  const logoSrc = settings.logo_url || logoImg;
 
   const navLinkProps = {
     className: "text-sm font-semibold uppercase tracking-wider text-foreground/80 hover:text-primary transition-colors",
@@ -20,7 +23,7 @@ export function Header() {
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link to="/" className="flex items-center gap-2" aria-label="Nutrin Sports home">
-          <img src={logoImg} alt="Nutrin Sports" className="h-10 w-auto md:h-12" />
+          <img src={logoSrc} alt="Nutrin Sports" className="h-10 w-auto md:h-12" />
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
