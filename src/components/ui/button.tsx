@@ -11,11 +11,13 @@ const buttonVariants = cva(
       variant: {
         default: "bg-primary text-primary-foreground shadow hover:bg-primary/90",
         destructive: "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
-        outline:
-          "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
+        outline: "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
         secondary: "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        
+        // 🌟 നിങ്ങളുടെ ആവശ്യപ്രകാരം പുതുതായി ചേർത്ത മഞ്ഞ നിറത്തിലുള്ള വേരിയന്റ് (image_59aba6.png-ൽ ഉള്ളത്)
+        yellow: "bg-[#FFCC00] text-black font-bold shadow-sm hover:bg-[#E6B800] transition-colors",
       },
       size: {
         default: "h-9 px-4 py-2",
