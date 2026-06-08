@@ -34,8 +34,8 @@
   --color-dark-surface: var(--dark-surface);
   --color-dark-surface-foreground: var(--dark-surface-foreground);
 
-  --font-display: "Outfit", system-ui, sans-serif;
-  --font-sans: "Figtree", "Inter", system-ui, sans-serif;
+  --font-display: "Space Grotesk", system-ui, sans-serif;
+  --font-sans: "DM Sans", "Inter", system-ui, sans-serif;
 
   --animate-float: float 6s ease-in-out infinite;
   --animate-glow-pulse: glow-pulse 3s ease-in-out infinite;
@@ -172,8 +172,8 @@
   }
   h1, h2, h3, .font-display {
     font-family: var(--font-display);
-    letter-spacing: -0.015em;
-    font-weight: 700;
+    letter-spacing: -0.01em;
+    font-weight: 500;
   }
   ::selection {
     background: oklch(0.82 0.13 88 / 0.4);
