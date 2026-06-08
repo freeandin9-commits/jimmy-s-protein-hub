@@ -9,7 +9,7 @@ import { toast } from "sonner";
 export function ProductCard({ product }: { product: Product }) {
   const addItem = useCartStore((s) => s.addItem);
   const open = useCartStore((s) => s.open);
-  const [qty, setQty] = useState(1);
+  const [qty, setQty] = useState(0);
 
   const gallery = productGallery(product);
   const hasMultiple = gallery.length > 1;
@@ -179,7 +179,7 @@ export function ProductCard({ product }: { product: Product }) {
               className="h-9 w-9"
               onClick={(e) => {
                 stop(e);
-                setQty((q) => Math.max(1, q - 1));
+                setQty((q) => Math.max(0, q - 1));
               }}
               aria-label="Decrease quantity"
             >
@@ -204,7 +204,7 @@ export function ProductCard({ product }: { product: Product }) {
             onClick={handleAdd}
             size="sm"
             variant="outline"
-            disabled={!product.in_stock}
+            disabled={!product.in_stock || qty === 0}
             className="flex-1 font-bold uppercase"
             aria-label="Add to cart"
           >
@@ -213,7 +213,7 @@ export function ProductCard({ product }: { product: Product }) {
           <Button
             onClick={handleBuyNow}
             size="sm"
-            disabled={!product.in_stock}
+            disabled={!product.in_stock || qty === 0}
             className="flex-1 bg-primary font-bold uppercase text-primary-foreground hover:bg-primary/90"
           >
             <Zap className="h-4 w-4" />
