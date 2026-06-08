@@ -3,11 +3,10 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/ProductCard";
 import { fetchProducts, type Product } from "@/lib/products";
-import { Zap, Shield, Flame, ArrowRight, Phone, Dumbbell } from "lucide-react";
+import { Zap, Shield, Flame, ArrowRight, Phone, BadgeCheck, Truck, Award } from "lucide-react";
 import heroImg from "@/assets/hero.jpg";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { AdsStrip } from "@/components/AdsStrip";
-import { SearchBar } from "@/components/SearchBar";
 import { CategoriesSection } from "@/components/CategoriesSection";
 
 export const Route = createFileRoute("/")({
