@@ -71,6 +71,14 @@ function ProductsPage() {
     });
   }, [products, q, activeCategory]);
 
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const p of products) {
+      if (p.category_id) counts[p.category_id] = (counts[p.category_id] ?? 0) + 1;
+    }
+    return counts;
+  }, [products]);
+
   return (
     <>
       <SearchBar />
@@ -105,24 +113,70 @@ function ProductsPage() {
           )}
         </header>
 
-        {loading ? (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="aspect-[3/4] animate-pulse rounded-xl bg-card" />
-            ))}
+        <div className="grid gap-8 lg:grid-cols-[260px_1fr]">
+          <aside className="lg:sticky lg:top-24 lg:self-start">
+            <div className="card-3d rounded-xl border border-border/60 p-5">
+              <h2 className="mb-4 font-display text-sm uppercase tracking-widest text-primary">
+                Categories
+              </h2>
+              <nav className="flex flex-col gap-1">
+                <Link
+                  to="/products"
+                  search={{ q, category: "" }}
+                  className={`flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors ${
+                    !activeCategory
+                      ? "bg-primary/15 font-semibold text-primary"
+                      : "hover:bg-secondary/60 text-foreground/80"
+                  }`}
+                >
+                  <span>All Products</span>
+                  <span className="text-xs text-muted-foreground">{products.length}</span>
+                </Link>
+                {categories.map((c) => {
+                  const active = activeCategory?.id === c.id;
+                  return (
+                    <Link
+                      key={c.id}
+                      to="/products"
+                      search={{ q, category: c.slug }}
+                      className={`flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors ${
+                        active
+                          ? "bg-primary/15 font-semibold text-primary"
+                          : "hover:bg-secondary/60 text-foreground/80"
+                      }`}
+                    >
+                      <span>{c.name}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {categoryCounts[c.id] ?? 0}
+                      </span>
+                    </Link>
+                  );
+                })}
+              </nav>
+            </div>
+          </aside>
+
+          <div>
+            {loading ? (
+              <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="aspect-[3/4] animate-pulse rounded-xl bg-card" />
+                ))}
+              </div>
+            ) : filtered.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-border p-16 text-center">
+                <h2 className="font-display text-3xl uppercase tracking-wide">No products found</h2>
+                <p className="mt-3 text-muted-foreground">
+                  {q || activeCategory ? "Try a different search or category." : "Add products from the admin panel to see them here."}
+                </p>
+              </div>
+            ) : (
+              <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                {filtered.map((p) => <ProductCard key={p.id} product={p} />)}
+              </div>
+            )}
           </div>
-        ) : filtered.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-border p-16 text-center">
-            <h2 className="font-display text-3xl uppercase tracking-wide">No products found</h2>
-            <p className="mt-3 text-muted-foreground">
-              {q || activeCategory ? "Try a different search or category." : "Add products from the admin panel to see them here."}
-            </p>
-          </div>
-        ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {filtered.map((p) => <ProductCard key={p.id} product={p} />)}
-          </div>
-        )}
+        </div>
       </div>
     </>
   );
