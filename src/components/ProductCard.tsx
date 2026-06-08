@@ -204,7 +204,7 @@ export function ProductCard({ product }: { product: Product }) {
             onClick={handleAdd}
             size="sm"
             variant="outline"
-            disabled={!product.in_stock}
+            disabled={!product.in_stock || qty === 0}
             className="flex-1 font-bold uppercase"
             aria-label="Add to cart"
           >
@@ -213,7 +213,7 @@ export function ProductCard({ product }: { product: Product }) {
           <Button
             onClick={handleBuyNow}
             size="sm"
-            disabled={!product.in_stock}
+            disabled={!product.in_stock || qty === 0}
             className="flex-1 bg-primary font-bold uppercase text-primary-foreground hover:bg-primary/90"
           >
             <Zap className="h-4 w-4" />
