@@ -176,7 +176,8 @@
     font-weight: 700;
   }
   ::selection {
-    background: oklch(0.72 0.16 160 / 0.4);
-    color: oklch(0.97 0.015 95);
+    background: oklch(0.82 0.13 88 / 0.4);
+    color: oklch(0.08 0 0);
   }
+
 }
