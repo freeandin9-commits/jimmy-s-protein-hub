@@ -9,6 +9,7 @@ import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { AdsStrip } from "@/components/AdsStrip";
 import { SearchBar } from "@/components/SearchBar";
 import { CategoriesSection } from "@/components/CategoriesSection";
+import { InstagramSection } from "@/components/InstagramSection";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -184,6 +185,8 @@ function HomePage() {
           </div>
         )}
       </section>
+
+      <InstagramSection />
 
       {/* CTA STRIP */}
       <section className="border-t border-border bg-primary text-primary-foreground">
