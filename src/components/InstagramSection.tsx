@@ -17,6 +17,9 @@ export function InstagramSection() {
     /* ignore */
   }
 
+  const profileUrl = `https://www.instagram.com/${handle}/`;
+  const embedUrl = `https://www.instagram.com/${handle}/embed`;
+
   return (
     <section className="bg-black text-foreground">
       <div className="container mx-auto max-w-5xl px-4 py-16 md:py-20">
@@ -35,7 +38,7 @@ export function InstagramSection() {
             </div>
           </div>
           <a
-            href={url}
+            href={profileUrl}
             target="_blank"
             rel="noreferrer noopener"
             className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-xs font-bold uppercase tracking-wider text-primary-foreground hover:opacity-90"
@@ -45,17 +48,15 @@ export function InstagramSection() {
         </div>
 
         <div className="relative overflow-hidden rounded-xl border border-white/10 bg-white">
-          {/* Real Instagram page embedded via iframe.
-              Instagram may block framing on some browsers; the fallback CTA above always works. */}
           <iframe
-            src={url}
+            src={embedUrl}
             title={`Instagram @${handle}`}
             loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
+            referrerPolicy="strict-origin-when-cross-origin"
             className="block h-[720px] w-full md:h-[820px]"
           />
           <a
-            href={url}
+            href={profileUrl}
             target="_blank"
             rel="noreferrer noopener"
             className="absolute bottom-4 right-4 inline-flex items-center gap-1.5 rounded-md bg-black/80 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur hover:bg-black"
