@@ -9,7 +9,7 @@ import { toast } from "sonner";
 export function ProductCard({ product }: { product: Product }) {
   const addItem = useCartStore((s) => s.addItem);
   const open = useCartStore((s) => s.open);
-  const [qty, setQty] = useState(1);
+  const [qty, setQty] = useState(0);
 
   const gallery = productGallery(product);
   const hasMultiple = gallery.length > 1;
