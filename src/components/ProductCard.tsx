@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { useCartStore, pickItemFromProduct } from "@/stores/cartStore";
 import { formatPrice, productGallery, type Product } from "@/lib/products";
-import { Minus, Plus, ShoppingCart } from "lucide-react";
+import { Minus, Plus, ShoppingCart, Zap } from "lucide-react";
 import { toast } from "sonner";
 
 export function ProductCard({ product }: { product: Product }) {
@@ -69,6 +69,16 @@ export function ProductCard({ product }: { product: Product }) {
     }
     addItem(pickItemFromProduct(product), qty);
     toast.success(`Added ${qty} × ${product.title}`, { position: "top-center" });
+    open();
+  };
+
+  const handleBuyNow = (e: React.MouseEvent) => {
+    stop(e);
+    if (!product.in_stock) {
+      toast.error("Out of stock");
+      return;
+    }
+    addItem(pickItemFromProduct(product), qty);
     open();
   };
 
@@ -193,11 +203,21 @@ export function ProductCard({ product }: { product: Product }) {
           <Button
             onClick={handleAdd}
             size="sm"
+            variant="outline"
+            disabled={!product.in_stock}
+            className="flex-1 font-bold uppercase"
+            aria-label="Add to cart"
+          >
+            <ShoppingCart className="h-4 w-4" />
+          </Button>
+          <Button
+            onClick={handleBuyNow}
+            size="sm"
             disabled={!product.in_stock}
             className="flex-1 bg-primary font-bold uppercase text-primary-foreground hover:bg-primary/90"
           >
-            <ShoppingCart className="h-4 w-4" />
-            {product.in_stock ? "Add to Cart" : "Sold out"}
+            <Zap className="h-4 w-4" />
+            {product.in_stock ? "Buy Now" : "Sold out"}
           </Button>
         </div>
 
