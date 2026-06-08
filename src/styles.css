@@ -34,8 +34,8 @@
   --color-dark-surface: var(--dark-surface);
   --color-dark-surface-foreground: var(--dark-surface-foreground);
 
-  --font-display: "Outfit", system-ui, sans-serif;
-  --font-sans: "Figtree", "Inter", system-ui, sans-serif;
+  --font-display: "Space Grotesk", system-ui, sans-serif;
+  --font-sans: "DM Sans", "Inter", system-ui, sans-serif;
 
   --animate-float: float 6s ease-in-out infinite;
   --animate-glow-pulse: glow-pulse 3s ease-in-out infinite;
