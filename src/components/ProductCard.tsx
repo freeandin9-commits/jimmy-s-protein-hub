@@ -179,7 +179,7 @@ export function ProductCard({ product }: { product: Product }) {
               className="h-9 w-9"
               onClick={(e) => {
                 stop(e);
-                setQty((q) => Math.max(1, q - 1));
+                setQty((q) => Math.max(0, q - 1));
               }}
               aria-label="Decrease quantity"
             >
