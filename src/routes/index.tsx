@@ -3,11 +3,10 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/ProductCard";
 import { fetchProducts, type Product } from "@/lib/products";
-import { Zap, Shield, Flame, ArrowRight, Phone, Dumbbell } from "lucide-react";
+import { Shield, ArrowRight, Phone, BadgeCheck, Truck, Award } from "lucide-react";
 import heroImg from "@/assets/hero.jpg";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { AdsStrip } from "@/components/AdsStrip";
-import { SearchBar } from "@/components/SearchBar";
 import { CategoriesSection } from "@/components/CategoriesSection";
 
 export const Route = createFileRoute("/")({
@@ -39,49 +38,60 @@ function HomePage() {
 
   return (
     <div>
-      <SearchBar />
       <AdsStrip />
-      {/* HERO — Black + emerald + gold 3D */}
+
+      {/* HERO — MuscleBlaze-style banner */}
       <section
         className="relative overflow-hidden"
         style={{ background: "var(--gradient-hero)" }}
       >
-        {/* layered ambient glows */}
-        <div aria-hidden className="pointer-events-none absolute -left-40 top-10 h-[500px] w-[500px] rounded-full bg-primary/20 blur-[120px]" />
-        <div aria-hidden className="pointer-events-none absolute -right-32 bottom-0 h-[600px] w-[600px] rounded-full bg-accent/15 blur-[140px]" />
-        <div aria-hidden className="pointer-events-none absolute inset-0 mesh-bg opacity-60" />
+        <div aria-hidden className="pointer-events-none absolute -left-40 top-10 h-[500px] w-[500px] rounded-full bg-primary/25 blur-[120px]" />
+        <div aria-hidden className="pointer-events-none absolute -right-32 bottom-0 h-[600px] w-[600px] rounded-full bg-accent/20 blur-[140px]" />
+        <div aria-hidden className="pointer-events-none absolute inset-0 mesh-bg opacity-50" />
 
-        {/* subtle grid */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-[0.07]"
-          style={{
-            backgroundImage:
-              "linear-gradient(oklch(0.97 0.015 95) 1px, transparent 1px), linear-gradient(90deg, oklch(0.97 0.015 95) 1px, transparent 1px)",
-            backgroundSize: "60px 60px",
-            maskImage: "radial-gradient(ellipse at center, black 30%, transparent 75%)",
-          }}
-        />
-
-        <div className="container relative mx-auto grid min-h-[640px] gap-10 px-4 py-16 md:grid-cols-2 md:py-20 lg:py-28">
+        <div className="container relative mx-auto grid min-h-[560px] gap-8 px-4 py-14 md:grid-cols-2 md:py-20">
           <div className="relative z-10 flex flex-col justify-center">
-            <span className="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.3em] text-primary backdrop-blur-sm">
-              <Dumbbell className="h-3.5 w-3.5" /> 100% Premium Quality
-            </span>
-            <h1 className="font-display text-5xl uppercase leading-[0.95] tracking-tight md:text-6xl lg:text-7xl xl:text-[5.5rem]">
-              <span className="text-foreground">{settings.hero_headline}</span>
+            <h1 className="font-display text-5xl uppercase leading-[0.92] tracking-tight md:text-6xl lg:text-7xl">
+              <span className="block text-gold-gradient">{settings.hero_headline}</span>
+              <span className="mt-3 block text-2xl font-normal normal-case tracking-normal text-foreground/90 md:text-3xl">
+                what your body needs
+              </span>
             </h1>
             <p className="mt-6 max-w-md text-base text-muted-foreground md:text-lg">
               {settings.hero_subtext}
             </p>
-            <div className="mt-10 flex flex-wrap items-center gap-6">
+
+            {/* Stat chips */}
+            <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-3 text-foreground/90">
+              {[
+                { v: "25g", l: "protein per scoop" },
+                { v: "0g", l: "added sugar" },
+                { v: "100%", l: "premium" },
+              ].map((s, i, arr) => (
+                <div key={s.l} className="flex items-center gap-8">
+                  <div>
+                    <div className="font-display text-2xl text-primary">{s.v}</div>
+                    <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">{s.l}</div>
+                  </div>
+                  {i < arr.length - 1 && <div className="hidden h-10 w-px bg-border md:block" />}
+                </div>
+              ))}
+            </div>
+
+            {/* Promo code chip */}
+            <div className="mt-8 inline-flex w-fit items-center divide-x divide-primary/30 rounded-lg border border-primary/40 bg-primary/10 text-sm font-bold uppercase tracking-[0.2em] text-primary">
+              <span className="px-4 py-2">Extra 5% Off</span>
+              <span className="px-4 py-2">Code: JIMMY5</span>
+            </div>
+
+            <div className="mt-8 flex flex-wrap items-center gap-6">
               <Button
                 asChild
                 size="lg"
                 className="btn-gold h-12 rounded-full px-8 font-bold uppercase tracking-[0.2em]"
               >
                 <Link to="/products">
-                  Buy Now <ArrowRight className="h-4 w-4" />
+                  Shop Now <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
               {phone && (
@@ -91,7 +101,7 @@ function HomePage() {
                   </span>
                   <span className="text-left">
                     <span className="block text-[10px] font-bold uppercase tracking-[0.25em] text-muted-foreground">
-                      Contact Us Daily
+                      Call us
                     </span>
                     <span className="block font-display text-xl tracking-wide">{phone}</span>
                   </span>
@@ -101,10 +111,8 @@ function HomePage() {
           </div>
 
           <div className="relative z-10 flex items-center justify-center [perspective:1200px]">
-            {/* glow rings */}
             <div aria-hidden className="absolute inset-10 rounded-full bg-primary/30 blur-3xl animate-[glow-pulse_3s_ease-in-out_infinite]" />
             <div aria-hidden className="absolute inset-20 rounded-full bg-accent/25 blur-2xl" />
-            {/* orbit ring */}
             <div aria-hidden className="absolute h-[420px] w-[420px] rounded-full border border-primary/20" />
             <div aria-hidden className="absolute h-[480px] w-[480px] rounded-full border border-accent/10" />
 
@@ -115,45 +123,48 @@ function HomePage() {
                 className="relative max-h-[520px] w-auto rounded-2xl object-cover"
                 style={{
                   boxShadow:
-                    "0 50px 80px -20px oklch(0 0 0 / 0.7), 0 25px 40px -15px oklch(0.72 0.16 160 / 0.45), 0 0 0 1px oklch(1 0 0 / 0.05) inset",
+                    "0 50px 80px -20px oklch(0 0 0 / 0.7), 0 25px 40px -15px oklch(0.82 0.13 88 / 0.45), 0 0 0 1px oklch(1 0 0 / 0.05) inset",
                 }}
               />
-              {/* reflection */}
               <div
                 aria-hidden
                 className="absolute inset-x-6 -bottom-16 h-24 rounded-[50%] blur-xl"
-                style={{ background: "oklch(0.72 0.16 160 / 0.5)" }}
+                style={{ background: "oklch(0.82 0.13 88 / 0.5)" }}
               />
             </div>
           </div>
         </div>
+
+        {/* Carousel dots (visual) */}
+        <div className="relative z-10 flex items-center justify-center gap-2 pb-6">
+          {[0, 1, 2, 3, 4].map((i) => (
+            <span
+              key={i}
+              className={`h-1.5 rounded-full transition-all ${i === 0 ? "w-8 bg-primary" : "w-1.5 bg-border"}`}
+            />
+          ))}
+        </div>
       </section>
 
-      {/* BENEFITS — 3D cards */}
-      <section className="relative border-y border-border bg-dark-surface/60">
-        <div className="container mx-auto grid gap-6 px-4 py-16 md:grid-cols-3">
+      {/* TRUST STRIP */}
+      <section className="border-y border-border bg-dark-surface/60">
+        <div className="container mx-auto grid grid-cols-2 gap-6 px-4 py-6 md:grid-cols-4">
           {[
-            { icon: Zap, title: "25g Protein", desc: "Per single scoop. No skimping." },
-            { icon: Shield, title: "Zero Junk", desc: "No fillers, no hidden sugars, no BS." },
-            { icon: Flame, title: "Bold Flavors", desc: "Tastes incredible. Mixes clean." },
+            { icon: BadgeCheck, t: "100% Authentic" },
+            { icon: Truck, t: "Free Shipping ₹999+" },
+            { icon: Award, t: "Clinically Tested" },
+            { icon: Shield, t: "Secure Checkout" },
           ].map((b) => (
-            <div
-              key={b.title}
-              className="card-3d card-3d-hover group flex items-start gap-4 rounded-2xl p-6"
-            >
-              <div className="rounded-xl bg-primary/15 p-3 text-primary ring-1 ring-primary/30 transition-transform group-hover:scale-110">
-                <b.icon className="h-6 w-6" />
-              </div>
-              <div>
-                <h3 className="font-display text-2xl uppercase tracking-wide">{b.title}</h3>
-                <p className="text-sm text-muted-foreground">{b.desc}</p>
-              </div>
+            <div key={b.t} className="flex items-center justify-center gap-3 text-center">
+              <b.icon className="h-5 w-5 text-primary" />
+              <span className="text-xs font-bold uppercase tracking-[0.18em] text-foreground/80">{b.t}</span>
             </div>
           ))}
         </div>
       </section>
 
       <CategoriesSection />
+
 
       {/* FEATURED PRODUCTS */}
       <section className="container mx-auto px-4 py-16 md:py-24">
