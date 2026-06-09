@@ -1,9 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/ProductCard";
 import { fetchProducts, type Product } from "@/lib/products";
-import { Zap, Shield, Flame, ArrowRight, Phone, Dumbbell } from "lucide-react";
+import { Zap, Shield, Flame, ArrowRight, Phone, Dumbbell, ChevronLeft, ChevronRight } from "lucide-react";
 import heroImg from "@/assets/hero.jpg";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { AdsStrip } from "@/components/AdsStrip";
@@ -30,6 +30,14 @@ function HomePage() {
   const [loading, setLoading] = useState(true);
   const { settings } = useSiteSettings();
   const phone = settings.whatsapp_number || "";
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (dir: "left" | "right") => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const amount = el.clientWidth * 0.8;
+    el.scrollBy({ left: dir === "left" ? -amount : amount, behavior: "smooth" });
+  };
 
   useEffect(() => {
     fetchProducts(6).then((p) => {
@@ -180,12 +188,31 @@ function HomePage() {
             <p className="mt-2 text-sm text-muted-foreground">Tell us what to add and we'll create it.</p>
           </div>
         ) : (
-          <div className="-mx-4 flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth px-4 pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {products.map((p) => (
-              <div key={p.id} className="w-[280px] flex-shrink-0 snap-start sm:w-[320px] lg:w-[360px]">
-                <ProductCard product={p} />
-              </div>
-            ))}
+          <div className="relative">
+            <button
+              onClick={() => scroll("left")}
+              className="absolute left-2 top-1/2 z-10 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-background/90 text-foreground shadow-lg ring-1 ring-border backdrop-blur-sm hover:bg-background transition-colors"
+              aria-label="Scroll left"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <div
+              ref={scrollRef}
+              className="-mx-4 flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth px-4 pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            >
+              {products.map((p) => (
+                <div key={p.id} className="w-[280px] flex-shrink-0 snap-start sm:w-[320px] lg:w-[360px]">
+                  <ProductCard product={p} />
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => scroll("right")}
+              className="absolute right-2 top-1/2 z-10 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-background/90 text-foreground shadow-lg ring-1 ring-border backdrop-blur-sm hover:bg-background transition-colors"
+              aria-label="Scroll right"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
           </div>
         )}
 
