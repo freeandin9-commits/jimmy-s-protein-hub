@@ -68,8 +68,7 @@ export function ProductCard({ product }: { product: Product }) {
       return;
     }
     addItem(pickItemFromProduct(product), qty);
-    toast.success(`Added ${qty} × ${product.title}`, { position: "top-center" });
-    open();
+    toast.success(`Added ${qty} × ${product.title} to cart`, { position: "top-center" });
   };
 
   const handleBuyNow = (e: React.MouseEvent) => {
