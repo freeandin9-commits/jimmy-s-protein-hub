@@ -31,6 +31,7 @@ export function Header() {
           <Link to="/products" {...navLinkProps}>Shop</Link>
           <Link to="/track" {...navLinkProps}>Track Order</Link>
           <Link to="/about" {...navLinkProps}>About</Link>
+          <Link to="/blog" {...navLinkProps}>Blog</Link>
           <Link to="/contact" {...navLinkProps}>Contact</Link>
         </nav>
 
@@ -77,6 +78,7 @@ export function Header() {
               { to: "/products", label: "Shop" },
               { to: "/track", label: "Track Order" },
               { to: "/about", label: "About" },
+              { to: "/blog", label: "Blog" },
               { to: "/contact", label: "Contact" },
             ].map((l) => (
               <Link
