@@ -169,9 +169,9 @@ function HomePage() {
         </div>
 
         {loading ? (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="aspect-[3/4] animate-pulse rounded-xl bg-card" />
+          <div className="flex gap-6 overflow-x-auto pb-4">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="aspect-[3/4] w-[280px] flex-shrink-0 animate-pulse rounded-xl bg-card sm:w-[320px]" />
             ))}
           </div>
         ) : products.length === 0 ? (
@@ -180,10 +180,15 @@ function HomePage() {
             <p className="mt-2 text-sm text-muted-foreground">Tell us what to add and we'll create it.</p>
           </div>
         ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {products.map((p) => <ProductCard key={p.id} product={p} />)}
+          <div className="-mx-4 flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth px-4 pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {products.map((p) => (
+              <div key={p.id} className="w-[280px] flex-shrink-0 snap-start sm:w-[320px] lg:w-[360px]">
+                <ProductCard product={p} />
+              </div>
+            ))}
           </div>
         )}
+
       </section>
 
       <InstagramSection />
