@@ -30,6 +30,14 @@ function HomePage() {
   const [loading, setLoading] = useState(true);
   const { settings } = useSiteSettings();
   const phone = settings.whatsapp_number || "";
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (dir: "left" | "right") => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const amount = el.clientWidth * 0.8;
+    el.scrollBy({ left: dir === "left" ? -amount : amount, behavior: "smooth" });
+  };
 
   useEffect(() => {
     fetchProducts(6).then((p) => {
