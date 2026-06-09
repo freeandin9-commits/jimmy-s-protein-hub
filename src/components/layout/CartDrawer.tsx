@@ -287,7 +287,7 @@ export function CartDrawer() {
                     required
                     type="tel"
                     inputMode="numeric"
-                    placeholder="98765 43210"
+                    placeholder=""
                     className="border-0 px-0 shadow-none focus-visible:ring-0"
                     value={formatIndianPhoneDisplay(form.phone)}
                     onChange={(e) => setForm({ ...form, phone: e.target.value })}
