@@ -78,6 +78,7 @@ export function Header() {
               { to: "/products", label: "Shop" },
               { to: "/track", label: "Track Order" },
               { to: "/about", label: "About" },
+              { to: "/blog", label: "Blog" },
               { to: "/contact", label: "Contact" },
             ].map((l) => (
               <Link
