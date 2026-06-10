@@ -78,32 +78,32 @@ function HomePage() {
             <span className="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.3em] text-primary backdrop-blur-sm">
               <Dumbbell className="h-3.5 w-3.5" /> 100% Premium Quality
             </span>
-            <h1 className="font-display text-5xl uppercase leading-[0.95] tracking-tight md:text-6xl lg:text-7xl xl:text-[5.5rem]">
+            <h1 className="font-display text-4xl uppercase leading-[0.95] tracking-tight sm:text-5xl md:text-6xl lg:text-7xl xl:text-[5.5rem]">
               <span className="text-foreground">{settings.hero_headline}</span>
             </h1>
             <p className="mt-6 max-w-md text-base text-muted-foreground md:text-lg">
               {settings.hero_subtext}
             </p>
-            <div className="mt-10 flex flex-wrap items-center gap-6">
+            <div className="mt-8 flex flex-wrap items-center gap-4 sm:gap-6 md:mt-10">
               <Button
                 asChild
                 size="lg"
-                className="btn-gold h-12 rounded-full px-8 font-bold uppercase tracking-[0.2em]"
+                className="btn-gold h-12 rounded-full px-6 font-bold uppercase tracking-[0.2em] sm:px-8"
               >
                 <Link to="/products">
                   Buy Now <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
               {phone && (
-                <a href={`tel:${phone}`} className="flex items-center gap-3 text-foreground">
-                  <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/15 text-primary ring-1 ring-primary/30">
+                <a href={`tel:${phone}`} className="flex min-w-0 items-center gap-3 text-foreground">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary ring-1 ring-primary/30">
                     <Phone className="h-5 w-5" />
                   </span>
-                  <span className="text-left">
+                  <span className="min-w-0 text-left">
                     <span className="block text-[10px] font-bold uppercase tracking-[0.25em] text-muted-foreground">
                       Contact Us Daily
                     </span>
-                    <span className="block font-display text-xl tracking-wide">{phone}</span>
+                    <span className="block truncate font-display text-lg tracking-wide sm:text-xl">{phone}</span>
                   </span>
                 </a>
               )}
