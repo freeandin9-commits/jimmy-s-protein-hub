@@ -85,7 +85,7 @@ function ProductsPage() {
       <div className="container mx-auto px-4 py-12 md:py-16">
         <header className="mb-8">
           <p className="text-sm font-bold uppercase tracking-widest text-primary">The Lineup</p>
-          <h1 className="mt-2 font-display text-5xl uppercase tracking-wide md:text-6xl">
+          <h1 className="mt-2 font-display text-4xl uppercase tracking-wide sm:text-5xl md:text-6xl">
             {activeCategory ? activeCategory.name : q ? `Results for "${q}"` : "Shop All"}
           </h1>
           <p className="mt-3 max-w-xl text-muted-foreground">
