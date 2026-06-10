@@ -19,7 +19,7 @@ function AboutPage() {
       <section className="border-b border-border bg-card/40">
         <div className="container mx-auto px-4 py-16 md:py-24">
           <p className="text-sm font-bold uppercase tracking-widest text-primary">Our Story</p>
-          <h1 className="mt-2 max-w-3xl font-display text-5xl uppercase leading-tight tracking-wide md:text-7xl">
+          <h1 className="mt-2 max-w-3xl font-display text-4xl uppercase leading-tight tracking-wide sm:text-5xl md:text-7xl">
             Built in the gym.<br />
             Made for the <span className="text-primary">grind</span>.
           </h1>

@@ -85,8 +85,7 @@ export function ProductCard({ product }: { product: Product }) {
     <Link
       to="/product/$handle"
       params={{ handle: product.id }}
-      className="group relative flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-all hover:border-primary hover:shadow-[var(--shadow-glow)]"
-      style={{ width: "325px", height: "366.95px" }}
+      className="group relative flex h-full w-full flex-col overflow-hidden rounded-xl border border-border bg-card transition-all hover:border-primary hover:shadow-[var(--shadow-glow)]"
     >
       <div
         className="relative aspect-square overflow-hidden bg-secondary"
