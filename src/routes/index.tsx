@@ -202,7 +202,7 @@ function HomePage() {
               className="-mx-4 flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth px-4 pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             >
               {products.map((p) => (
-                <div key={p.id} className="w-[280px] flex-shrink-0 snap-start sm:w-[320px] lg:w-[360px]">
+                <div key={p.id} className="w-[260px] flex-shrink-0 snap-start sm:w-[300px] lg:w-[340px]">
                   <ProductCard product={p} />
                 </div>
               ))}
