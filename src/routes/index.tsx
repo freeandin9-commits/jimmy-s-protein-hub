@@ -166,13 +166,13 @@ function HomePage() {
       <CategoriesSection />
 
       {/* FEATURED PRODUCTS */}
-      <section className="container mx-auto px-4 py-16 md:py-24">
-        <div className="mb-10 flex items-end justify-between">
-          <div>
+      <section className="container mx-auto px-4 py-12 md:py-24">
+        <div className="mb-8 flex flex-wrap items-end justify-between gap-3 md:mb-10">
+          <div className="min-w-0">
             <p className="text-sm font-bold uppercase tracking-widest text-primary">Best Sellers</p>
-            <h2 className="mt-2 font-display text-4xl uppercase tracking-wide md:text-5xl">Fuel the Grind</h2>
+            <h2 className="mt-2 font-display text-3xl uppercase tracking-wide sm:text-4xl md:text-5xl">Fuel the Grind</h2>
           </div>
-          <Link to="/products" className="hidden text-sm font-bold uppercase tracking-wider text-primary hover:underline md:inline">
+          <Link to="/products" className="text-sm font-bold uppercase tracking-wider text-primary hover:underline">
             View all →
           </Link>
         </div>
