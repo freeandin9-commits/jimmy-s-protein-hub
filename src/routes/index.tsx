@@ -73,7 +73,7 @@ function HomePage() {
           }}
         />
 
-        <div className="container relative mx-auto grid min-h-[640px] gap-10 px-4 py-16 md:grid-cols-2 md:py-20 lg:py-28">
+        <div className="container relative mx-auto grid min-h-[520px] gap-10 px-4 py-12 sm:py-16 md:min-h-[640px] md:grid-cols-2 md:py-20 lg:py-28">
           <div className="relative z-10 flex flex-col justify-center">
             <span className="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.3em] text-primary backdrop-blur-sm">
               <Dumbbell className="h-3.5 w-3.5" /> 100% Premium Quality
