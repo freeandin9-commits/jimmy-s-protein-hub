@@ -67,7 +67,7 @@ export function AdsStrip() {
 
   return (
     <section className="bg-background">
-      <div className="container relative mx-auto px-4 pt-4">
+      <div className="relative w-full pt-4">
         {/* Main Slider Wrapper */}
         <div
           ref={scrollerRef}
@@ -78,11 +78,11 @@ export function AdsStrip() {
             const fy = ad.focal_y ?? 50;
             const z = ad.zoom ?? 1;
             const card = (
-              <div className="relative aspect-[4/3] sm:aspect-[16/9] md:aspect-[21/9] lg:aspect-[21/8] h-full w-full overflow-hidden rounded-xl border border-border bg-black">
+              <div className="relative aspect-[4/3] sm:aspect-[16/9] md:aspect-[21/9] lg:aspect-[21/8] h-full w-full overflow-hidden bg-black">
                 <img
                   src={ad.image_url}
                   alt={ad.title || "Ad"}
-                  className="h-full w-full object-contain"
+                  className="h-full w-full object-cover"
                   style={{
                     objectPosition: `${fx}% ${fy}%`,
                     transform: z !== 1 ? `scale(${z})` : undefined,
@@ -91,6 +91,7 @@ export function AdsStrip() {
                 />
               </div>
             );
+
             return (
               <div
                 key={ad.id}
