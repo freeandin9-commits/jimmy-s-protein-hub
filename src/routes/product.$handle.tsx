@@ -126,7 +126,7 @@ function ProductPage() {
         </div>
 
         <div className="flex flex-col">
-          <h1 className="font-display text-3xl uppercase leading-tight tracking-wide sm:text-4xl md:text-5xl">{product.title}</h1>
+          <h1 className="font-display text-4xl uppercase leading-tight tracking-wide md:text-5xl">{product.title}</h1>
           <div className="mt-3 flex flex-wrap items-baseline gap-3">
             <p className="text-3xl font-bold text-primary">
               {formatPrice(product.price, product.currency)}

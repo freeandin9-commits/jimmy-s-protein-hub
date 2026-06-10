@@ -23,7 +23,7 @@ function ContactPage() {
   return (
     <div className="container mx-auto px-4 py-16 md:py-24">
       <p className="text-sm font-bold uppercase tracking-widest text-primary">Get in touch</p>
-      <h1 className="mt-2 font-display text-4xl uppercase tracking-wide sm:text-5xl md:text-6xl">Talk to us</h1>
+      <h1 className="mt-2 font-display text-5xl uppercase tracking-wide md:text-6xl">Talk to us</h1>
       <p className="mt-3 max-w-xl text-muted-foreground">
         Orders, refills, wholesale, sponsorships — easiest way is WhatsApp. We reply fast.
       </p>

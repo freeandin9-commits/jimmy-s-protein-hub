@@ -73,37 +73,37 @@ function HomePage() {
           }}
         />
 
-        <div className="container relative mx-auto grid min-h-[520px] gap-10 px-4 py-12 sm:py-16 md:min-h-[640px] md:grid-cols-2 md:py-20 lg:py-28">
+        <div className="container relative mx-auto grid min-h-[640px] gap-10 px-4 py-16 md:grid-cols-2 md:py-20 lg:py-28">
           <div className="relative z-10 flex flex-col justify-center">
             <span className="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.3em] text-primary backdrop-blur-sm">
               <Dumbbell className="h-3.5 w-3.5" /> 100% Premium Quality
             </span>
-            <h1 className="font-display text-4xl uppercase leading-[0.95] tracking-tight sm:text-5xl md:text-6xl lg:text-7xl xl:text-[5.5rem]">
+            <h1 className="font-display text-5xl uppercase leading-[0.95] tracking-tight md:text-6xl lg:text-7xl xl:text-[5.5rem]">
               <span className="text-foreground">{settings.hero_headline}</span>
             </h1>
             <p className="mt-6 max-w-md text-base text-muted-foreground md:text-lg">
               {settings.hero_subtext}
             </p>
-            <div className="mt-8 flex flex-wrap items-center gap-4 sm:gap-6 md:mt-10">
+            <div className="mt-10 flex flex-wrap items-center gap-6">
               <Button
                 asChild
                 size="lg"
-                className="btn-gold h-12 rounded-full px-6 font-bold uppercase tracking-[0.2em] sm:px-8"
+                className="btn-gold h-12 rounded-full px-8 font-bold uppercase tracking-[0.2em]"
               >
                 <Link to="/products">
                   Buy Now <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
               {phone && (
-                <a href={`tel:${phone}`} className="flex min-w-0 items-center gap-3 text-foreground">
-                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary ring-1 ring-primary/30">
+                <a href={`tel:${phone}`} className="flex items-center gap-3 text-foreground">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/15 text-primary ring-1 ring-primary/30">
                     <Phone className="h-5 w-5" />
                   </span>
-                  <span className="min-w-0 text-left">
+                  <span className="text-left">
                     <span className="block text-[10px] font-bold uppercase tracking-[0.25em] text-muted-foreground">
                       Contact Us Daily
                     </span>
-                    <span className="block truncate font-display text-lg tracking-wide sm:text-xl">{phone}</span>
+                    <span className="block font-display text-xl tracking-wide">{phone}</span>
                   </span>
                 </a>
               )}
@@ -166,13 +166,13 @@ function HomePage() {
       <CategoriesSection />
 
       {/* FEATURED PRODUCTS */}
-      <section className="container mx-auto px-4 py-12 md:py-24">
-        <div className="mb-8 flex flex-wrap items-end justify-between gap-3 md:mb-10">
-          <div className="min-w-0">
+      <section className="container mx-auto px-4 py-16 md:py-24">
+        <div className="mb-10 flex items-end justify-between">
+          <div>
             <p className="text-sm font-bold uppercase tracking-widest text-primary">Best Sellers</p>
-            <h2 className="mt-2 font-display text-3xl uppercase tracking-wide sm:text-4xl md:text-5xl">Fuel the Grind</h2>
+            <h2 className="mt-2 font-display text-4xl uppercase tracking-wide md:text-5xl">Fuel the Grind</h2>
           </div>
-          <Link to="/products" className="text-sm font-bold uppercase tracking-wider text-primary hover:underline">
+          <Link to="/products" className="hidden text-sm font-bold uppercase tracking-wider text-primary hover:underline md:inline">
             View all →
           </Link>
         </div>
@@ -202,7 +202,7 @@ function HomePage() {
               className="-mx-4 flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth px-4 pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             >
               {products.map((p) => (
-                <div key={p.id} className="w-[260px] flex-shrink-0 snap-start sm:w-[300px] lg:w-[340px]">
+                <div key={p.id} className="w-[280px] flex-shrink-0 snap-start sm:w-[320px] lg:w-[360px]">
                   <ProductCard product={p} />
                 </div>
               ))}
