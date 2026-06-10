@@ -10,6 +10,7 @@ import { AdsStrip } from "@/components/AdsStrip";
 import { SearchBar } from "@/components/SearchBar";
 import { CategoriesSection } from "@/components/CategoriesSection";
 import { InstagramSection } from "@/components/InstagramSection";
+import { TrustBadges } from "@/components/TrustBadges";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -217,6 +218,8 @@ function HomePage() {
         )}
 
       </section>
+
+      <TrustBadges />
 
       <InstagramSection />
 
