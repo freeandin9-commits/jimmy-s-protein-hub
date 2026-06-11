@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
+import { LayoutGrid } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 type Category = {
@@ -26,29 +27,29 @@ export function CategoriesSection() {
   if (categories.length === 0) return null;
 
   return (
-    <section className="border-t border-border bg-card/30">
-      <div className="container mx-auto px-4 py-10 md:py-14">
-        <div className="mb-6 flex items-end justify-between">
-          <div>
-            <p className="text-sm font-bold uppercase tracking-widest text-primary">Browse</p>
-            <h2 className="mt-2 font-display text-3xl uppercase tracking-wide md:text-4xl">
-              Shop by Category
-            </h2>
-          </div>
-        </div>
-        <div className="-mx-4 flex gap-5 overflow-x-auto px-4 pb-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <section className="bg-background">
+      <div className="container mx-auto px-3 py-5 md:py-7">
+        <div className="-mx-3 flex gap-4 overflow-x-auto px-3 pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-6">
+          <Link
+            to="/products"
+            className="group flex w-[78px] shrink-0 flex-col items-center gap-2 sm:w-[92px]"
+          >
+            <div className="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-foreground text-background transition-transform duration-300 group-hover:scale-105 sm:h-[84px] sm:w-[84px]">
+              <LayoutGrid className="h-7 w-7" strokeWidth={2.5} />
+            </div>
+            <h3 className="text-center text-xs font-semibold leading-tight text-foreground sm:text-sm">
+              Categories
+            </h3>
+          </Link>
+
           {categories.map((c) => (
             <Link
               key={c.id}
               to="/products"
               search={{ category: c.slug }}
-              className="group flex w-[88px] shrink-0 flex-col items-center gap-2 sm:w-[100px]"
+              className="group flex w-[78px] shrink-0 flex-col items-center gap-2 sm:w-[92px]"
             >
-              <div className="relative h-[76px] w-[76px] overflow-hidden rounded-full bg-primary ring-2 ring-primary/40 transition-all duration-300 group-hover:ring-4 group-hover:ring-primary group-hover:scale-105 sm:h-[88px] sm:w-[88px]"
-                style={{
-                  boxShadow: "0 8px 20px -6px oklch(0.82 0.13 88 / 0.4), inset 0 -4px 10px oklch(0 0 0 / 0.15)",
-                }}
-              >
+              <div className="relative h-[72px] w-[72px] overflow-hidden rounded-full bg-primary transition-transform duration-300 group-hover:scale-105 sm:h-[84px] sm:w-[84px]">
                 {c.image_url ? (
                   <img
                     src={c.image_url}
@@ -57,12 +58,12 @@ export function CategoriesSection() {
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <div className="flex h-full items-center justify-center text-[10px] font-bold uppercase text-primary-foreground">
+                  <div className="flex h-full items-center justify-center text-sm font-bold uppercase text-primary-foreground">
                     {c.name.slice(0, 2)}
                   </div>
                 )}
               </div>
-              <h3 className="text-center text-xs font-semibold leading-tight text-foreground transition-colors group-hover:text-primary sm:text-sm">
+              <h3 className="text-center text-xs font-semibold leading-tight text-foreground sm:text-sm">
                 {c.name}
               </h3>
             </Link>
