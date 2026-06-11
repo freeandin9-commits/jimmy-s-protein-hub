@@ -4,7 +4,8 @@ import { useState } from "react";
 import { useCartStore } from "@/stores/cartStore";
 import { Button } from "@/components/ui/button";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
-import logoImg from "@/assets/logo.jpg";
+import logoAsset from "@/assets/nutrin-logo.png.asset.json";
+const logoImg = logoAsset.url;
 
 export function Header() {
   const items = useCartStore((s) => s.items);
