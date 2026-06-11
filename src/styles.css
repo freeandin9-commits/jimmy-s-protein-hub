@@ -103,6 +103,49 @@
   --foreground: oklch(0.98 0.005 90);
 }
 
+/* Light theme scope — applied to specific pages (e.g. shop) */
+.theme-light {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.18 0.01 90);
+  --card: oklch(0.99 0.002 90);
+  --card-foreground: oklch(0.18 0.01 90);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.01 90);
+  --primary: oklch(0.72 0.16 70);
+  --primary-foreground: oklch(0.15 0.01 90);
+  --secondary: oklch(0.96 0.005 90);
+  --secondary-foreground: oklch(0.2 0.01 90);
+  --muted: oklch(0.97 0.004 90);
+  --muted-foreground: oklch(0.48 0.01 90);
+  --accent: oklch(0.92 0.05 80);
+  --accent-foreground: oklch(0.18 0.01 90);
+  --border: oklch(0.9 0.005 90);
+  --input: oklch(0.94 0.005 90);
+  --ring: oklch(0.72 0.16 70);
+
+  --gradient-hero:
+    radial-gradient(ellipse 80% 60% at 20% 0%, oklch(0.92 0.1 88 / 0.5), transparent 60%),
+    radial-gradient(ellipse 60% 50% at 90% 100%, oklch(0.88 0.08 55 / 0.4), transparent 60%),
+    linear-gradient(180deg, oklch(1 0 0), oklch(0.98 0.005 90));
+  --gradient-card: linear-gradient(145deg, oklch(1 0 0) 0%, oklch(0.97 0.005 90) 100%);
+  --gradient-mesh:
+    radial-gradient(at 20% 30%, oklch(0.92 0.1 88 / 0.18) 0px, transparent 50%),
+    radial-gradient(at 80% 20%, oklch(0.88 0.08 55 / 0.14) 0px, transparent 50%),
+    radial-gradient(at 70% 80%, oklch(0.92 0.1 88 / 0.14) 0px, transparent 50%);
+
+  --shadow-glow: 0 20px 60px -15px oklch(0.72 0.16 70 / 0.35);
+  --shadow-3d:
+    0 1px 0 0 oklch(1 0 0 / 0.9) inset,
+    0 -1px 0 0 oklch(0 0 0 / 0.04) inset,
+    0 24px 50px -22px oklch(0.2 0.02 90 / 0.18),
+    0 6px 16px -8px oklch(0.72 0.16 70 / 0.15);
+  --shadow-3d-hover:
+    0 1px 0 0 oklch(1 0 0 / 0.9) inset,
+    0 -1px 0 0 oklch(0 0 0 / 0.05) inset,
+    0 40px 80px -20px oklch(0.2 0.02 90 / 0.28),
+    0 14px 30px -10px oklch(0.72 0.16 70 / 0.25);
+}
+
 
 @keyframes float {
   0%, 100% { transform: translateY(0) rotate(0deg); }
