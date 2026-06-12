@@ -178,6 +178,6 @@ function ProductsPage() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
