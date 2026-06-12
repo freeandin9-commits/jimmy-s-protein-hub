@@ -80,7 +80,7 @@ function ProductsPage() {
   }, [products]);
 
   return (
-    <>
+    <div className="light-theme flex-1 bg-background">
       <SearchBar />
       <div className="container mx-auto px-4 py-12 md:py-16">
         <header className="mb-8">
@@ -178,6 +178,6 @@ function ProductsPage() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
