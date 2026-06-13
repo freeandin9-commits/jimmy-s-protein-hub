@@ -8,6 +8,7 @@ import { SearchBar } from "@/components/SearchBar";
 import { fetchProducts, type Product } from "@/lib/products";
 import { supabase } from "@/integrations/supabase/client";
 import { X } from "lucide-react";
+import { CategoriesSection } from "@/components/CategoriesSection";
 
 const productsSearchSchema = z.object({
   q: fallback(z.string(), "").default(""),
