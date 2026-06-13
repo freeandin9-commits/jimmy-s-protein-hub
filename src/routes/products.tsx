@@ -83,6 +83,7 @@ function ProductsPage() {
   return (
     <div className="light-theme flex-1 bg-background">
       <SearchBar />
+      <CategoriesSection />
       <div className="container mx-auto px-4 py-12 md:py-16">
         <header className="mb-8">
           <p className="text-sm font-bold uppercase tracking-widest text-primary">The Lineup</p>
