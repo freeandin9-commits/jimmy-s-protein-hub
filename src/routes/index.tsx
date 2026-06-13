@@ -16,7 +16,11 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Jimmy's Protein — Real Fuel. No Junk." },
-      { name: "description", content: "Premium protein powder for athletes who train hard. 25g protein per scoop, clean ingredients, bold flavors." },
+      {
+        name: "description",
+        content:
+          "Premium protein powder for athletes who train hard. 25g protein per scoop, clean ingredients, bold flavors.",
+      },
       { property: "og:title", content: "Jimmy's Protein — Real Fuel. No Junk." },
       { property: "og:description", content: "Premium protein powder for athletes who train hard." },
       { property: "og:image", content: heroImg },
@@ -41,10 +45,12 @@ function HomePage() {
   };
 
   useEffect(() => {
-    fetchProducts(6).then((p) => {
-      setProducts(p);
-      setLoading(false);
-    }).catch(() => setLoading(false));
+    fetchProducts(6)
+      .then((p) => {
+        setProducts(p);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
   }, []);
 
   return (
@@ -54,11 +60,17 @@ function HomePage() {
       {/* HERO — Black + emerald + gold 3D */}
       <section
         className="relative overflow-hidden"
-        style={{ background: "var(--gradient-hero)" }}
+        style={{ background: "linear-gradient(135deg,#0B0B0D 0%,#151518 40%,#1C1C21 100%)" }}
       >
         {/* layered ambient glows */}
-        <div aria-hidden className="pointer-events-none absolute -left-40 top-10 h-[500px] w-[500px] rounded-full bg-primary/20 blur-[120px]" />
-        <div aria-hidden className="pointer-events-none absolute -right-32 bottom-0 h-[600px] w-[600px] rounded-full bg-accent/15 blur-[140px]" />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -left-40 top-10 h-[500px] w-[500px] rounded-full bg-primary/20 blur-[120px]"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-32 bottom-0 h-[600px] w-[600px] rounded-full bg-accent/15 blur-[140px]"
+        />
         <div aria-hidden className="pointer-events-none absolute inset-0 mesh-bg opacity-60" />
 
         {/* subtle grid */}
@@ -81,9 +93,7 @@ function HomePage() {
             <h1 className="font-display text-5xl uppercase leading-[0.95] tracking-tight md:text-6xl lg:text-7xl xl:text-[5.5rem]">
               <span className="text-foreground">{settings.hero_headline}</span>
             </h1>
-            <p className="mt-6 max-w-md text-base text-muted-foreground md:text-lg">
-              {settings.hero_subtext}
-            </p>
+            <p className="mt-6 max-w-md text-base text-muted-foreground md:text-lg">{settings.hero_subtext}</p>
             <div className="mt-10 flex flex-wrap items-center gap-6">
               <Button
                 asChild
@@ -112,7 +122,10 @@ function HomePage() {
 
           <div className="relative z-10 flex items-center justify-center [perspective:1200px]">
             {/* glow rings */}
-            <div aria-hidden className="absolute inset-10 rounded-full bg-primary/30 blur-3xl animate-[glow-pulse_3s_ease-in-out_infinite]" />
+            <div
+              aria-hidden
+              className="absolute inset-10 rounded-full bg-primary/30 blur-3xl animate-[glow-pulse_3s_ease-in-out_infinite]"
+            />
             <div aria-hidden className="absolute inset-20 rounded-full bg-accent/25 blur-2xl" />
             {/* orbit ring */}
             <div aria-hidden className="absolute h-[420px] w-[420px] rounded-full border border-primary/20" />
@@ -147,10 +160,7 @@ function HomePage() {
             { icon: Shield, title: "Zero Junk", desc: "No fillers, no hidden sugars, no BS." },
             { icon: Flame, title: "Bold Flavors", desc: "Tastes incredible. Mixes clean." },
           ].map((b) => (
-            <div
-              key={b.title}
-              className="card-3d card-3d-hover group flex items-start gap-4 rounded-2xl p-6"
-            >
+            <div key={b.title} className="card-3d card-3d-hover group flex items-start gap-4 rounded-2xl p-6">
               <div className="rounded-xl bg-primary/15 p-3 text-primary ring-1 ring-primary/30 transition-transform group-hover:scale-110">
                 <b.icon className="h-6 w-6" />
               </div>
@@ -172,7 +182,10 @@ function HomePage() {
             <p className="text-sm font-bold uppercase tracking-widest text-primary">Best Sellers</p>
             <h2 className="mt-2 font-display text-4xl uppercase tracking-wide md:text-5xl">Fuel the Grind</h2>
           </div>
-          <Link to="/products" className="hidden text-sm font-bold uppercase tracking-wider text-primary hover:underline md:inline">
+          <Link
+            to="/products"
+            className="hidden text-sm font-bold uppercase tracking-wider text-primary hover:underline md:inline"
+          >
             View all →
           </Link>
         </div>
@@ -180,7 +193,10 @@ function HomePage() {
         {loading ? (
           <div className="flex gap-6 overflow-x-auto pb-4">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="aspect-[3/4] w-[280px] flex-shrink-0 animate-pulse rounded-xl bg-card sm:w-[320px]" />
+              <div
+                key={i}
+                className="aspect-[3/4] w-[280px] flex-shrink-0 animate-pulse rounded-xl bg-card sm:w-[320px]"
+              />
             ))}
           </div>
         ) : products.length === 0 ? (
@@ -216,7 +232,6 @@ function HomePage() {
             </button>
           </div>
         )}
-
       </section>
 
       <TrustBadges />
@@ -230,7 +245,12 @@ function HomePage() {
             <h3 className="font-display text-3xl uppercase tracking-wide md:text-4xl">Ready to level up?</h3>
             <p className="mt-1 opacity-80">Order on WhatsApp. Fast confirmation. No checkout headache.</p>
           </div>
-          <Button asChild size="lg" variant="outline" className="h-12 border-primary-foreground bg-transparent px-8 font-bold uppercase tracking-wider text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+          <Button
+            asChild
+            size="lg"
+            variant="outline"
+            className="h-12 border-primary-foreground bg-transparent px-8 font-bold uppercase tracking-wider text-primary-foreground hover:bg-primary-foreground hover:text-primary"
+          >
             <Link to="/products">Shop the range</Link>
           </Button>
         </div>
