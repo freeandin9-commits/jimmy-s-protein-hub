@@ -9,7 +9,7 @@ import { toast } from "sonner";
 export function ProductCard({ product }: { product: Product }) {
   const addItem = useCartStore((s) => s.addItem);
   const open = useCartStore((s) => s.open);
-  const [qty, setQty] = useState(1); // Default quantity 1 ആക്കി, വാങ്ങാൻ കൂടുതൽ എളുപ്പമാക്കാൻ
+  const [qty, setQty] = useState(1);
 
   const gallery = productGallery(product);
   const hasMultiple = gallery.length > 1;
@@ -80,11 +80,11 @@ export function ProductCard({ product }: { product: Product }) {
     <Link
       to="/product/$handle"
       params={{ handle: product.id }}
-      className="group relative flex w-full flex-col overflow-hidden rounded-2xl border border-border bg-card/60 backdrop-blur-sm transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_20px_rgba(0,255,0,0.15)]"
+      className="group relative flex w-full flex-col overflow-hidden rounded-2xl border border-border bg-card/60 backdrop-blur-sm transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_20px_rgba(0,255,0,0.15)] h-full"
     >
       {/* Image Section */}
       <div
-        className="relative aspect-[4/5] overflow-hidden bg-secondary/40"
+        className="relative aspect-[4/5] overflow-hidden bg-secondary/40 w-full"
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
         onTouchStart={onTouchStart}
@@ -148,16 +148,19 @@ export function ProductCard({ product }: { product: Product }) {
       </div>
 
       {/* Product Info Content */}
-      <div className="flex flex-1 flex-col p-4">
-        <div className="flex-1">
-          <h3 className="font-display text-lg font-bold uppercase tracking-wide line-clamp-1 group-hover:text-primary transition-colors">
+      <div className="flex flex-1 flex-col p-4 justify-between">
+        {/* Title & Description wrapped with min-height */}
+        <div className="flex-1 min-h-[76px]">
+          <h3 className="font-display text-lg font-bold uppercase tracking-wide line-clamp-1 group-hover:text-primary transition-colors h-[28px] flex items-center">
             {product.title}
           </h3>
-          <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground/80">{product.description}</p>
+          <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground/80 min-h-[32px]">
+            {product.description}
+          </p>
         </div>
 
-        {/* Pricing Area */}
-        <div className="mt-3 border-t border-border/40 pt-3">
+        {/* Pricing Area with fixed heights */}
+        <div className="mt-3 border-t border-border/40 pt-3 min-h-[54px] flex flex-col justify-center">
           <div className="flex items-center gap-2">
             <span className="text-xl font-black text-foreground">{formatPrice(product.price, product.currency)}</span>
             {hasCompare && (
@@ -167,11 +170,13 @@ export function ProductCard({ product }: { product: Product }) {
             )}
           </div>
 
-          {hasCompare && (
-            <p className="mt-0.5 text-[11px] font-medium text-emerald-500 flex items-center gap-1">
-              ✨ You save {formatPrice(lineSaved, product.currency)}
-            </p>
-          )}
+          <div className="h-4 mt-0.5">
+            {hasCompare && (
+              <p className="text-[11px] font-medium text-emerald-500 flex items-center gap-1">
+                ✨ You save {formatPrice(lineSaved, product.currency)}
+              </p>
+            )}
+          </div>
         </div>
 
         {/* Action Controls */}
@@ -234,11 +239,14 @@ export function ProductCard({ product }: { product: Product }) {
           </Button>
         </div>
 
-        {qty > 1 && product.in_stock && (
-          <div className="mt-2 text-center text-[11px] text-muted-foreground bg-secondary/30 py-1 rounded-md border border-border/30">
-            Total Value: <span className="font-bold text-foreground">{formatPrice(lineTotal, product.currency)}</span>
-          </div>
-        )}
+        {/* Total Value container with reserved layout height */}
+        <div className="h-[26px] mt-2">
+          {qty > 1 && product.in_stock && (
+            <div className="text-center text-[11px] text-muted-foreground bg-secondary/30 py-1 rounded-md border border-border/30">
+              Total Value: <span className="font-bold text-foreground">{formatPrice(lineTotal, product.currency)}</span>
+            </div>
+          )}
+        </div>
       </div>
     </Link>
   );
