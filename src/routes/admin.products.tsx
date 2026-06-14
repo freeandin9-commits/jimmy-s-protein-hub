@@ -29,6 +29,10 @@ interface FormState {
   in_stock: boolean;
   sort_order: string;
   category_id: string;
+  highlights: string; // newline-separated bullets in the form
+  ingredients: string;
+  how_to_use: string;
+  nutrition: string;
 }
 
 const empty: FormState = {
@@ -43,6 +47,10 @@ const empty: FormState = {
   in_stock: true,
   sort_order: "0",
   category_id: "",
+  highlights: "",
+  ingredients: "",
+  how_to_use: "",
+  nutrition: "",
 };
 
 function ProductsAdminPage() {
@@ -86,6 +94,10 @@ function ProductsAdminPage() {
       in_stock: p.in_stock,
       sort_order: String(p.sort_order),
       category_id: p.category_id ?? "",
+      highlights: (p.highlights ?? []).join("\n"),
+      ingredients: p.ingredients ?? "",
+      how_to_use: p.how_to_use ?? "",
+      nutrition: p.nutrition ?? "",
     });
     setOpen(true);
   };
@@ -131,6 +143,13 @@ function ProductsAdminPage() {
       in_stock: form.in_stock,
       sort_order: parseInt(form.sort_order) || 0,
       category_id: form.category_id || null,
+      highlights: form.highlights
+        .split("\n")
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0),
+      ingredients: form.ingredients,
+      how_to_use: form.how_to_use,
+      nutrition: form.nutrition,
     };
     try {
       if (form.id) {
@@ -330,6 +349,32 @@ function ProductsAdminPage() {
                 {form.image_3 && (
                   <img src={form.image_3} alt="preview 3" className="mt-2 h-24 w-24 rounded-md border border-border object-cover" />
                 )}
+              </div>
+            </div>
+            <div className="space-y-3 rounded-md border border-border bg-muted/30 p-3">
+              <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Product Content</p>
+              <div>
+                <Label htmlFor="highlights">Key Highlights</Label>
+                <Textarea
+                  id="highlights"
+                  rows={4}
+                  value={form.highlights}
+                  onChange={(e) => setForm({ ...form, highlights: e.target.value })}
+                  placeholder={"One bullet per line, e.g.\n25g protein per serving\nGrass-fed whey\nNo added sugar"}
+                />
+                <p className="mt-1 text-[11px] text-muted-foreground">One point per line. Shown as a bullet list on the product page.</p>
+              </div>
+              <div>
+                <Label htmlFor="ingredients">Ingredients</Label>
+                <Textarea id="ingredients" rows={3} value={form.ingredients} onChange={(e) => setForm({ ...form, ingredients: e.target.value })} placeholder="Whey protein concentrate, cocoa, natural flavors…" />
+              </div>
+              <div>
+                <Label htmlFor="how_to_use">How to Use</Label>
+                <Textarea id="how_to_use" rows={3} value={form.how_to_use} onChange={(e) => setForm({ ...form, how_to_use: e.target.value })} placeholder="Mix 1 scoop with 250ml water or milk…" />
+              </div>
+              <div>
+                <Label htmlFor="nutrition">Nutrition Info</Label>
+                <Textarea id="nutrition" rows={3} value={form.nutrition} onChange={(e) => setForm({ ...form, nutrition: e.target.value })} placeholder="Per serving: 120 kcal, 25g protein, 2g carbs…" />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">

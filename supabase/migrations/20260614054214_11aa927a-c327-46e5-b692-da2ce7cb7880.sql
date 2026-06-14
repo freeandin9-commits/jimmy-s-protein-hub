@@ -1,0 +1,5 @@
+ALTER TABLE public.products
+  ADD COLUMN IF NOT EXISTS highlights text[] NOT NULL DEFAULT '{}',
+  ADD COLUMN IF NOT EXISTS ingredients text NOT NULL DEFAULT '',
+  ADD COLUMN IF NOT EXISTS how_to_use text NOT NULL DEFAULT '',
+  ADD COLUMN IF NOT EXISTS nutrition text NOT NULL DEFAULT '';
