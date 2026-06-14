@@ -120,7 +120,7 @@ export function CategoriesSection() {
             <div key={c.id} className="shrink-0">
               <Link
                 to="/products"
-                search={{ category: c.slug } as any}
+                search={(prev: any) => ({ ...prev, category: c.slug })}
                 className="group flex w-[104px] flex-col items-center gap-3 sm:w-[124px] md:w-[140px]"
               >
                 <div className="relative h-[96px] w-[96px] overflow-hidden rounded-full bg-muted border border-border/40 shadow-md transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl group-hover:border-primary/30 sm:h-[112px] sm:w-[112px] md:h-[128px] md:w-[128px]">
