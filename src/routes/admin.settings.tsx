@@ -20,7 +20,7 @@ function SettingsPage() {
     queryFn: async () => {
       const { data: resData, error } = await supabase.from("site_settings").select("*").limit(1).maybeSingle();
       if (error) throw error;
-      return resData as any;
+      return resData as any; // Type error ഒഴിവാക്കാൻ any ആക്കുന്നു
     },
   });
 
@@ -32,8 +32,8 @@ function SettingsPage() {
   useEffect(() => {
     if (data && !form) {
       setForm(data);
-      if (data.faq && Array.isArray(data.faq)) {
-        setFaqs(data.faq);
+      if (data && (data as any).faq && Array.isArray((data as any).faq)) {
+        setFaqs((data as any).faq);
       } else {
         setFaqs([
           {
@@ -130,17 +130,10 @@ function SettingsPage() {
       facebook_url: form.facebook_url,
       address: form.address,
       business_hours: form.business_hours,
+      faq: filteredFaqs as any, // ഇവിടെ TypeScript എറർ അടിക്കാതിരിക്കാൻ as any നൽകി
     };
 
-    // ടേബിളിൽ കോളം ഉണ്ടെങ്കിൽ മാത്രം ഫയൽ സേവ് ചെയ്യാനായി സുരക്ഷിതമായി അപ്ഡേറ്റ് ചെയ്യുന്നു
-    if ("faq" in form || filteredFaqs.length > 0) {
-      updateData.faq = filteredFaqs;
-    }
-
-    const { error } = await supabase
-      .from("site_settings")
-      .update(updateData as any)
-      .eq("id", form.id);
+    const { error } = await supabase.from("site_settings").update(updateData).eq("id", form.id);
 
     setSaving(false);
     if (error) {
