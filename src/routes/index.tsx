@@ -259,17 +259,15 @@ function HomePage() {
 
       <TrustBadges />
 
-      {/* INSTAGRAM SECTION WITH VISIBLE JIMMY'S IMAGE BACKGROUND */}
+      {/* INSTAGRAM SECTION WITH FIXED PARALLAX BACKGROUND */}
       <section
-        className="relative bg-cover bg-center bg-no-repeat py-16 md:py-24 overflow-hidden"
+        className="relative bg-cover bg-center bg-fixed bg-no-repeat py-20 md:py-28 overflow-hidden"
         style={{ backgroundImage: `url(${heroImg})` }}
       >
-        {/* Dark semi-transparent overlay to keep the typography readable but the background image beautiful */}
-        <div className="absolute inset-0 bg-black/70 backdrop-blur-[1px]" aria-hidden />
+        {/* Dark overlay to keep typography sharp & clean */}
+        <div className="absolute inset-0 bg-black/75 backdrop-blur-[1px]" aria-hidden />
 
-        {/* Enforcing background transparency on the container so the internal 
-          component doesn't accidentally color over our custom hero image background.
-        */}
+        {/* Enforcing background transparency on children */}
         <div className="relative z-10 [&_section]:bg-transparent [&_div]:bg-transparent">
           <InstagramSection />
         </div>
