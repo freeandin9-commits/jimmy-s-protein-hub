@@ -13,11 +13,6 @@ export const Route = createFileRoute("/admin/settings")({
   component: SettingsPage,
 });
 
-interface FAQItem {
-  q: string;
-  a: string;
-}
-
 function SettingsPage() {
   const qc = useQueryClient();
   const { data, isLoading } = useQuery({
@@ -25,30 +20,20 @@ function SettingsPage() {
     queryFn: async () => {
       const { data: resData, error } = await supabase.from("site_settings").select("*").limit(1).maybeSingle();
       if (error) throw error;
-      return resData;
+      return resData as any;
     },
   });
 
   const [form, setForm] = useState<any>(null);
-  const [faqs, setFaqs] = useState<FAQItem[]>([]);
+  const [faqs, setFaqs] = useState<any[]>([]);
   const [saving, setSaving] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
 
   useEffect(() => {
     if (data && !form) {
       setForm(data);
-
-      // FAQ ടൈപ്പ് സേഫ് ആയി പാർസ് ചെയ്യുന്നു
-      let parsedFaqs: FAQItem[] = [];
       if (data.faq && Array.isArray(data.faq)) {
-        parsedFaqs = (data.faq as any[]).map((item) => ({
-          q: String(item?.q || ""),
-          a: String(item?.a || ""),
-        }));
-      }
-
-      if (parsedFaqs.length > 0) {
-        setFaqs(parsedFaqs);
+        setFaqs(data.faq);
       } else {
         setFaqs([
           {
@@ -102,7 +87,10 @@ function SettingsPage() {
       if (upErr) throw upErr;
       const { data: signed } = await supabase.storage.from("ads").createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
       if (!signed?.signedUrl) throw new Error("Failed to get URL");
-      const { error } = await supabase.from("site_settings").update({ logo_url: signed.signedUrl }).eq("id", form.id);
+      const { error } = await supabase
+        .from("site_settings")
+        .update({ logo_url: signed.signedUrl } as any)
+        .eq("id", form.id);
       if (error) throw error;
       setForm({ ...form, logo_url: signed.signedUrl });
       qc.invalidateQueries({ queryKey: ["site_settings"] });
@@ -116,7 +104,10 @@ function SettingsPage() {
 
   const deleteLogo = async () => {
     if (!confirm("Remove the logo? The default will be shown.")) return;
-    const { error } = await supabase.from("site_settings").update({ logo_url: null }).eq("id", form.id);
+    const { error } = await supabase
+      .from("site_settings")
+      .update({ logo_url: null } as any)
+      .eq("id", form.id);
     if (error) return toast.error(error.message);
     setForm({ ...form, logo_url: null });
     qc.invalidateQueries({ queryKey: ["site_settings"] });
@@ -127,23 +118,28 @@ function SettingsPage() {
     e.preventDefault();
     setSaving(true);
 
-    const filteredFaqs = faqs.filter((item) => item.q.trim() !== "" || item.a.trim() !== "");
+    const filteredFaqs = faqs.filter((item) => item && item.q && item.q.trim() !== "");
 
-    // Supabase jsonb അപ്ഡേറ്റിനായി ടൈപ്പ് കാസ്റ്റിംഗ് ചെയ്യുന്നു
+    const updateData: any = {
+      whatsapp_number: (form.whatsapp_number || "").replace(/[^0-9]/g, ""),
+      hero_headline: form.hero_headline,
+      hero_subtext: form.hero_subtext,
+      contact_email: form.contact_email,
+      contact_phone: form.contact_phone,
+      instagram_url: form.instagram_url,
+      facebook_url: form.facebook_url,
+      address: form.address,
+      business_hours: form.business_hours,
+    };
+
+    // ടേബിളിൽ കോളം ഉണ്ടെങ്കിൽ മാത്രം ഫയൽ സേവ് ചെയ്യാനായി സുരക്ഷിതമായി അപ്ഡേറ്റ് ചെയ്യുന്നു
+    if ("faq" in form || filteredFaqs.length > 0) {
+      updateData.faq = filteredFaqs;
+    }
+
     const { error } = await supabase
       .from("site_settings")
-      .update({
-        whatsapp_number: (form.whatsapp_number || "").replace(/[^0-9]/g, ""),
-        hero_headline: form.hero_headline,
-        hero_subtext: form.hero_subtext,
-        contact_email: form.contact_email,
-        contact_phone: form.contact_phone,
-        instagram_url: form.instagram_url,
-        facebook_url: form.facebook_url,
-        address: form.address,
-        business_hours: form.business_hours,
-        faq: filteredFaqs as any,
-      })
+      .update(updateData as any)
       .eq("id", form.id);
 
     setSaving(false);
@@ -324,7 +320,7 @@ function SettingsPage() {
                 <div className="pr-8">
                   <Label className="text-xs">Question {index + 1}</Label>
                   <Input
-                    value={faq.q}
+                    value={faq?.q || ""}
                     onChange={(e) => handleFaqChange(index, "q", e.target.value)}
                     placeholder="e.g., How long does delivery take?"
                     className="mt-1"
@@ -333,7 +329,7 @@ function SettingsPage() {
                 <div>
                   <Label className="text-xs">Answer</Label>
                   <Textarea
-                    value={faq.a}
+                    value={faq?.a || ""}
                     onChange={(e) => handleFaqChange(index, "a", e.target.value)}
                     placeholder="e.g., Delivery takes 2-5 business days."
                     rows={2}
