@@ -57,7 +57,8 @@ function HomePage() {
     <div>
       <SearchBar />
       <AdsStrip />
-      {/* HERO — Black + emerald + gold 3D */}
+      <CategoriesSection />
+
       <section
         className="relative overflow-hidden"
         style={{ background: "linear-gradient(135deg,#0B0B0D 0%,#151518 40%,#1C1C21 100%)" }}
@@ -173,7 +174,7 @@ function HomePage() {
         </div>
       </section>
 
-      <CategoriesSection />
+
 
       {/* FEATURED PRODUCTS */}
       <section className="container mx-auto px-4 py-16 md:py-24">
