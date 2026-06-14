@@ -32,12 +32,12 @@ export function CategoriesSection() {
         <div className="-mx-3 flex gap-4 overflow-x-auto px-3 pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-6">
           <Link
             to="/products"
-            className="group flex w-[78px] shrink-0 flex-col items-center gap-2 sm:w-[92px]"
+            className="group flex w-[104px] shrink-0 flex-col items-center gap-2 sm:w-[124px] md:w-[140px]"
           >
-            <div className="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-foreground text-background transition-transform duration-300 group-hover:scale-105 sm:h-[84px] sm:w-[84px]">
-              <LayoutGrid className="h-7 w-7" strokeWidth={2.5} />
+            <div className="flex h-[96px] w-[96px] items-center justify-center rounded-full bg-foreground text-background transition-transform duration-300 group-hover:scale-105 sm:h-[112px] sm:w-[112px] md:h-[128px] md:w-[128px]">
+              <LayoutGrid className="h-9 w-9 md:h-10 md:w-10" strokeWidth={2.5} />
             </div>
-            <h3 className="text-center text-xs font-semibold leading-tight text-foreground sm:text-sm">
+            <h3 className="text-center text-sm font-semibold leading-tight text-foreground sm:text-base">
               Categories
             </h3>
           </Link>
@@ -47,9 +47,9 @@ export function CategoriesSection() {
               key={c.id}
               to="/products"
               search={{ category: c.slug }}
-              className="group flex w-[78px] shrink-0 flex-col items-center gap-2 sm:w-[92px]"
+              className="group flex w-[104px] shrink-0 flex-col items-center gap-2 sm:w-[124px] md:w-[140px]"
             >
-              <div className="relative h-[72px] w-[72px] overflow-hidden rounded-full bg-primary transition-transform duration-300 group-hover:scale-105 sm:h-[84px] sm:w-[84px]">
+              <div className="relative h-[96px] w-[96px] overflow-hidden rounded-full bg-primary transition-transform duration-300 group-hover:scale-105 sm:h-[112px] sm:w-[112px] md:h-[128px] md:w-[128px]">
                 {c.image_url ? (
                   <img
                     src={c.image_url}
@@ -58,12 +58,12 @@ export function CategoriesSection() {
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <div className="flex h-full items-center justify-center text-sm font-bold uppercase text-primary-foreground">
+                  <div className="flex h-full items-center justify-center text-base font-bold uppercase text-primary-foreground">
                     {c.name.slice(0, 2)}
                   </div>
                 )}
               </div>
-              <h3 className="text-center text-xs font-semibold leading-tight text-foreground sm:text-sm">
+              <h3 className="text-center text-sm font-semibold leading-tight text-foreground sm:text-base">
                 {c.name}
               </h3>
             </Link>
