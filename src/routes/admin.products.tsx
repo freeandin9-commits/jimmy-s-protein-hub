@@ -29,6 +29,10 @@ interface FormState {
   in_stock: boolean;
   sort_order: string;
   category_id: string;
+  highlights: string; // newline-separated bullets in the form
+  ingredients: string;
+  how_to_use: string;
+  nutrition: string;
 }
 
 const empty: FormState = {
@@ -43,6 +47,10 @@ const empty: FormState = {
   in_stock: true,
   sort_order: "0",
   category_id: "",
+  highlights: "",
+  ingredients: "",
+  how_to_use: "",
+  nutrition: "",
 };
 
 function ProductsAdminPage() {
