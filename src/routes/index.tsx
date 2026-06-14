@@ -174,7 +174,7 @@ function HomePage() {
         </div>
       </section>
 
-      <CategoriesSection />
+
 
       {/* FEATURED PRODUCTS */}
       <section className="container mx-auto px-4 py-16 md:py-24">
