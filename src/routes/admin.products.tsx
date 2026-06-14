@@ -351,6 +351,32 @@ function ProductsAdminPage() {
                 )}
               </div>
             </div>
+            <div className="space-y-3 rounded-md border border-border bg-muted/30 p-3">
+              <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Product Content</p>
+              <div>
+                <Label htmlFor="highlights">Key Highlights</Label>
+                <Textarea
+                  id="highlights"
+                  rows={4}
+                  value={form.highlights}
+                  onChange={(e) => setForm({ ...form, highlights: e.target.value })}
+                  placeholder={"One bullet per line, e.g.\n25g protein per serving\nGrass-fed whey\nNo added sugar"}
+                />
+                <p className="mt-1 text-[11px] text-muted-foreground">One point per line. Shown as a bullet list on the product page.</p>
+              </div>
+              <div>
+                <Label htmlFor="ingredients">Ingredients</Label>
+                <Textarea id="ingredients" rows={3} value={form.ingredients} onChange={(e) => setForm({ ...form, ingredients: e.target.value })} placeholder="Whey protein concentrate, cocoa, natural flavors…" />
+              </div>
+              <div>
+                <Label htmlFor="how_to_use">How to Use</Label>
+                <Textarea id="how_to_use" rows={3} value={form.how_to_use} onChange={(e) => setForm({ ...form, how_to_use: e.target.value })} placeholder="Mix 1 scoop with 250ml water or milk…" />
+              </div>
+              <div>
+                <Label htmlFor="nutrition">Nutrition Info</Label>
+                <Textarea id="nutrition" rows={3} value={form.nutrition} onChange={(e) => setForm({ ...form, nutrition: e.target.value })} placeholder="Per serving: 120 kcal, 25g protein, 2g carbs…" />
+              </div>
+            </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label htmlFor="sort">Sort order</Label>
