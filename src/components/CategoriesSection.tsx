@@ -39,14 +39,28 @@ export function CategoriesSection() {
 
   useEffect(() => {
     const container = scrollContainerRef.current;
+
+    // മൗസ് വീൽ വഴി വശങ്ങളിലേക്ക് സ്ക്രോൾ ചെയ്യാനുള്ള ഫങ്ക്ഷൻ
+    const handleWheel = (e: WheelEvent) => {
+      if (!container) return;
+      // മുകളിലേക്കും താഴേക്കും ഉള്ള സ്ക്രോളിനെ വശങ്ങളിലേക്ക് മാറ്റുന്നു
+      if (e.deltaY !== 0) {
+        e.preventDefault();
+        container.scrollLeft += e.deltaY;
+      }
+    };
+
     if (container) {
       checkScroll();
       container.addEventListener("scroll", checkScroll);
+      container.addEventListener("wheel", handleWheel, { passive: false }); // Wheel event ചേർത്തു
       window.addEventListener("resize", checkScroll);
     }
+
     return () => {
       if (container) {
         container.removeEventListener("scroll", checkScroll);
+        container.removeEventListener("wheel", handleWheel);
       }
       window.removeEventListener("resize", checkScroll);
     };
@@ -117,7 +131,6 @@ export function CategoriesSection() {
                 search={{ category: c.slug }}
                 className="group flex w-[104px] flex-col items-center gap-3 sm:w-[124px] md:w-[140px]"
               >
-                {/* Image Container with hover zoom and shadows */}
                 <div className="relative h-[96px] w-[96px] overflow-hidden rounded-full bg-muted border border-border/40 shadow-md transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl group-hover:border-primary/30 sm:h-[112px] sm:w-[112px] md:h-[128px] md:w-[128px]">
                   {c.image_url ? (
                     <img
@@ -131,11 +144,9 @@ export function CategoriesSection() {
                       {c.name.slice(0, 2)}
                     </div>
                   )}
-                  {/* Subtle dark overlay on hover */}
                   <div className="absolute inset-0 bg-black/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                 </div>
 
-                {/* Text with upward bounce effect on hover */}
                 <h3 className="text-center text-xs font-bold tracking-wide uppercase text-foreground/80 transition-all duration-300 group-hover:text-primary group-hover:translate-y-[-2px] sm:text-sm line-clamp-1">
                   {c.name}
                 </h3>
