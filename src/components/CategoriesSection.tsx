@@ -32,36 +32,22 @@ export function CategoriesSection() {
   const checkScroll = () => {
     if (scrollContainerRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
-      // ചെറിയ വ്യത്യാസങ്ങൾ ഒഴിവാക്കാൻ കറക്റ്റ് ആയി മാച്ച് ചെയ്യുന്നു
-      setShowLeftArrow(scrollLeft > 2);
-      setShowRightArrow(scrollLeft + clientWidth < scrollWidth - 5);
+      setShowLeftArrow(scrollLeft > 0);
+      setShowRightArrow(scrollLeft + clientWidth < scrollWidth - 1);
     }
   };
 
   useEffect(() => {
     const container = scrollContainerRef.current;
-    if (!container) return;
-
-    // മൗസ് വീൽ വഴി വശങ്ങളിലേക്ക് സ്ക്രോൾ ചെയ്യാനുള്ള ഫങ്ക്ഷൻ
-    const handleWheel = (e: WheelEvent) => {
-      if (e.deltaY !== 0) {
-        e.preventDefault();
-        container.scrollLeft += e.deltaY;
-      }
-    };
-
-    // ഇനിഷ്യൽ ചെക്കിംഗും ഇവന്റ് ലിസണറുകളും
-    // കാറ്റഗറികളും ചിത്രങ്ങളും പൂർണ്ണമായി റെൻഡർ ചെയ്യാൻ ചെറിയൊരു ഡിലേ നൽകുന്നു
-    const timeoutId = setTimeout(checkScroll, 300);
-
-    container.addEventListener("scroll", checkScroll);
-    container.addEventListener("wheel", handleWheel, { passive: false });
-    window.addEventListener("resize", checkScroll);
-
+    if (container) {
+      checkScroll();
+      container.addEventListener("scroll", checkScroll);
+      window.addEventListener("resize", checkScroll);
+    }
     return () => {
-      clearTimeout(timeoutId);
-      container.removeEventListener("scroll", checkScroll);
-      container.removeEventListener("wheel", handleWheel);
+      if (container) {
+        container.removeEventListener("scroll", checkScroll);
+      }
       window.removeEventListener("resize", checkScroll);
     };
   }, [categories]);
@@ -131,6 +117,7 @@ export function CategoriesSection() {
                 search={{ category: c.slug }}
                 className="group flex w-[104px] flex-col items-center gap-3 sm:w-[124px] md:w-[140px]"
               >
+                {/* Image Container with hover zoom and shadows */}
                 <div className="relative h-[96px] w-[96px] overflow-hidden rounded-full bg-muted border border-border/40 shadow-md transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl group-hover:border-primary/30 sm:h-[112px] sm:w-[112px] md:h-[128px] md:w-[128px]">
                   {c.image_url ? (
                     <img
@@ -138,16 +125,17 @@ export function CategoriesSection() {
                       alt={c.name}
                       loading="lazy"
                       className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
-                      onLoad={checkScroll} // ഇമേജ് ലോഡ് ആയി കഴിഞ്ഞും സ്ക്രോൾ ലിമിറ്റ് ചെക്ക് ചെയ്യും
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center text-lg font-black uppercase bg-gradient-to-br from-primary/10 to-primary/30 text-primary">
                       {c.name.slice(0, 2)}
                     </div>
                   )}
+                  {/* Subtle dark overlay on hover */}
                   <div className="absolute inset-0 bg-black/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                 </div>
 
+                {/* Text with upward bounce effect on hover */}
                 <h3 className="text-center text-xs font-bold tracking-wide uppercase text-foreground/80 transition-all duration-300 group-hover:text-primary group-hover:translate-y-[-2px] sm:text-sm line-clamp-1">
                   {c.name}
                 </h3>
