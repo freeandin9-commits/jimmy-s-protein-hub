@@ -169,6 +169,42 @@ function ProductPage() {
           </p>
         </div>
       </div>
+
+      {(product.highlights?.length > 0 || product.ingredients || product.how_to_use || product.nutrition) && (
+        <div className="mt-12 grid gap-6 md:grid-cols-2">
+          {product.highlights?.length > 0 && (
+            <section className="rounded-2xl border border-border bg-card p-6">
+              <h2 className="font-display text-xl uppercase tracking-wide">Key Highlights</h2>
+              <ul className="mt-3 space-y-2">
+                {product.highlights.map((h, i) => (
+                  <li key={i} className="flex gap-2 text-sm text-muted-foreground">
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                    <span>{h}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+          {product.ingredients && (
+            <section className="rounded-2xl border border-border bg-card p-6">
+              <h2 className="font-display text-xl uppercase tracking-wide">Ingredients</h2>
+              <p className="mt-3 whitespace-pre-line text-sm text-muted-foreground">{product.ingredients}</p>
+            </section>
+          )}
+          {product.how_to_use && (
+            <section className="rounded-2xl border border-border bg-card p-6">
+              <h2 className="font-display text-xl uppercase tracking-wide">How to Use</h2>
+              <p className="mt-3 whitespace-pre-line text-sm text-muted-foreground">{product.how_to_use}</p>
+            </section>
+          )}
+          {product.nutrition && (
+            <section className="rounded-2xl border border-border bg-card p-6">
+              <h2 className="font-display text-xl uppercase tracking-wide">Nutrition Info</h2>
+              <p className="mt-3 whitespace-pre-line text-sm text-muted-foreground">{product.nutrition}</p>
+            </section>
+          )}
+        </div>
+      )}
     </div>
   );
 }
