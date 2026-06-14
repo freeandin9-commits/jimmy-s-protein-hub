@@ -144,10 +144,14 @@ export type Database = {
           created_at: string
           currency: string
           description: string
+          highlights: string[]
+          how_to_use: string
           id: string
           image_url: string
           images: string[]
           in_stock: boolean
+          ingredients: string
+          nutrition: string
           price: number
           sort_order: number
           title: string
@@ -159,10 +163,14 @@ export type Database = {
           created_at?: string
           currency?: string
           description?: string
+          highlights?: string[]
+          how_to_use?: string
           id?: string
           image_url?: string
           images?: string[]
           in_stock?: boolean
+          ingredients?: string
+          nutrition?: string
           price?: number
           sort_order?: number
           title: string
@@ -174,10 +182,14 @@ export type Database = {
           created_at?: string
           currency?: string
           description?: string
+          highlights?: string[]
+          how_to_use?: string
           id?: string
           image_url?: string
           images?: string[]
           in_stock?: boolean
+          ingredients?: string
+          nutrition?: string
           price?: number
           sort_order?: number
           title?: string
