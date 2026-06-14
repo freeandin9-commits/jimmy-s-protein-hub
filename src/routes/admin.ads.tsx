@@ -1,15 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { Trash2, Upload, Plus, Settings2, Image as ImageIcon, Save, Loader2 } from "lucide-react";
+import { Trash2, Upload, Plus, Settings2 } from "lucide-react";
 import { AdFitPreview } from "@/components/admin/AdFitPreview";
-import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 export const Route = createFileRoute("/admin/ads")({
   component: AdsPage,
@@ -30,9 +29,6 @@ type Ad = {
 
 function AdsPage() {
   const qc = useQueryClient();
-  const { settings } = useSiteSettings();
-
-  // Existing Landing Page Ads State
   const { data: ads = [], isLoading } = useQuery({
     queryKey: ["admin", "ads"],
     queryFn: async () => {
@@ -62,22 +58,6 @@ function AdsPage() {
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
-
-  // New Shop Side Banners State
-  const [shopBanner1, setShopBanner1] = useState("");
-  const [shopBanner2, setShopBanner2] = useState("");
-  const [shopSaving, setShopSaving] = useState(false);
-  const [settingsId, setSettingsId] = useState<string | null>(null);
-
-  // Load existing Shop Side Banners from site_settings
-  useEffect(() => {
-    if (settings) {
-      const anySettings = settings as any;
-      setSettingsId(anySettings.id || null);
-      setShopBanner1(anySettings.shop_side_banner_1 || "");
-      setShopBanner2(anySettings.shop_side_banner_2 || "");
-    }
-  }, [settings]);
 
   const onFile = async (file: File) => {
     setUploading(true);
@@ -119,13 +99,8 @@ function AdsPage() {
     } as any);
     setSaving(false);
     if (error) return toast.error(error.message);
-    setTitle("");
-    setImageUrl("");
-    setLinkUrl("");
-    setFitMode("cover");
-    setFocalX(50);
-    setFocalY(50);
-    setZoom(1);
+    setTitle(""); setImageUrl(""); setLinkUrl("");
+    setFitMode("cover"); setFocalX(50); setFocalY(50); setZoom(1);
     qc.invalidateQueries({ queryKey: ["admin", "ads"] });
     qc.invalidateQueries({ queryKey: ["ads", "public"] });
     toast.success("Ad published");
@@ -141,10 +116,7 @@ function AdsPage() {
     id: string,
     patch: { fit_mode?: string; focal_x?: number; focal_y?: number; zoom?: number },
   ) => {
-    await supabase
-      .from("ads")
-      .update(patch as any)
-      .eq("id", id);
+    await supabase.from("ads").update(patch as any).eq("id", id);
     qc.invalidateQueries({ queryKey: ["admin", "ads"] });
     qc.invalidateQueries({ queryKey: ["ads", "public"] });
   };
@@ -157,103 +129,16 @@ function AdsPage() {
     toast.success("Ad deleted");
   };
 
-  // Save Shop Side Banners
-  const saveShopBanners = async () => {
-    setShopSaving(true);
-    try {
-      const updateData: any = {
-        shop_side_banner_1: shopBanner1.trim(),
-        shop_side_banner_2: shopBanner2.trim(),
-      };
-
-      let error;
-      if (settingsId) {
-        const { error: updateError } = await supabase.from("site_settings").update(updateData).eq("id", settingsId);
-        error = updateError;
-      } else {
-        const { error: insertError } = await supabase.from("site_settings").insert([updateData]);
-        error = insertError;
-      }
-
-      if (error) throw error;
-
-      qc.invalidateQueries({ queryKey: ["site-settings"] });
-      toast.success("Shop Side Banners updated successfully!");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to save shop banners.");
-    } finally {
-      setShopSaving(false);
-    }
-  };
-
   return (
-    <div className="space-y-12">
-      {/* PAGE TITLE */}
+    <div className="space-y-8">
       <div>
-        <h1 className="font-display text-4xl uppercase tracking-wide">Advertisement Settings</h1>
-        <p className="text-sm text-muted-foreground">Manage banner ads shown across different pages of your website.</p>
+        <h1 className="font-display text-4xl uppercase tracking-wide">Ads</h1>
+        <p className="text-sm text-muted-foreground">Banner ads shown on the landing page.</p>
       </div>
 
-      {/* --- NEW SECTION: SHOP SIDE BANNERS --- */}
-      <div className="rounded-xl border border-border bg-card p-5 space-y-6">
-        <h2 className="font-display text-2xl uppercase tracking-wide flex items-center gap-2 border-b border-border/40 pb-2 text-primary">
-          <ImageIcon className="h-5 w-5" /> Shop Sidebar Ads
-        </h2>
-        <p className="text-xs text-muted-foreground -mt-3">
-          These image banners appear on the left sidebar of the main Shop Page (`/products`) below the categories list.
-        </p>
-
-        <div className="grid gap-6 md:grid-cols-2">
-          {/* SHOP BANNER 1 */}
-          <div className="space-y-2">
-            <Label className="uppercase tracking-wider text-xs">Shop Side Banner URL 1</Label>
-            <Input
-              value={shopBanner1}
-              onChange={(e) => setShopBanner1(e.target.value)}
-              placeholder="https://example.com/banner1.jpg"
-              className="bg-background"
-            />
-            {shopBanner1 && (
-              <div className="mt-2 relative aspect-[4/3] max-w-[160px] overflow-hidden rounded-lg border border-border bg-background">
-                <img src={shopBanner1} alt="Preview 1" className="h-full w-full object-cover" />
-              </div>
-            )}
-          </div>
-
-          {/* SHOP BANNER 2 */}
-          <div className="space-y-2">
-            <Label className="uppercase tracking-wider text-xs">Shop Side Banner URL 2</Label>
-            <Input
-              value={shopBanner2}
-              onChange={(e) => setShopBanner2(e.target.value)}
-              placeholder="https://example.com/banner2.jpg"
-              className="bg-background"
-            />
-            {shopBanner2 && (
-              <div className="mt-2 relative aspect-[4/3] max-w-[160px] overflow-hidden rounded-lg border border-border bg-background">
-                <img src={shopBanner2} alt="Preview 2" className="h-full w-full object-cover" />
-              </div>
-            )}
-          </div>
-        </div>
-
-        <Button onClick={saveShopBanners} disabled={shopSaving}>
-          {shopSaving ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...
-            </>
-          ) : (
-            <>
-              <Save className="mr-2 h-4 w-4" /> Save Shop Banners
-            </>
-          )}
-        </Button>
-      </div>
-
-      {/* --- EXISTING SECTION: LANDING PAGE HERO ADS --- */}
       <div className="rounded-xl border border-border bg-card p-5 space-y-4">
-        <h2 className="font-display text-2xl uppercase tracking-wide flex items-center gap-2 border-b border-border/40 pb-2 text-primary">
-          <Plus className="h-5 w-5" /> New Landing Page Ad
+        <h2 className="font-display text-2xl uppercase tracking-wide flex items-center gap-2">
+          <Plus className="h-5 w-5" /> New Ad
         </h2>
         <div className="grid gap-4 md:grid-cols-2">
           <div>
@@ -304,11 +189,8 @@ function AdsPage() {
         </Button>
       </div>
 
-      {/* ACTIVE ADS LIST */}
       <div className="rounded-xl border border-border bg-card p-5">
-        <h2 className="font-display text-2xl uppercase tracking-wide border-b border-border/40 pb-2 text-primary">
-          Active Landing Ads
-        </h2>
+        <h2 className="font-display text-2xl uppercase tracking-wide">Active Ads</h2>
         {isLoading ? (
           <p className="mt-4 text-sm text-muted-foreground">Loading…</p>
         ) : ads.length === 0 ? (
@@ -316,7 +198,7 @@ function AdsPage() {
         ) : (
           <ul className="mt-4 space-y-5">
             {ads.map((ad) => (
-              <li key={ad.id} className="rounded-lg border border-border p-3 bg-background/50">
+              <li key={ad.id} className="rounded-lg border border-border p-3">
                 <div className="relative aspect-[16/5] w-full overflow-hidden rounded-lg border border-border bg-card md:aspect-[16/4]">
                   <img
                     src={ad.image_url}
@@ -334,8 +216,7 @@ function AdsPage() {
                     <div className="truncate font-semibold">{ad.title || "(no title)"}</div>
                     <div className="truncate text-xs text-muted-foreground">{ad.link_url || "no link"}</div>
                     <div className="text-xs text-muted-foreground">
-                      Landing size preview · pos {Math.round(ad.focal_x)}%/{Math.round(ad.focal_y)}% · zoom{" "}
-                      {ad.zoom.toFixed(2)}x
+                      Landing size preview · pos {Math.round(ad.focal_x)}%/{Math.round(ad.focal_y)}% · zoom {ad.zoom.toFixed(2)}x
                     </div>
                   </div>
                   <Button
@@ -379,7 +260,8 @@ function AdEditor({
   const [focalY, setFocalY] = useState(ad.focal_y);
   const [zoom, setZoom] = useState(ad.zoom);
   const [saving, setSaving] = useState(false);
-  const dirty = fitMode !== ad.fit_mode || focalX !== ad.focal_x || focalY !== ad.focal_y || zoom !== ad.zoom;
+  const dirty =
+    fitMode !== ad.fit_mode || focalX !== ad.focal_x || focalY !== ad.focal_y || zoom !== ad.zoom;
 
   return (
     <div className="space-y-3">
