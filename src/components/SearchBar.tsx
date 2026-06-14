@@ -13,23 +13,28 @@ export function SearchBar() {
   };
 
   return (
-    <section className="border-b border-border/60 bg-background">
-      <div className="container mx-auto px-4 py-4 md:py-6">
+    <section className="border-b border-border/40 bg-gradient-to-b from-background to-background/95 sticky top-0 z-50 backdrop-blur-md">
+      <div className="container mx-auto px-4 py-4 md:py-5">
         <form onSubmit={onSubmit} className="relative mx-auto flex w-full max-w-3xl items-center">
-          <Search className="pointer-events-none absolute left-4 h-5 w-5 text-muted-foreground md:h-6 md:w-6 md:left-5" />
+          {/* Animated Search Icon */}
+          <div className="pointer-events-none absolute left-4.5 z-10 flex items-center justify-center text-muted-foreground transition-colors group-focus-within:text-primary md:left-5">
+            <Search className="h-5 w-5 md:h-6 md:w-6" />
+          </div>
 
+          {/* Premium Input Field */}
           <input
             type="search"
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Search products, categories…"
+            placeholder="Search for premium products, brands..."
             aria-label="Search the store"
-            className="h-14 w-full rounded-full border border-border bg-card pl-12 pr-28 text-base shadow-md outline-none transition-all placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/10 md:h-16 md:pl-14 md:pr-32 md:text-lg"
+            className="h-14 w-full rounded-full border border-border/80 bg-card/60 pl-12 pr-32 text-base font-medium shadow-sm outline-none transition-all duration-300 placeholder:text-muted-foreground/80 placeholder:font-normal focus:border-primary focus:bg-background focus:ring-4 focus:ring-primary/10 focus:shadow-md md:h-16 md:pl-14 md:pr-36 md:text-lg"
           />
 
+          {/* Modern & Attractive Search Button */}
           <button
             type="submit"
-            className="absolute right-2 inline-flex h-10 items-center rounded-full bg-primary px-5 text-xs font-bold uppercase tracking-wider text-primary-foreground transition-opacity hover:opacity-90 md:h-12 md:px-6 md:text-sm"
+            className="absolute right-2 inline-flex h-10 items-center justify-center rounded-full bg-primary px-5 text-xs font-bold uppercase tracking-wider text-primary-foreground shadow-sm transition-all duration-200 hover:scale-105 hover:opacity-95 hover:shadow-md active:scale-95 md:h-12 md:px-7 md:text-sm"
           >
             Search
           </button>
