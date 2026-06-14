@@ -280,13 +280,26 @@ function HomePage() {
         </div>
       </section>
 
-      {/* CTA STRIP */}
+      {/* CTA STRIP WITH PHONE CALL BUTTON */}
       <section className="border-t border-border bg-primary text-primary-foreground">
         <div className="container mx-auto flex flex-col items-center gap-4 px-4 py-12 text-center md:flex-row md:justify-between md:text-left">
-          <div>
-            <h3 className="font-display text-3xl uppercase tracking-wide md:text-4xl">Ready to level up?</h3>
-            <p className="mt-1 opacity-80">Order on WhatsApp. Fast confirmation. No checkout headache.</p>
+          <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6">
+            <div>
+              <h3 className="font-display text-3xl uppercase tracking-wide md:text-4xl">Ready to level up?</h3>
+              <p className="mt-1 opacity-80">Order on WhatsApp. Fast confirmation. No checkout headache.</p>
+            </div>
+
+            {/* Quick Call Button Action */}
+            <a
+              href="tel:+919142027275"
+              className="inline-flex items-center gap-2 rounded-full bg-primary-foreground/10 px-4 py-2 text-sm font-bold tracking-wide text-primary-foreground hover:bg-primary-foreground/20 transition-all border border-primary-foreground/20"
+              title="Call Us Now"
+            >
+              <Phone className="h-4 w-4 animate-[pulse_2s_infinite]" />
+              <span>+91 91420 27275</span>
+            </a>
           </div>
+
           <Button
             asChild
             size="lg"
