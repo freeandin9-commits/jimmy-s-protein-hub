@@ -59,6 +59,7 @@ function HomePage() {
       <AdsStrip />
       <CategoriesSection />
 
+      {/* HERO SECTION */}
       <section
         className="relative overflow-hidden"
         style={{ background: "linear-gradient(135deg,#0B0B0D 0%,#151518 40%,#1C1C21 100%)" }}
@@ -73,35 +74,6 @@ function HomePage() {
           className="pointer-events-none absolute -right-32 bottom-0 h-[600px] w-[600px] rounded-full bg-accent/15 blur-[140px]"
         />
         <div aria-hidden className="pointer-events-none absolute inset-0 mesh-bg opacity-60" />
-
-        {/* animated background image — ken burns */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-[0.18] mix-blend-luminosity"
-          style={{
-            backgroundImage: `url(${heroImg})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            animation: "ken-burns 18s ease-in-out infinite",
-            maskImage: "radial-gradient(ellipse at center, black 20%, transparent 75%)",
-          }}
-        />
-
-        {/* floating image orbs */}
-        <img
-          src={heroImg}
-          aria-hidden
-          alt=""
-          className="pointer-events-none absolute -left-10 top-10 h-40 w-40 rounded-full object-cover blur-sm"
-          style={{ animation: "drift-slow 12s ease-in-out infinite", opacity: 0.22 }}
-        />
-        <img
-          src={heroImg}
-          aria-hidden
-          alt=""
-          className="pointer-events-none absolute right-4 bottom-8 h-56 w-56 rounded-full object-cover blur-sm hidden md:block"
-          style={{ animation: "drift-reverse 15s ease-in-out infinite", opacity: 0.2 }}
-        />
 
         {/* subtle grid */}
         <div
@@ -171,33 +143,60 @@ function HomePage() {
                     "0 50px 80px -20px oklch(0 0 0 / 0.7), 0 25px 40px -15px oklch(0.72 0.16 160 / 0.45), 0 0 0 1px oklch(1 0 0 / 0.05) inset",
                 }}
               />
+              {/* reflection */}
+              <div
+                aria-hidden
+                className="absolute inset-x-6 -bottom-16 h-24 rounded-[50%] blur-xl"
+                style={{ background: "oklch(0.72 0.16 160 / 0.5)" }}
+              />
             </div>
           </div>
         </div>
       </section>
 
-      {/* BENEFITS — 3D cards */}
-      <section className="relative border-y border-border bg-dark-surface/60">
+      {/* BENEFITS — ATTRACTIVE 3D CARDS WITH BG PATTERN */}
+      <section className="relative border-y border-border/50 bg-gradient-to-b from-dark-surface/90 to-dark-surface/40 overflow-hidden">
         <div className="container mx-auto grid gap-6 px-4 py-16 md:grid-cols-3">
           {[
             { icon: Zap, title: "25g Protein", desc: "Per single scoop. No skimping." },
             { icon: Shield, title: "Zero Junk", desc: "No fillers, no hidden sugars, no BS." },
             { icon: Flame, title: "Bold Flavors", desc: "Tastes incredible. Mixes clean." },
           ].map((b) => (
-            <div key={b.title} className="card-3d card-3d-hover group flex items-start gap-4 rounded-2xl p-6">
-              <div className="rounded-xl bg-primary/15 p-3 text-primary ring-1 ring-primary/30 transition-transform group-hover:scale-110">
-                <b.icon className="h-6 w-6" />
+            <div
+              key={b.title}
+              className="group relative flex items-start gap-5 rounded-2xl border border-border/60 bg-card/40 p-6 overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-[0_12px_30px_rgba(0,0,0,0.4)]"
+            >
+              {/* Background Grid Image/Pattern Effect */}
+              <div
+                className="absolute inset-0 opacity-[0.03] transition-opacity duration-300 group-hover:opacity-[0.06] pointer-events-none"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)",
+                  backgroundSize: "20px 20px",
+                }}
+              />
+
+              {/* Radial Ambient Glow behind icon on hover */}
+              <div className="absolute -left-4 -top-4 h-24 w-24 rounded-full bg-primary/10 blur-xl opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none" />
+
+              {/* Animated Icon Container */}
+              <div className="relative z-10 rounded-xl bg-primary/10 p-3 text-primary ring-1 ring-primary/20 transition-all duration-300 group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground group-hover:ring-primary/50">
+                <b.icon className="h-6 w-6 transition-transform duration-300 group-hover:rotate-6" />
               </div>
-              <div>
-                <h3 className="font-display text-2xl uppercase tracking-wide">{b.title}</h3>
-                <p className="text-sm text-muted-foreground">{b.desc}</p>
+
+              {/* Text Content */}
+              <div className="relative z-10">
+                <h3 className="font-display text-2xl uppercase tracking-wide text-foreground transition-colors duration-300 group-hover:text-primary">
+                  {b.title}
+                </h3>
+                <p className="mt-1 text-sm text-muted-foreground leading-relaxed transition-colors duration-300 group-hover:text-muted-foreground/90">
+                  {b.desc}
+                </p>
               </div>
             </div>
           ))}
         </div>
       </section>
-
-
 
       {/* FEATURED PRODUCTS */}
       <section className="container mx-auto px-4 py-16 md:py-24">
