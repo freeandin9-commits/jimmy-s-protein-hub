@@ -11,6 +11,7 @@ import { SearchBar } from "@/components/SearchBar";
 import { CategoriesSection } from "@/components/CategoriesSection";
 import { InstagramSection } from "@/components/InstagramSection";
 import { TrustBadges } from "@/components/TrustBadges";
+import { motion, AnimatePresence } from "framer-motion";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -53,17 +54,23 @@ function HomePage() {
       .catch(() => setLoading(false));
   }, []);
 
+  const benefits = [
+    { icon: Zap, title: "25g Protein", desc: "Per single scoop. No skimping." },
+    { icon: Shield, title: "Zero Junk", desc: "No fillers, no hidden sugars, no BS." },
+    { icon: Flame, title: "Bold Flavors", desc: "Tastes incredible. Mixes clean." },
+  ];
+
   return (
     <div>
       <SearchBar />
       <AdsStrip />
       <CategoriesSection />
 
+      {/* HERO SECTION */}
       <section
         className="relative overflow-hidden"
         style={{ background: "linear-gradient(135deg,#0B0B0D 0%,#151518 40%,#1C1C21 100%)" }}
       >
-        {/* layered ambient glows */}
         <div
           aria-hidden
           className="pointer-events-none absolute -left-40 top-10 h-[500px] w-[500px] rounded-full bg-primary/20 blur-[120px]"
@@ -73,37 +80,6 @@ function HomePage() {
           className="pointer-events-none absolute -right-32 bottom-0 h-[600px] w-[600px] rounded-full bg-accent/15 blur-[140px]"
         />
         <div aria-hidden className="pointer-events-none absolute inset-0 mesh-bg opacity-60" />
-
-        {/* animated background image — ken burns */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-[0.18] mix-blend-luminosity"
-          style={{
-            backgroundImage: `url(${heroImg})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            animation: "ken-burns 18s ease-in-out infinite",
-            maskImage: "radial-gradient(ellipse at center, black 20%, transparent 75%)",
-          }}
-        />
-
-        {/* floating image orbs */}
-        <img
-          src={heroImg}
-          aria-hidden
-          alt=""
-          className="pointer-events-none absolute -left-10 top-10 h-40 w-40 rounded-full object-cover blur-sm"
-          style={{ animation: "drift-slow 12s ease-in-out infinite", opacity: 0.22 }}
-        />
-        <img
-          src={heroImg}
-          aria-hidden
-          alt=""
-          className="pointer-events-none absolute right-4 bottom-8 h-56 w-56 rounded-full object-cover blur-sm hidden md:block"
-          style={{ animation: "drift-reverse 15s ease-in-out infinite", opacity: 0.2 }}
-        />
-
-        {/* subtle grid */}
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 opacity-[0.07]"
@@ -151,13 +127,11 @@ function HomePage() {
           </div>
 
           <div className="relative z-10 flex items-center justify-center [perspective:1200px]">
-            {/* glow rings */}
             <div
               aria-hidden
               className="absolute inset-10 rounded-full bg-primary/30 blur-3xl animate-[glow-pulse_3s_ease-in-out_infinite]"
             />
             <div aria-hidden className="absolute inset-20 rounded-full bg-accent/25 blur-2xl" />
-            {/* orbit ring */}
             <div aria-hidden className="absolute h-[420px] w-[420px] rounded-full border border-primary/20" />
             <div aria-hidden className="absolute h-[480px] w-[480px] rounded-full border border-accent/10" />
 
@@ -171,33 +145,62 @@ function HomePage() {
                     "0 50px 80px -20px oklch(0 0 0 / 0.7), 0 25px 40px -15px oklch(0.72 0.16 160 / 0.45), 0 0 0 1px oklch(1 0 0 / 0.05) inset",
                 }}
               />
+              <div
+                aria-hidden
+                className="absolute inset-x-6 -bottom-16 h-24 rounded-[50%] blur-xl"
+                style={{ background: "oklch(0.72 0.16 160 / 0.5)" }}
+              />
             </div>
           </div>
         </div>
       </section>
 
-      {/* BENEFITS — 3D cards */}
-      <section className="relative border-y border-border bg-dark-surface/60">
-        <div className="container mx-auto grid gap-6 px-4 py-16 md:grid-cols-3">
-          {[
-            { icon: Zap, title: "25g Protein", desc: "Per single scoop. No skimping." },
-            { icon: Shield, title: "Zero Junk", desc: "No fillers, no hidden sugars, no BS." },
-            { icon: Flame, title: "Bold Flavors", desc: "Tastes incredible. Mixes clean." },
-          ].map((b) => (
-            <div key={b.title} className="card-3d card-3d-hover group flex items-start gap-4 rounded-2xl p-6">
-              <div className="rounded-xl bg-primary/15 p-3 text-primary ring-1 ring-primary/30 transition-transform group-hover:scale-110">
-                <b.icon className="h-6 w-6" />
+      {/* BENEFITS — ATTRACTIVE ANIMATED 3D CARDS */}
+      <section className="relative border-y border-border/40 bg-gradient-to-r from-dark-surface/40 via-dark-surface/80 to-dark-surface/40 backdrop-blur-sm">
+        <div className="container mx-auto grid gap-6 px-4 py-16 sm:py-20 md:grid-cols-3">
+          {benefits.map((b, index) => (
+            <motion.div
+              key={b.title}
+              initial={{ opacity: 0, y: 50, rotateY: 20 }}
+              whileInView={{ opacity: 1, y: 0, rotateY: 0 }}
+              viewport={{ once: true, amount: 0.8 }}
+              transition={{
+                duration: 0.6,
+                delay: index * 0.2,
+                type: "spring",
+                bounce: 0.4,
+              }}
+              whileHover={{
+                scale: 1.05,
+                rotateY: 5,
+                transition: { duration: 0.3 },
+              }}
+              className="group relative flex items-start gap-5 rounded-2xl border border-border/50 bg-card/30 p-6 shadow-sm transition-all duration-500 ease-out hover:-translate-y-1.5 hover:border-primary/40 hover:bg-card/60 hover:shadow-[0_20px_40px_rgba(0,0,0,0.3)] [transform-style:preserve-3d]"
+            >
+              {/* Decorative inner ambient glow on card hover */}
+              <div className="absolute inset-0 -z-10 rounded-2xl bg-gradient-to-br from-primary/5 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+
+              {/* Animated Icon Container */}
+              <motion.div
+                whileHover={{ rotate: [0, -10, 10, -10, 0], transition: { duration: 0.5 } }}
+                className="rounded-xl bg-primary/10 p-3 text-primary ring-1 ring-primary/20 transition-all duration-500 ease-out group-hover:-translate-y-1 group-hover:bg-primary group-hover:text-primary-foreground group-hover:ring-primary/50 group-hover:shadow-[0_0_20px_rgba(234,179,8,0.3)]"
+              >
+                <b.icon className="h-6 w-6 transition-transform duration-500 group-hover:scale-110" />
+              </motion.div>
+
+              {/* Text Container */}
+              <div className="space-y-1">
+                <h3 className="font-display text-2xl uppercase tracking-wide text-foreground transition-colors duration-300 group-hover:text-primary">
+                  {b.title}
+                </h3>
+                <p className="text-sm text-muted-foreground/90 transition-colors duration-300 group-hover:text-muted-foreground">
+                  {b.desc}
+                </p>
               </div>
-              <div>
-                <h3 className="font-display text-2xl uppercase tracking-wide">{b.title}</h3>
-                <p className="text-sm text-muted-foreground">{b.desc}</p>
-              </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </section>
-
-
 
       {/* FEATURED PRODUCTS */}
       <section className="container mx-auto px-4 py-16 md:py-24">
@@ -241,11 +244,20 @@ function HomePage() {
               ref={scrollRef}
               className="-mx-4 flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth px-4 pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             >
-              {products.map((p) => (
-                <div key={p.id} className="w-[280px] flex-shrink-0 snap-start sm:w-[320px] lg:w-[360px]">
-                  <ProductCard product={p} />
-                </div>
-              ))}
+              <AnimatePresence>
+                {products.map((p) => (
+                  <motion.div
+                    key={p.id}
+                    initial={{ opacity: 0, x: 50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -50 }}
+                    transition={{ duration: 0.5 }}
+                    className="w-[280px] flex-shrink-0 snap-start sm:w-[320px] lg:w-[360px]"
+                  >
+                    <ProductCard product={p} />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
             </div>
             <button
               onClick={() => scroll("right")}
@@ -259,7 +271,6 @@ function HomePage() {
       </section>
 
       <TrustBadges />
-
       <InstagramSection />
 
       {/* CTA STRIP */}
