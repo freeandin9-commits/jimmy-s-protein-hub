@@ -54,16 +54,16 @@ function HomePage() {
   }, []);
 
   return (
-    <div>
+    <div className="overflow-x-hidden">
       <SearchBar />
       <AdsStrip />
       <CategoriesSection />
 
+      {/* HERO SECTION */}
       <section
         className="relative overflow-hidden"
         style={{ background: "linear-gradient(135deg,#0B0B0D 0%,#151518 40%,#1C1C21 100%)" }}
       >
-        {/* layered ambient glows */}
         <div
           aria-hidden
           className="pointer-events-none absolute -left-40 top-10 h-[500px] w-[500px] rounded-full bg-primary/20 blur-[120px]"
@@ -73,37 +73,6 @@ function HomePage() {
           className="pointer-events-none absolute -right-32 bottom-0 h-[600px] w-[600px] rounded-full bg-accent/15 blur-[140px]"
         />
         <div aria-hidden className="pointer-events-none absolute inset-0 mesh-bg opacity-60" />
-
-        {/* animated background image — ken burns */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-[0.18] mix-blend-luminosity"
-          style={{
-            backgroundImage: `url(${heroImg})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            animation: "ken-burns 18s ease-in-out infinite",
-            maskImage: "radial-gradient(ellipse at center, black 20%, transparent 75%)",
-          }}
-        />
-
-        {/* floating image orbs */}
-        <img
-          src={heroImg}
-          aria-hidden
-          alt=""
-          className="pointer-events-none absolute -left-10 top-10 h-40 w-40 rounded-full object-cover blur-sm"
-          style={{ animation: "drift-slow 12s ease-in-out infinite", opacity: 0.22 }}
-        />
-        <img
-          src={heroImg}
-          aria-hidden
-          alt=""
-          className="pointer-events-none absolute right-4 bottom-8 h-56 w-56 rounded-full object-cover blur-sm hidden md:block"
-          style={{ animation: "drift-reverse 15s ease-in-out infinite", opacity: 0.2 }}
-        />
-
-        {/* subtle grid */}
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 opacity-[0.07]"
@@ -121,9 +90,11 @@ function HomePage() {
               <Dumbbell className="h-3.5 w-3.5" /> 100% Premium Quality
             </span>
             <h1 className="font-display text-5xl uppercase leading-[0.95] tracking-tight md:text-6xl lg:text-7xl xl:text-[5.5rem]">
-              <span className="text-foreground">{settings.hero_headline}</span>
+              <span className="text-foreground">{settings?.hero_headline || "Real Fuel. No Junk."}</span>
             </h1>
-            <p className="mt-6 max-w-md text-base text-muted-foreground md:text-lg">{settings.hero_subtext}</p>
+            <p className="mt-6 max-w-md text-base text-muted-foreground md:text-lg">
+              {settings?.hero_subtext || "Premium protein powder for athletes who train hard."}
+            </p>
             <div className="mt-10 flex flex-wrap items-center gap-6">
               <Button
                 asChild
@@ -151,13 +122,11 @@ function HomePage() {
           </div>
 
           <div className="relative z-10 flex items-center justify-center [perspective:1200px]">
-            {/* glow rings */}
             <div
               aria-hidden
               className="absolute inset-10 rounded-full bg-primary/30 blur-3xl animate-[glow-pulse_3s_ease-in-out_infinite]"
             />
             <div aria-hidden className="absolute inset-20 rounded-full bg-accent/25 blur-2xl" />
-            {/* orbit ring */}
             <div aria-hidden className="absolute h-[420px] w-[420px] rounded-full border border-primary/20" />
             <div aria-hidden className="absolute h-[480px] w-[480px] rounded-full border border-accent/10" />
 
@@ -171,33 +140,52 @@ function HomePage() {
                     "0 50px 80px -20px oklch(0 0 0 / 0.7), 0 25px 40px -15px oklch(0.72 0.16 160 / 0.45), 0 0 0 1px oklch(1 0 0 / 0.05) inset",
                 }}
               />
+              <div
+                aria-hidden
+                className="absolute inset-x-6 -bottom-16 h-24 rounded-[50%] blur-xl"
+                style={{ background: "oklch(0.72 0.16 160 / 0.5)" }}
+              />
             </div>
           </div>
         </div>
       </section>
 
-      {/* BENEFITS — 3D cards */}
-      <section className="relative border-y border-border bg-dark-surface/60">
-        <div className="container mx-auto grid gap-6 px-4 py-16 md:grid-cols-3">
+      {/* BENEFITS — HIGHLY ATTRACTIVE ANIMATED CARDS */}
+      <section className="relative overflow-hidden border-y border-border/40 bg-gradient-to-r from-dark-surface/40 via-dark-surface/80 to-dark-surface/40 backdrop-blur-sm">
+        <div className="container mx-auto grid gap-6 px-4 py-16 sm:py-20 md:grid-cols-3">
           {[
-            { icon: Zap, title: "25g Protein", desc: "Per single scoop. No skimping." },
-            { icon: Shield, title: "Zero Junk", desc: "No fillers, no hidden sugars, no BS." },
-            { icon: Flame, title: "Bold Flavors", desc: "Tastes incredible. Mixes clean." },
+            { icon: Zap, title: "25g Protein", desc: "Per single scoop. No skimping.", delay: "delay-0" },
+            { icon: Shield, title: "Zero Junk", desc: "No fillers, no hidden sugars, no BS.", delay: "delay-150" },
+            { icon: Flame, title: "Bold Flavors", desc: "Tastes incredible. Mixes clean.", delay: "delay-300" },
           ].map((b) => (
-            <div key={b.title} className="card-3d card-3d-hover group flex items-start gap-4 rounded-2xl p-6">
-              <div className="rounded-xl bg-primary/15 p-3 text-primary ring-1 ring-primary/30 transition-transform group-hover:scale-110">
-                <b.icon className="h-6 w-6" />
+            <div
+              key={b.title}
+              className={`group relative flex items-start gap-5 rounded-2xl border border-border/50 bg-card/30 p-6 shadow-sm transition-all duration-700 ease-out hover:-translate-y-2 hover:scale-[1.03] hover:border-primary/50 hover:bg-card/70 hover:shadow-[0_25px_50px_rgba(0,0,0,0.4)] [transform-style:preserve-3d] [perspective:1000px] animate-in fade-in slide-in-from-bottom-12 ${b.delay}`}
+            >
+              {/* Glowing Background Radial Effect on Hover */}
+              <div className="absolute inset-0 -z-10 rounded-2xl bg-[radial-gradient(circle_at_top_left,rgba(234,179,8,0.08),transparent_60%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+
+              {/* Animated 3D Floating Icon Container */}
+              <div className="relative rounded-xl bg-primary/10 p-3 text-primary ring-1 ring-primary/20 transition-all duration-500 ease-out group-hover:translate-z-10 group-hover:bg-primary group-hover:text-primary-foreground group-hover:ring-primary/50 group-hover:shadow-[0_0_25px_rgba(234,179,8,0.4)] group-hover:rotate-[10deg]">
+                <b.icon className="h-6 w-6 transition-transform duration-500 group-hover:scale-110" />
               </div>
-              <div>
-                <h3 className="font-display text-2xl uppercase tracking-wide">{b.title}</h3>
-                <p className="text-sm text-muted-foreground">{b.desc}</p>
+
+              {/* Text Container with dynamic title effect */}
+              <div className="space-y-1 transition-transform duration-500 group-hover:translate-x-1">
+                <h3 className="font-display text-2xl uppercase tracking-wide text-foreground transition-colors duration-300 group-hover:text-primary">
+                  {b.title}
+                </h3>
+                <p className="text-sm text-muted-foreground/90 transition-colors duration-300 group-hover:text-muted-foreground">
+                  {b.desc}
+                </p>
               </div>
+
+              {/* Bottom Border Accent Line */}
+              <div className="absolute bottom-0 left-1/2 h-[2px] w-0 -translate-x-1/2 bg-gradient-to-r from-transparent via-primary to-transparent transition-all duration-500 group-hover:w-[80%]" />
             </div>
           ))}
         </div>
       </section>
-
-
 
       {/* FEATURED PRODUCTS */}
       <section className="container mx-auto px-4 py-16 md:py-24">
@@ -259,7 +247,6 @@ function HomePage() {
       </section>
 
       <TrustBadges />
-
       <InstagramSection />
 
       {/* CTA STRIP */}
