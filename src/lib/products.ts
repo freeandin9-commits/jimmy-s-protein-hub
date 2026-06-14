@@ -12,6 +12,10 @@ export interface Product {
   in_stock: boolean;
   sort_order: number;
   category_id: string | null;
+  highlights: string[];
+  ingredients: string;
+  how_to_use: string;
+  nutrition: string;
   created_at: string;
   updated_at: string;
 }
