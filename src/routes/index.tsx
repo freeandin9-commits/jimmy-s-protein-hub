@@ -59,6 +59,7 @@ function HomePage() {
       <AdsStrip />
       <CategoriesSection />
 
+      {/* HERO SECTION */}
       <section
         className="relative overflow-hidden"
         style={{ background: "linear-gradient(135deg,#0B0B0D 0%,#151518 40%,#1C1C21 100%)" }}
@@ -197,8 +198,6 @@ function HomePage() {
         </div>
       </section>
 
-
-
       {/* FEATURED PRODUCTS */}
       <section className="container mx-auto px-4 py-16 md:py-24">
         <div className="mb-10 flex items-end justify-between">
@@ -260,7 +259,21 @@ function HomePage() {
 
       <TrustBadges />
 
-      <InstagramSection />
+      {/* INSTAGRAM SECTION WITH VISIBLE JIMMY'S IMAGE BACKGROUND */}
+      <section
+        className="relative bg-cover bg-center bg-no-repeat py-16 md:py-24 overflow-hidden"
+        style={{ backgroundImage: `url(${heroImg})` }}
+      >
+        {/* Dark semi-transparent overlay to keep the typography readable but the background image beautiful */}
+        <div className="absolute inset-0 bg-black/70 backdrop-blur-[1px]" aria-hidden />
+
+        {/* Enforcing background transparency on the container so the internal 
+          component doesn't accidentally color over our custom hero image background.
+        */}
+        <div className="relative z-10 [&_section]:bg-transparent [&_div]:bg-transparent">
+          <InstagramSection />
+        </div>
+      </section>
 
       {/* CTA STRIP */}
       <section className="border-t border-border bg-primary text-primary-foreground">
