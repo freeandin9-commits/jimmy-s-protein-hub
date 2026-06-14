@@ -32,22 +32,33 @@ export function CategoriesSection() {
   const checkScroll = () => {
     if (scrollContainerRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
-      setShowLeftArrow(scrollLeft > 0);
-      setShowRightArrow(scrollLeft + clientWidth < scrollWidth - 1);
+      setShowLeftArrow(scrollLeft > 2);
+      setShowRightArrow(scrollLeft + clientWidth < scrollWidth - 5);
     }
   };
 
   useEffect(() => {
     const container = scrollContainerRef.current;
-    if (container) {
-      checkScroll();
-      container.addEventListener("scroll", checkScroll);
-      window.addEventListener("resize", checkScroll);
-    }
-    return () => {
-      if (container) {
-        container.removeEventListener("scroll", checkScroll);
+    if (!container) return;
+
+    // TypeScript Build Error ഒഴിവാക്കാൻ 'any' ടൈപ്പ് ഉപയോഗിച്ച് സുരക്ഷിതമാക്കി
+    const handleWheel = (e: any) => {
+      if (e.deltaY !== 0) {
+        e.preventDefault();
+        container.scrollLeft += e.deltaY;
       }
+    };
+
+    const timeoutId = setTimeout(checkScroll, 300);
+
+    container.addEventListener("scroll", checkScroll);
+    container.addEventListener("wheel", handleWheel, { passive: false });
+    window.addEventListener("resize", checkScroll);
+
+    return () => {
+      clearTimeout(timeoutId);
+      container.removeEventListener("scroll", checkScroll);
+      container.removeEventListener("wheel", handleWheel);
       window.removeEventListener("resize", checkScroll);
     };
   }, [categories]);
@@ -70,6 +81,7 @@ export function CategoriesSection() {
         {/* Left Arrow Button */}
         {showLeftArrow && (
           <button
+            type="button"
             onClick={() => scroll("left")}
             className="absolute left-6 top-1/2 -translate-y-1/2 z-20 bg-background/80 backdrop-blur-md hover:bg-primary hover:text-primary-foreground border border-border/60 shadow-lg p-3 rounded-full hidden md:flex items-center justify-center transition-all duration-300 transform hover:scale-110 active:scale-95"
             aria-label="Scroll Left"
@@ -81,6 +93,7 @@ export function CategoriesSection() {
         {/* Right Arrow Button */}
         {showRightArrow && (
           <button
+            type="button"
             onClick={() => scroll("right")}
             className="absolute right-6 top-1/2 -translate-y-1/2 z-20 bg-background/80 backdrop-blur-md hover:bg-primary hover:text-primary-foreground border border-border/60 shadow-lg p-3 rounded-full hidden md:flex items-center justify-center transition-all duration-300 transform hover:scale-110 active:scale-95"
             aria-label="Scroll Right"
@@ -95,7 +108,7 @@ export function CategoriesSection() {
           className="-mx-3 flex gap-5 overflow-x-auto px-3 pb-4 pt-2 scroll-smooth [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-6"
         >
           {/* All Categories Static Link */}
-          <div className="shrink-0 animate-fade-in">
+          <div className="shrink-0">
             <Link to="/products" className="group flex w-[104px] flex-col items-center gap-3 sm:w-[124px] md:w-[140px]">
               <div className="flex h-[96px] w-[96px] items-center justify-center rounded-full bg-foreground text-background shadow-md transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl group-hover:bg-primary group-hover:text-primary-foreground sm:h-[112px] sm:w-[112px] md:h-[128px] md:w-[128px]">
                 <LayoutGrid
@@ -117,7 +130,6 @@ export function CategoriesSection() {
                 search={{ category: c.slug }}
                 className="group flex w-[104px] flex-col items-center gap-3 sm:w-[124px] md:w-[140px]"
               >
-                {/* Image Container with hover zoom and shadows */}
                 <div className="relative h-[96px] w-[96px] overflow-hidden rounded-full bg-muted border border-border/40 shadow-md transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl group-hover:border-primary/30 sm:h-[112px] sm:w-[112px] md:h-[128px] md:w-[128px]">
                   {c.image_url ? (
                     <img
@@ -125,17 +137,16 @@ export function CategoriesSection() {
                       alt={c.name}
                       loading="lazy"
                       className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
+                      onLoad={checkScroll}
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center text-lg font-black uppercase bg-gradient-to-br from-primary/10 to-primary/30 text-primary">
                       {c.name.slice(0, 2)}
                     </div>
                   )}
-                  {/* Subtle dark overlay on hover */}
                   <div className="absolute inset-0 bg-black/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                 </div>
 
-                {/* Text with upward bounce effect on hover */}
                 <h3 className="text-center text-xs font-bold tracking-wide uppercase text-foreground/80 transition-all duration-300 group-hover:text-primary group-hover:translate-y-[-2px] sm:text-sm line-clamp-1">
                   {c.name}
                 </h3>
