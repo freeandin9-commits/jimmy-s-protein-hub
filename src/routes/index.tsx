@@ -59,6 +59,7 @@ function HomePage() {
       <AdsStrip />
       <CategoriesSection />
 
+      {/* HERO SECTION */}
       <section
         className="relative overflow-hidden"
         style={{ background: "linear-gradient(135deg,#0B0B0D 0%,#151518 40%,#1C1C21 100%)" }}
@@ -197,8 +198,6 @@ function HomePage() {
         </div>
       </section>
 
-
-
       {/* FEATURED PRODUCTS */}
       <section className="container mx-auto px-4 py-16 md:py-24">
         <div className="mb-10 flex items-end justify-between">
@@ -260,7 +259,18 @@ function HomePage() {
 
       <TrustBadges />
 
-      <InstagramSection />
+      {/* INSTAGRAM SECTION WITH CUSTOM JIMMY'S IMAGE BACKGROUND */}
+      <section
+        className="relative bg-cover bg-center bg-no-repeat py-12 md:py-20"
+        style={{ backgroundImage: `url(${heroImg})` }}
+      >
+        {/* Dark overlay to ensure text/content inside Instagram Section remains readable */}
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" aria-hidden />
+
+        <div className="relative z-10">
+          <InstagramSection />
+        </div>
+      </section>
 
       {/* CTA STRIP */}
       <section className="border-t border-border bg-primary text-primary-foreground">
