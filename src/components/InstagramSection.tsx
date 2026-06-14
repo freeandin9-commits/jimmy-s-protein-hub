@@ -21,14 +21,8 @@ export function InstagramSection() {
   const embedUrl = `https://www.instagram.com/${handle}/embed`;
 
   return (
-    <section
-      className="relative overflow-hidden bg-cover bg-center bg-no-repeat py-16 md:py-20"
-      style={{ backgroundImage: "url('/hero.jpg')" }}
-    >
-      {/* Background Overlay - ടെക്സ്റ്റുകൾ നന്നായി കാണാൻ വേണ്ടി */}
-      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
-
-      <div className="container relative z-10 mx-auto max-w-5xl px-4">
+    <section className="bg-black text-foreground">
+      <div className="container mx-auto max-w-5xl px-4 py-16 md:py-20">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="rounded-lg bg-gradient-to-tr from-primary via-accent to-primary p-[2px]">
@@ -37,7 +31,9 @@ export function InstagramSection() {
               </div>
             </div>
             <div>
-              <h2 className="text-xl font-extrabold uppercase tracking-wider text-white sm:text-2xl">@{handle}</h2>
+              <h2 className="text-xl font-extrabold uppercase tracking-wider text-white sm:text-2xl">
+                @{handle}
+              </h2>
               <p className="text-xs text-white/60">Follow us on Instagram</p>
             </div>
           </div>
