@@ -259,16 +259,23 @@ function HomePage() {
 
       <TrustBadges />
 
-      {/* INSTAGRAM SECTION WITH FIXED PARALLAX BACKGROUND */}
+      {/* INSTAGRAM SECTION WITH FIXED PARALLAX BACKGROUND EFFECT */}
       <section
-        className="relative bg-cover bg-center bg-fixed bg-no-repeat py-20 md:py-28 overflow-hidden"
-        style={{ backgroundImage: `url(${heroImg})` }}
+        className="relative py-20 md:py-28 overflow-hidden before:content-[''] before:absolute before:inset-0 before:bg-cover before:bg-center before:bg-no-repeat before:bg-fixed before:pointer-events-none"
+        style={{ "--bg-image": `url(${heroImg})` } as React.CSSProperties}
       >
-        {/* Dark overlay to keep typography sharp & clean */}
-        <div className="absolute inset-0 bg-black/75 backdrop-blur-[1px]" aria-hidden />
+        {/* Style tag injects the background globally inside the pseudo-element to guarantee standard support across mobile browsers */}
+        <style>{`
+          section[style*="--bg-image"]::before {
+            background-image: var(--bg-image);
+          }
+        `}</style>
 
-        {/* Enforcing background transparency on children */}
-        <div className="relative z-10 [&_section]:bg-transparent [&_div]:bg-transparent">
+        {/* Pure solid overlay to maintain excellent text contrast without blurring the image away */}
+        <div className="absolute inset-0 bg-black/60" aria-hidden />
+
+        {/* Enforcing transparency on child layouts */}
+        <div className="relative z-10 [&_section]:bg-transparent [&_div]:bg-transparent [&_header]:bg-transparent">
           <InstagramSection />
         </div>
       </section>
