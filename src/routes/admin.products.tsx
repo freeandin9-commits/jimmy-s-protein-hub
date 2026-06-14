@@ -94,6 +94,10 @@ function ProductsAdminPage() {
       in_stock: p.in_stock,
       sort_order: String(p.sort_order),
       category_id: p.category_id ?? "",
+      highlights: (p.highlights ?? []).join("\n"),
+      ingredients: p.ingredients ?? "",
+      how_to_use: p.how_to_use ?? "",
+      nutrition: p.nutrition ?? "",
     });
     setOpen(true);
   };
