@@ -142,12 +142,6 @@ function HomePage() {
                     "0 50px 80px -20px oklch(0 0 0 / 0.7), 0 25px 40px -15px oklch(0.72 0.16 160 / 0.45), 0 0 0 1px oklch(1 0 0 / 0.05) inset",
                 }}
               />
-              {/* reflection */}
-              <div
-                aria-hidden
-                className="absolute inset-x-6 -bottom-16 h-24 rounded-[50%] blur-xl"
-                style={{ background: "oklch(0.72 0.16 160 / 0.5)" }}
-              />
             </div>
           </div>
         </div>
