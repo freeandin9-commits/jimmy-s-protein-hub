@@ -143,6 +143,13 @@ function ProductsAdminPage() {
       in_stock: form.in_stock,
       sort_order: parseInt(form.sort_order) || 0,
       category_id: form.category_id || null,
+      highlights: form.highlights
+        .split("\n")
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0),
+      ingredients: form.ingredients,
+      how_to_use: form.how_to_use,
+      nutrition: form.nutrition,
     };
     try {
       if (form.id) {
