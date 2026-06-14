@@ -15,7 +15,7 @@ export function TrustBadges() {
           <div
             key={b.title}
             style={{ animationDelay: `${index * 100}ms` }}
-            className="group flex flex-col items-center justify-center gap-3 rounded-xl border border-border bg-white px-4 py-8 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-md hover:bg-white animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both"
+            className="group flex flex-col items-center justify-center gap-3 rounded-xl border border-border bg-background px-4 py-8 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-md hover:bg-card/50 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both"
           >
             <div className="rounded-full bg-primary/10 p-3 transition-transform duration-300 group-hover:scale-110 group-hover:bg-primary/20">
               <b.icon
