@@ -37,6 +37,7 @@ export function CategoriesSection() {
     }
   };
 
+  // കാറ്റഗറി ഡാറ്റ മാറുമ്പോഴും വിൻഡോ റീസൈസ് ചെയ്യുമ്പോഴും സ്ക്രോൾ ബട്ടണുകൾ അപ്ഡേറ്റ് ചെയ്യാൻ
   useEffect(() => {
     const timeoutId = setTimeout(checkScroll, 300);
     window.addEventListener("resize", checkScroll);
@@ -47,9 +48,10 @@ export function CategoriesSection() {
     };
   }, [categories]);
 
-  // മൗസ് വീൽ വശങ്ങളിലേക്ക് സ്ക്രോൾ ചെയ്യാനുള്ള ഫങ്ക്ഷൻ
+  // മൗസ് വീൽ വശങ്ങളിലേക്ക് സ്ക്രോൾ ചെയ്യാനുള്ള സുരക്ഷിതമായ റിയാക്ട് ഫങ്ക്ഷൻ
   const handleWheelScroll = (e: React.WheelEvent<HTMLDivElement>) => {
     if (scrollContainerRef.current && e.deltaY !== 0) {
+      // ഡെസ്ക്ടോപ്പിൽ താഴേക്ക് സ്ക്രോൾ ചെയ്യുമ്പോൾ കാറ്റഗറി റൈറ്റ് സൈഡിലേക്ക് നീങ്ങും
       scrollContainerRef.current.scrollLeft += e.deltaY;
     }
   };
@@ -120,7 +122,7 @@ export function CategoriesSection() {
             <div key={c.id} className="shrink-0">
               <Link
                 to="/products"
-                search={(prev: any) => ({ ...prev, category: c.slug })}
+                search={{ category: c.slug }}
                 className="group flex w-[104px] flex-col items-center gap-3 sm:w-[124px] md:w-[140px]"
               >
                 <div className="relative h-[96px] w-[96px] overflow-hidden rounded-full bg-muted border border-border/40 shadow-md transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl group-hover:border-primary/30 sm:h-[112px] sm:w-[112px] md:h-[128px] md:w-[128px]">
