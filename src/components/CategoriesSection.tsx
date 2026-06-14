@@ -48,28 +48,13 @@ export function CategoriesSection() {
     };
   }, [categories]);
 
-  // മൗസ് വീൽ വശങ്ങളിലേക്ക് സുഗമമായി സ്ക്രോൾ ചെയ്യാനുള്ള ഫങ്ക്ഷൻ (Wheel listener with passive: false)
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-
-    const handleWheel = (e: WheelEvent) => {
-      if (e.deltaY !== 0) {
-        // ഡെസ്ക്ടോപ്പിൽ താഴേക്ക് സ്ക്രോൾ ചെയ്യുമ്പോൾ മെയിൻ പേജ് സ്ക്രോൾ ആകാതെ കാറ്റഗറി വശങ്ങളിലേക്ക് നീങ്ങാൻ
-        e.preventDefault();
-
-        // requestAnimationFrame ഉപയോഗിച്ച് സ്ക്രോളിംഗ് കൂടുതൽ സ്മൂത്ത് ആക്കുന്നു
-        window.requestAnimationFrame(() => {
-          container.scrollLeft += e.deltaY * 1.2; // സ്ക്രോൾ സ്പീഡ് അല്പം കൂട്ടാൻ 1.2 നൽകിയിരിക്കുന്നു
-        });
-      }
-    };
-
-    container.addEventListener("wheel", handleWheel, { passive: false });
-    return () => {
-      container.removeEventListener("wheel", handleWheel);
-    };
-  }, [categories]);
+  // മൗസ് വീൽ വശങ്ങളിലേക്ക് സ്ക്രോൾ ചെയ്യാനുള്ള സുരക്ഷിതമായ റിയാക്ട് ഫങ്ക്ഷൻ
+  const handleWheelScroll = (e: React.WheelEvent<HTMLDivElement>) => {
+    if (scrollContainerRef.current && e.deltaY !== 0) {
+      // ഡെസ്ക്ടോപ്പിൽ താഴേക്ക് സ്ക്രോൾ ചെയ്യുമ്പോൾ കാറ്റഗറി റൈറ്റ് സൈഡിലേക്ക് നീങ്ങും
+      scrollContainerRef.current.scrollLeft += e.deltaY;
+    }
+  };
 
   const scroll = (direction: "left" | "right") => {
     if (scrollContainerRef.current) {
@@ -114,6 +99,7 @@ export function CategoriesSection() {
         <div
           ref={scrollContainerRef}
           onScroll={checkScroll}
+          onWheel={handleWheelScroll}
           className="-mx-3 flex gap-5 overflow-x-auto px-3 pb-4 pt-2 scroll-smooth [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-6"
         >
           {/* All Categories Static Link */}
