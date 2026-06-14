@@ -1,16 +1,24 @@
 import { createFileRoute, Outlet, Link, useNavigate, useLocation } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { LayoutDashboard, ShoppingBag, Package, Settings, BarChart3, LogOut, Dumbbell, ExternalLink, Megaphone, Tags } from "lucide-react";
+import {
+  LayoutDashboard,
+  ShoppingBag,
+  Package,
+  Settings,
+  BarChart3,
+  LogOut,
+  Dumbbell,
+  ExternalLink,
+  Megaphone,
+  Tags,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
-    meta: [
-      { title: "Admin — Jimmy's Protein" },
-      { name: "robots", content: "noindex, nofollow" },
-    ],
+    meta: [{ title: "Admin — Jimmy's Protein" }, { name: "robots", content: "noindex, nofollow" }],
   }),
   component: AdminLayout,
 });
@@ -21,7 +29,7 @@ const navItems: NavItem[] = [
   { to: "/admin/orders", label: "Orders", icon: ShoppingBag },
   { to: "/admin/products", label: "Products", icon: Package },
   { to: "/admin/categories", label: "Categories", icon: Tags },
-  { to: "/admin/ads", label: "Ads", icon: Megaphone },
+  { to: "/admin/ads", label: "Shop Ads", icon: Megaphone }, // ഇവിടെ "Shop Ads" എന്ന് മാറ്റം വരുത്തിയിട്ടുണ്ട്
   { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/admin/settings", label: "Settings", icon: Settings },
 ];
@@ -68,9 +76,7 @@ function AdminLayout() {
 
         <nav className="flex-1 space-y-1 p-4">
           {navItems.map((item) => {
-            const active = item.exact
-              ? location.pathname === item.to
-              : location.pathname.startsWith(item.to);
+            const active = item.exact ? location.pathname === item.to : location.pathname.startsWith(item.to);
             return (
               <Link
                 key={item.to}
@@ -121,9 +127,7 @@ function AdminLayout() {
         {/* Mobile nav pill row */}
         <nav className="flex gap-1 overflow-x-auto border-b border-border bg-card px-2 py-2 md:hidden">
           {navItems.map((item) => {
-            const active = item.exact
-              ? location.pathname === item.to
-              : location.pathname.startsWith(item.to);
+            const active = item.exact ? location.pathname === item.to : location.pathname.startsWith(item.to);
             return (
               <Link
                 key={item.to}
