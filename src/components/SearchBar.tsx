@@ -14,20 +14,22 @@ export function SearchBar() {
 
   return (
     <section className="border-b border-border/60 bg-background">
-      <div className="container mx-auto px-4 py-3">
-        <form onSubmit={onSubmit} className="relative mx-auto flex w-full max-w-2xl items-center">
-          <Search className="pointer-events-none absolute left-3 h-4 w-4 text-muted-foreground" />
+      <div className="container mx-auto px-4 py-4 md:py-6">
+        <form onSubmit={onSubmit} className="relative mx-auto flex w-full max-w-3xl items-center">
+          <Search className="pointer-events-none absolute left-4 h-5 w-5 text-muted-foreground md:h-6 md:w-6 md:left-5" />
+
           <input
             type="search"
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search products, categories…"
             aria-label="Search the store"
-            className="h-11 w-full rounded-full border border-border bg-card pl-10 pr-24 text-sm shadow-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-primary"
+            className="h-14 w-full rounded-full border border-border bg-card pl-12 pr-28 text-base shadow-md outline-none transition-all placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/10 md:h-16 md:pl-14 md:pr-32 md:text-lg"
           />
+
           <button
             type="submit"
-            className="absolute right-1.5 inline-flex h-8 items-center rounded-full bg-primary px-4 text-xs font-bold uppercase tracking-wider text-primary-foreground transition-opacity hover:opacity-90"
+            className="absolute right-2 inline-flex h-10 items-center rounded-full bg-primary px-5 text-xs font-bold uppercase tracking-wider text-primary-foreground transition-opacity hover:opacity-90 md:h-12 md:px-6 md:text-sm"
           >
             Search
           </button>
