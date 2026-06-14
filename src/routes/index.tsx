@@ -74,6 +74,35 @@ function HomePage() {
         />
         <div aria-hidden className="pointer-events-none absolute inset-0 mesh-bg opacity-60" />
 
+        {/* animated background image — ken burns */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-[0.18] mix-blend-luminosity"
+          style={{
+            backgroundImage: `url(${heroImg})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            animation: "ken-burns 18s ease-in-out infinite",
+            maskImage: "radial-gradient(ellipse at center, black 20%, transparent 75%)",
+          }}
+        />
+
+        {/* floating image orbs */}
+        <img
+          src={heroImg}
+          aria-hidden
+          alt=""
+          className="pointer-events-none absolute -left-10 top-10 h-40 w-40 rounded-full object-cover blur-sm"
+          style={{ animation: "drift-slow 12s ease-in-out infinite", opacity: 0.22 }}
+        />
+        <img
+          src={heroImg}
+          aria-hidden
+          alt=""
+          className="pointer-events-none absolute right-4 bottom-8 h-56 w-56 rounded-full object-cover blur-sm hidden md:block"
+          style={{ animation: "drift-reverse 15s ease-in-out infinite", opacity: 0.2 }}
+        />
+
         {/* subtle grid */}
         <div
           aria-hidden
@@ -141,12 +170,6 @@ function HomePage() {
                   boxShadow:
                     "0 50px 80px -20px oklch(0 0 0 / 0.7), 0 25px 40px -15px oklch(0.72 0.16 160 / 0.45), 0 0 0 1px oklch(1 0 0 / 0.05) inset",
                 }}
-              />
-              {/* reflection */}
-              <div
-                aria-hidden
-                className="absolute inset-x-6 -bottom-16 h-24 rounded-[50%] blur-xl"
-                style={{ background: "oklch(0.72 0.16 160 / 0.5)" }}
               />
             </div>
           </div>
