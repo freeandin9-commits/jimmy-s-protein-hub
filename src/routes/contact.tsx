@@ -18,6 +18,11 @@ export const Route = createFileRoute("/contact")({
   component: ContactPage,
 });
 
+interface FAQItem {
+  q: string;
+  a: string;
+}
+
 function ContactPage() {
   const { settings, isLoading } = useSiteSettings();
 
@@ -36,7 +41,26 @@ function ContactPage() {
   const emailHref = settings.contact_email ? `mailto:${settings.contact_email}` : "#";
   const instagramHref = settings.instagram_url || "#";
 
-  // Instagram യൂസർനെയിം URL-ൽ നിന്ന് വേർതിരിച്ചെടുക്കാൻ (ഭംഗിയായി കാണിക്കാൻ വേണ്ടി മാത്രം)
+  // Dynamic FAQs admin settings-ൽ നിന്ന് എടുക്കുന്നു (ഇല്ലെങ്കിൽ ഒരു default fallback അറേ)
+  const faqList: FAQItem[] = Array.isArray(settings.faq)
+    ? settings.faq
+    : [
+        {
+          q: "How does ordering work?",
+          a: "Add what you want to the cart, hit 'Order on WhatsApp' — we confirm stock, share payment details, and ship out.",
+        },
+        {
+          q: "What payment methods do you accept?",
+          a: "UPI, bank transfer, and cash on delivery in select areas. We confirm options on WhatsApp.",
+        },
+        {
+          q: "How long does delivery take?",
+          a: "2–5 business days for most metros, 5–8 for the rest. Tracking shared on WhatsApp.",
+        },
+        { q: "Do you do wholesale?", a: "Yes. Email hello@jimmysprotein.com or WhatsApp us with your store details." },
+      ];
+
+  // Instagram യൂസർനെയിം URL-ൽ നിന്ന് വേർതിരിച്ചെടുക്കാൻ
   const getInstagramUsername = (url: string) => {
     if (!url || url === "#") return "@jimmysprotein";
     try {
@@ -102,25 +126,8 @@ function ContactPage() {
       <section className="mt-16">
         <h2 className="font-display text-3xl uppercase tracking-wide">FAQ</h2>
         <div className="mt-6 space-y-4">
-          {[
-            {
-              q: "How does ordering work?",
-              a: "Add what you want to the cart, hit 'Order on WhatsApp' — we confirm stock, share payment details, and ship out.",
-            },
-            {
-              q: "What payment methods do you accept?",
-              a: "UPI, bank transfer, and cash on delivery in select areas. We confirm options on WhatsApp.",
-            },
-            {
-              q: "How long does delivery take?",
-              a: "2–5 business days for most metros, 5–8 for the rest. Tracking shared on WhatsApp.",
-            },
-            {
-              q: "Do you do wholesale?",
-              a: "Yes. Email hello@jimmysprotein.com or WhatsApp us with your store details.",
-            },
-          ].map((f) => (
-            <details key={f.q} className="group rounded-lg border border-border bg-card p-4">
+          {faqList.map((f, i) => (
+            <details key={i} className="group rounded-lg border border-border bg-card p-4">
               <summary className="cursor-pointer font-bold">{f.q}</summary>
               <p className="mt-2 text-sm text-muted-foreground">{f.a}</p>
             </details>
