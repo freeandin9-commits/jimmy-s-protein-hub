@@ -9,6 +9,7 @@ import { fetchProducts, type Product } from "@/lib/products";
 import { supabase } from "@/integrations/supabase/client";
 import { X } from "lucide-react";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { ShopAdsCarousel } from "@/components/ShopAdsCarousel";
 
 const productsSearchSchema = z.object({
   q: fallback(z.string(), "").default(""),
