@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet, Link, useNavigate, useLocation } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { LayoutDashboard, ShoppingBag, Package, Settings, BarChart3, LogOut, Dumbbell, ExternalLink, Megaphone, Tags, Image as ImageIcon } from "lucide-react";
+import { LayoutDashboard, ShoppingBag, Package, Settings, BarChart3, LogOut, Dumbbell, ExternalLink, Megaphone, Tags, Image as ImageIcon, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
@@ -21,6 +21,7 @@ const navItems: NavItem[] = [
   { to: "/admin/orders", label: "Orders", icon: ShoppingBag },
   { to: "/admin/products", label: "Products", icon: Package },
   { to: "/admin/categories", label: "Categories", icon: Tags },
+  { to: "/admin/hero", label: "Hero Section", icon: Sparkles },
   { to: "/admin/ads", label: "Ads", icon: Megaphone },
   { to: "/admin/shop-ads", label: "Shop Banners", icon: ImageIcon },
   { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },

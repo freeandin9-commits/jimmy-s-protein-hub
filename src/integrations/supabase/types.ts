@@ -269,8 +269,14 @@ export type Database = {
           contact_phone: string
           facebook_url: string
           faq: Json | null
+          hero_badge_text: string | null
+          hero_cta_link: string | null
+          hero_cta_text: string | null
           hero_headline: string
+          hero_image_url: string | null
+          hero_media_type: string | null
           hero_subtext: string
+          hero_video_url: string | null
           id: string
           instagram_url: string
           logo_url: string | null
@@ -284,8 +290,14 @@ export type Database = {
           contact_phone?: string
           facebook_url?: string
           faq?: Json | null
+          hero_badge_text?: string | null
+          hero_cta_link?: string | null
+          hero_cta_text?: string | null
           hero_headline?: string
+          hero_image_url?: string | null
+          hero_media_type?: string | null
           hero_subtext?: string
+          hero_video_url?: string | null
           id?: string
           instagram_url?: string
           logo_url?: string | null
@@ -299,8 +311,14 @@ export type Database = {
           contact_phone?: string
           facebook_url?: string
           faq?: Json | null
+          hero_badge_text?: string | null
+          hero_cta_link?: string | null
+          hero_cta_text?: string | null
           hero_headline?: string
+          hero_image_url?: string | null
+          hero_media_type?: string | null
           hero_subtext?: string
+          hero_video_url?: string | null
           id?: string
           instagram_url?: string
           logo_url?: string | null
