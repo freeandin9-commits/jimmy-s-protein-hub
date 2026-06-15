@@ -118,9 +118,11 @@ function HomePage() {
 
         <div className="container relative mx-auto grid min-h-[640px] gap-10 px-4 py-16 md:grid-cols-2 md:py-20 lg:py-28">
           <div className="relative z-10 flex flex-col justify-center">
-            <span className="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.3em] text-primary backdrop-blur-sm">
-              <Dumbbell className="h-3.5 w-3.5" /> 100% Premium Quality
-            </span>
+            {settings.hero_badge_text && (
+              <span className="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.3em] text-primary backdrop-blur-sm">
+                <Dumbbell className="h-3.5 w-3.5" /> {settings.hero_badge_text}
+              </span>
+            )}
             <h1 className="font-display text-5xl uppercase leading-[0.95] tracking-tight md:text-6xl lg:text-7xl xl:text-[5.5rem]">
               <span className="text-foreground">{settings.hero_headline}</span>
             </h1>
@@ -131,9 +133,15 @@ function HomePage() {
                 size="lg"
                 className="btn-gold h-12 rounded-full px-8 font-bold uppercase tracking-[0.2em]"
               >
-                <Link to="/products">
-                  Buy Now <ArrowRight className="h-4 w-4" />
-                </Link>
+                {settings.hero_cta_link?.startsWith("http") ? (
+                  <a href={settings.hero_cta_link}>
+                    {settings.hero_cta_text || "Buy Now"} <ArrowRight className="h-4 w-4" />
+                  </a>
+                ) : (
+                  <Link to={(settings.hero_cta_link || "/products") as any}>
+                    {settings.hero_cta_text || "Buy Now"} <ArrowRight className="h-4 w-4" />
+                  </Link>
+                )}
               </Button>
               {phone && (
                 <a href={`tel:${phone}`} className="flex items-center gap-3 text-foreground">
@@ -163,15 +171,30 @@ function HomePage() {
             <div aria-hidden className="absolute h-[480px] w-[480px] rounded-full border border-accent/10" />
 
             <div className="relative animate-[float_6s_ease-in-out_infinite] [transform-style:preserve-3d] [transform:rotateY(-8deg)_rotateX(4deg)]">
-              <img
-                src={heroImg}
-                alt="Jimmy's Protein tub"
-                className="relative max-h-[520px] w-auto rounded-2xl object-cover"
-                style={{
-                  boxShadow:
-                    "0 50px 80px -20px oklch(0 0 0 / 0.7), 0 25px 40px -15px oklch(0.72 0.16 160 / 0.45), 0 0 0 1px oklch(1 0 0 / 0.05) inset",
-                }}
-              />
+              {settings.hero_media_type === "video" && settings.hero_video_url ? (
+                <video
+                  src={settings.hero_video_url}
+                  className="relative max-h-[520px] w-auto rounded-2xl object-cover"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  style={{
+                    boxShadow:
+                      "0 50px 80px -20px oklch(0 0 0 / 0.7), 0 25px 40px -15px oklch(0.72 0.16 160 / 0.45), 0 0 0 1px oklch(1 0 0 / 0.05) inset",
+                  }}
+                />
+              ) : (
+                <img
+                  src={settings.hero_image_url || heroImg}
+                  alt="Jimmy's Protein"
+                  className="relative max-h-[520px] w-auto rounded-2xl object-cover"
+                  style={{
+                    boxShadow:
+                      "0 50px 80px -20px oklch(0 0 0 / 0.7), 0 25px 40px -15px oklch(0.72 0.16 160 / 0.45), 0 0 0 1px oklch(1 0 0 / 0.05) inset",
+                  }}
+                />
+              )}
             </div>
           </div>
         </div>
