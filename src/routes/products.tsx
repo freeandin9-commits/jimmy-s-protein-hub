@@ -9,6 +9,7 @@ import { fetchProducts, type Product } from "@/lib/products";
 import { supabase } from "@/integrations/supabase/client";
 import { X } from "lucide-react";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { ShopAdsCarousel } from "@/components/ShopAdsCarousel";
 
 const productsSearchSchema = z.object({
   q: fallback(z.string(), "").default(""),
@@ -94,6 +95,7 @@ function ProductsPage() {
   return (
     <div className="light-theme flex-1 bg-background">
       <SearchBar />
+      <ShopAdsCarousel categoryId={activeCategory?.id ?? null} />
       <div className="container mx-auto px-4 py-12 md:py-16">
         <header className="mb-8">
           <p className="text-sm font-bold uppercase tracking-widest text-primary">The Lineup</p>

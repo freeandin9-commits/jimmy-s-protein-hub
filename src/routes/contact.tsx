@@ -41,8 +41,9 @@ function ContactPage() {
 
   // Safe fallback parsing for settings.faq to prevent type errors
   let faqList: FAQItem[] = [];
-  if (settings.faq && Array.isArray(settings.faq)) {
-    faqList = (settings.faq as any[]).map((item) => ({
+  const faqRaw = (settings as any).faq;
+  if (faqRaw && Array.isArray(faqRaw)) {
+    faqList = (faqRaw as any[]).map((item) => ({
       q: String(item?.q || ""),
       a: String(item?.a || ""),
     }));
