@@ -205,6 +205,62 @@ export type Database = {
           },
         ]
       }
+      shop_ads: {
+        Row: {
+          active: boolean
+          category_id: string | null
+          created_at: string
+          fit_mode: string
+          focal_x: number
+          focal_y: number
+          id: string
+          image_url: string
+          link_url: string | null
+          sort_order: number
+          title: string
+          updated_at: string
+          zoom: number
+        }
+        Insert: {
+          active?: boolean
+          category_id?: string | null
+          created_at?: string
+          fit_mode?: string
+          focal_x?: number
+          focal_y?: number
+          id?: string
+          image_url: string
+          link_url?: string | null
+          sort_order?: number
+          title?: string
+          updated_at?: string
+          zoom?: number
+        }
+        Update: {
+          active?: boolean
+          category_id?: string | null
+          created_at?: string
+          fit_mode?: string
+          focal_x?: number
+          focal_y?: number
+          id?: string
+          image_url?: string
+          link_url?: string | null
+          sort_order?: number
+          title?: string
+          updated_at?: string
+          zoom?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_ads_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       site_settings: {
         Row: {
           address: string
