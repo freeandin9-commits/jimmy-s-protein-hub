@@ -212,6 +212,7 @@ export type Database = {
           contact_email: string
           contact_phone: string
           facebook_url: string
+          faq: Json | null
           hero_headline: string
           hero_subtext: string
           id: string
@@ -226,6 +227,7 @@ export type Database = {
           contact_email?: string
           contact_phone?: string
           facebook_url?: string
+          faq?: Json | null
           hero_headline?: string
           hero_subtext?: string
           id?: string
@@ -240,6 +242,7 @@ export type Database = {
           contact_email?: string
           contact_phone?: string
           facebook_url?: string
+          faq?: Json | null
           hero_headline?: string
           hero_subtext?: string
           id?: string
