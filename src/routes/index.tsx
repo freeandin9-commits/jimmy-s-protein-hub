@@ -75,6 +75,7 @@ function HomePage() {
       .catch(() => setLoading(false));
   }, []);
 
+  // CTA ലിങ്ക് എക്സ്റ്റേണൽ ആണോ എന്ന് നോക്കുന്നു
   const isExternalCta = settings?.hero_cta_link?.startsWith("http");
   const ctaText = settings?.hero_cta_text || "Buy Now";
 
@@ -169,7 +170,7 @@ function HomePage() {
                   size="lg"
                   className="btn-gold h-12 rounded-full px-8 font-bold uppercase tracking-[0.2em]"
                 >
-                  <Link to={(settings?.hero_cta_link || "/products") as any}>
+                  <Link to={settings?.hero_cta_link ? (settings.hero_cta_link as any) : "/products"}>
                     {ctaText} <ArrowRight className="h-4 w-4" />
                   </Link>
                 </Button>
