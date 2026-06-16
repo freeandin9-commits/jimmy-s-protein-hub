@@ -52,8 +52,6 @@ function HomePage() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const waUrl = `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, "")}?text=Hi,%20I'm%20interested%20in%20your%20products!`;
-
   const scroll = (dir: "left" | "right") => {
     const el = scrollRef.current;
     if (!el) return;
@@ -63,8 +61,10 @@ function HomePage() {
 
   const toggleMute = () => {
     if (videoRef.current) {
-      videoRef.current.muted = !videoRef.current.muted;
-      setIsMuted(videoRef.current.muted);
+      // HTML Video element-ന്റെ പ്രോപ്പർട്ടി നേരിട്ട് മാറ്റുന്നു
+      const currentMuted = videoRef.current.muted;
+      videoRef.current.muted = !currentMuted;
+      setIsMuted(!currentMuted);
     }
   };
 
