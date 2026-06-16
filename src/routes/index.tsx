@@ -63,14 +63,19 @@ function HomePage() {
   }, []);
 
   return (
-    <div className="relative">
-      {/* STICKY HEADER NAVIGATION AREA */}
-      <div className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-md">
+    <div className="relative min-h-screen bg-background">
+      {/* FIXED/STICKY HEADER NAVIGATION CONTAINER 
+        സ്ക്രോൾ ചെയ്യുമ്പോൾ ഹെഡർ മുകളിൽ തന്നെ ഉറച്ചുനിൽക്കാൻ ഇത് സഹായിക്കും.
+      */}
+      <div className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur-md transition-all">
         <SearchBar />
         <AdsStrip />
       </div>
 
-      <CategoriesSection />
+      {/* CATEGORIES SECTION */}
+      <div className="relative z-20">
+        <CategoriesSection />
+      </div>
 
       {/* HERO SECTION */}
       <section
