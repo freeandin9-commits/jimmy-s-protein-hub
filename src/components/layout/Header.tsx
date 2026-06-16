@@ -8,8 +8,7 @@ import logoImg from "@/assets/logo.jpg";
 
 export function Header() {
   const items = useCartStore((s) => s.items);
-  // കാർട്ട് ഓപ്പൺ ചെയ്യാനും ക്ലോസ് ചെയ്യാനുമുള്ള ഫങ്ക്ഷൻ സ്റ്റോറിൽ നിന്ന് എടുക്കുന്നു
-  const toggleCart = useCartStore((s) => (s as any).toggleOpen || (() => {}));
+  const open = useCartStore((s) => s.open);
   const totalItems = items.reduce((s, i) => s + i.quantity, 0);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -26,22 +25,15 @@ export function Header() {
   };
 
   return (
-    // sticky top-0, z-50, shadow-md എന്നിവ വഴി ഹെഡർ എപ്പോഴും മുകളിൽ ലോക്ക് ആയിരിക്കും
-    <header className="sticky top-0 z-50 w-full bg-white/95 text-black border-b border-slate-200 shadow-md backdrop-blur-md transition-all">
-      <div className="container mx-auto flex h-24 items-center justify-between px-4">
+    // Background pure white (#ffffff) ആക്കി, കറുത്ത ടെക്സ്റ്റും നേർത്ത ബോർഡറും നൽകിയിട്ടുണ്ട്
+    <header className="sticky top-0 z-40 bg-white text-black border-b border-slate-200 shadow-sm">
+      <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link to="/" className="flex items-center gap-2" aria-label="Nutrin Sports home">
-          {/* HD Quality വലിപ്പമുള്ള ലോഗോ */}
           <img
             src={logoSrc}
             alt="Nutrin Sports"
-            className="h-14 w-auto md:h-20 object-contain antialiased will-change-transform"
-            style={{
-              imageRendering: "auto",
-              transform: "translateZ(0)",
-            }}
-            loading="eager"
-            decoding="async"
-            key={logoSrc}
+            className="h-10 w-auto md:h-12 object-contain transition-all duration-300"
+            key={logoSrc} // ലോഗോ മാറുമ്പോൾ ഇമേജ് കംപോണന്റ് ഉടൻ റീ-റെൻഡർ ആകാൻ ഒരു key നൽകി
           />
         </Link>
 
@@ -78,11 +70,11 @@ export function Header() {
             <Link to="/login">Admin</Link>
           </Button>
 
-          {/* Cart Icon Button */}
+          {/* Cart Icon Button - Pure Black */}
           <Button
             variant="ghost"
             size="icon"
-            onClick={toggleCart}
+            onClick={open}
             className="relative text-black hover:bg-black/5 hover:text-black"
             aria-label="Open cart"
           >
@@ -107,9 +99,9 @@ export function Header() {
         </div>
       </div>
 
-      {/* Mobile Drawer Menu */}
+      {/* Mobile Drawer Menu - Pure White with Black Text */}
       {mobileOpen && (
-        <nav className="absolute left-0 right-0 border-t border-slate-100 bg-white shadow-lg md:hidden transition-all max-h-[calc(100vh-6rem)] overflow-y-auto">
+        <nav className="border-t border-slate-100 bg-white md:hidden transition-all">
           <div className="container mx-auto flex flex-col gap-1 px-4 py-3">
             {[
               { to: "/", label: "Home" },
