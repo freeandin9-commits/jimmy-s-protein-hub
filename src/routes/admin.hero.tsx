@@ -152,7 +152,7 @@ function HeroAdminPage() {
           Update the daily contact and support phone number displayed on the website.
         </p>
         <div>
-          <Label htmlFor="contactPhone">Contact Phone Number / WhatsApp</Label>
+          <Label htmlFor="contactPhone">Contact Phone Number</Label>
           <Input
             id="contactPhone"
             type="tel"
