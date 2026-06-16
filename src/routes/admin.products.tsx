@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2, Link as LinkIcon, Copy } from "lucide-react";
+import { Plus, Pencil, Trash2, Link as LinkIcon, Copy, Package, LayoutGrid, Eye } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin/products")({
@@ -20,8 +20,8 @@ interface FormState {
   id?: string;
   title: string;
   description: string;
-  price: string;            // Best / selling price
-  compare_at_price: string; // Original (MRP) — shown crossed out
+  price: string;
+  compare_at_price: string;
   currency: string;
   image_url: string;
   image_2: string;
@@ -29,7 +29,7 @@ interface FormState {
   in_stock: boolean;
   sort_order: string;
   category_id: string;
-  highlights: string; // newline-separated bullets in the form
+  highlights: string;
   ingredients: string;
   how_to_use: string;
   nutrition: string;
@@ -127,9 +127,7 @@ function ProductsAdminPage() {
       }
       compareNum = n;
     }
-    const extraImages = [form.image_2, form.image_3]
-      .map((s) => s.trim())
-      .filter((s) => s.length > 0);
+    const extraImages = [form.image_2, form.image_3].map((s) => s.trim()).filter((s) => s.length > 0);
 
     setSaving(true);
     const payload = {
@@ -183,120 +181,212 @@ function ProductsAdminPage() {
 
   const copyProductLink = (productId: string) => {
     const url = `${window.location.origin}/product/${productId}`;
-    navigator.clipboard.writeText(url).then(() => {
-      toast.success("Product link copied!");
-    }).catch(() => {
-      toast.error("Failed to copy link");
-    });
+    navigator.clipboard
+      .writeText(url)
+      .then(() => {
+        toast.success("Product link copied!");
+      })
+      .catch(() => {
+        toast.error("Failed to copy link");
+      });
   };
 
   const products = data ?? [];
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-end justify-between gap-4">
+    <div className="space-y-8 bg-[#0B0F17] p-6 rounded-2xl min-h-screen text-slate-100">
+      {/* Header Section */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-800 pb-6">
         <div>
-          <h1 className="font-display text-4xl uppercase tracking-wide">Products</h1>
-          <p className="text-sm text-muted-foreground">
-            Add, edit, and delete products. They appear on your public shop instantly.
+          <div className="flex items-center gap-2 text-[#FACC15] mb-1">
+            <Package className="h-5 w-5" />
+            <span className="text-xs font-bold uppercase tracking-widest">Inventory Management</span>
+          </div>
+          <h1 className="font-display text-4xl font-extrabold uppercase tracking-wide text-white">Products</h1>
+          <p className="text-sm text-slate-400 mt-1">
+            Add, edit, and manage your items. Changes reflect instantly on the public storefront.
           </p>
         </div>
-        <Button onClick={openNew} className="bg-primary text-primary-foreground hover:bg-primary/90">
-          <Plus className="h-4 w-4" /> Add Product
+        <Button
+          onClick={openNew}
+          className="bg-[#FACC15] text-black font-semibold hover:bg-[#E2B80D] transition-all duration-200 px-5 shadow-lg shadow-yellow-500/10 self-start sm:self-auto"
+        >
+          <Plus className="h-4 w-4 mr-2 stroke-[3]" /> Add Product
         </Button>
       </div>
 
+      {/* Main Content Area */}
       {isLoading ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {[...Array(6)].map((_, i) => <div key={i} className="aspect-[4/3] animate-pulse rounded-xl bg-card" />)}
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="aspect-[4/3] animate-pulse rounded-xl bg-slate-900 border border-slate-800" />
+          ))}
         </div>
       ) : products.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-border p-12 text-center">
-          <p className="text-lg text-muted-foreground">No products yet.</p>
-          <Button onClick={openNew} className="mt-4 bg-primary text-primary-foreground">
-            <Plus className="h-4 w-4" /> Add your first product
+        <div className="rounded-2xl border border-dashed border-slate-800 bg-slate-900/50 p-16 text-center max-w-xl mx-auto my-12">
+          <div className="bg-slate-800/80 w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4 text-[#FACC15]">
+            <LayoutGrid className="h-6 w-6" />
+          </div>
+          <p className="text-lg font-medium text-slate-300">No products added yet.</p>
+          <p className="text-sm text-slate-500 mt-1 mb-6">Create your first inventory listing to get started.</p>
+          <Button onClick={openNew} className="bg-[#FACC15] text-black font-semibold hover:bg-[#E2B80D]">
+            <Plus className="h-4 w-4 mr-2 stroke-[3]" /> Add Your First Product
           </Button>
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {products.map((p) => (
-            <div key={p.id} className="overflow-hidden rounded-xl border border-border bg-card">
-              <div className="aspect-square bg-secondary">
-                {p.image_url ? (
-                  <img src={p.image_url} alt={p.title} className="h-full w-full object-cover" />
-                ) : (
-                  <div className="flex h-full items-center justify-center text-muted-foreground">No image</div>
-                )}
-              </div>
-              <div className="p-4">
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className="font-semibold truncate">{p.title}</h3>
+            <div
+              key={p.id}
+              className="group overflow-hidden rounded-xl border border-slate-800/80 bg-[#141B2B] hover:border-slate-700/80 transition-all duration-300 flex flex-col justify-between shadow-xl"
+            >
+              <div>
+                {/* Image Wrap */}
+                <div className="aspect-square bg-slate-900 relative overflow-hidden border-b border-slate-800/60">
+                  {p.image_url ? (
+                    <img
+                      src={p.image_url}
+                      alt={p.title}
+                      className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center text-slate-600 text-sm">
+                      No image preview
+                    </div>
+                  )}
+
+                  {/* Status Overlay */}
                   {!p.in_stock && (
-                    <span className="rounded bg-destructive/15 px-2 py-0.5 text-[10px] font-bold uppercase text-destructive">
+                    <div className="absolute top-3 right-3 rounded-full bg-red-500/10 border border-red-500/30 backdrop-blur-md px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-red-400">
                       Sold out
-                    </span>
+                    </div>
                   )}
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  {formatPrice(p.price, p.currency)}
-                  {p.compare_at_price != null && (
-                    <span className="ml-2 line-through opacity-60">
-                      {formatPrice(p.compare_at_price, p.currency)}
+
+                {/* Info Container */}
+                <div className="p-5 space-y-3">
+                  <div>
+                    <h3 className="font-bold text-lg text-white truncate group-hover:text-[#FACC15] transition-colors">
+                      {p.title}
+                    </h3>
+                    <div className="mt-1 flex items-baseline gap-2">
+                      <span className="text-xl font-extrabold text-[#FACC15]">{formatPrice(p.price, p.currency)}</span>
+                      {p.compare_at_price != null && (
+                        <span className="text-xs line-through text-slate-500 font-medium">
+                          {formatPrice(p.compare_at_price, p.currency)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Product URL Action Bar */}
+                  <div className="flex items-center gap-2 rounded-lg bg-[#0B0F17] border border-slate-800/60 px-2.5 py-1.5">
+                    <LinkIcon className="h-3 w-3 shrink-0 text-slate-500" />
+                    <span
+                      className="text-[11px] font-mono text-slate-400 truncate select-all"
+                      title={`/product/${p.id}`}
+                    >
+                      /product/{p.id}
                     </span>
-                  )}
-                </p>
-                <div className="mt-2 flex items-center gap-1 rounded-md border border-border bg-muted/40 px-2 py-1">
-                  <LinkIcon className="h-3 w-3 shrink-0 text-muted-foreground" />
-                  <span className="text-[11px] text-muted-foreground truncate select-all" title={`/product/${p.id}`}>
-                    /product/{p.id}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => copyProductLink(p.id)}
-                    className="ml-auto shrink-0 rounded p-0.5 text-muted-foreground hover:bg-muted hover:text-primary transition-colors"
-                    title="Copy product link"
-                  >
-                    <Copy className="h-3 w-3" />
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => copyProductLink(p.id)}
+                      className="ml-auto shrink-0 rounded p-1 text-slate-400 hover:bg-slate-800 hover:text-[#FACC15] transition-colors"
+                      title="Copy Link"
+                    >
+                      <Copy className="h-3 w-3" />
+                    </button>
+                  </div>
                 </div>
-                <div className="mt-3 flex gap-2">
-                  <Button size="sm" variant="outline" onClick={() => openEdit(p)} className="flex-1">
-                    <Pencil className="h-3 w-3" /> Edit
-                  </Button>
-                  <Button size="sm" variant="outline" onClick={() => remove(p)} className="text-destructive hover:text-destructive">
-                    <Trash2 className="h-3 w-3" />
-                  </Button>
-                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="p-5 pt-0 mt-auto flex gap-2 border-t border-slate-800/40 pt-4">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => openEdit(p)}
+                  className="flex-1 bg-slate-800/60 text-slate-200 hover:bg-[#FACC15] hover:text-black font-semibold transition-all"
+                >
+                  <Pencil className="h-3 w-3 mr-1.5" /> Edit
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => remove(p)}
+                  className="bg-slate-900/40 text-slate-400 border border-slate-800 hover:bg-red-950/40 hover:text-red-400 hover:border-red-900/50 transition-all"
+                >
+                  <Trash2 className="h-3 w-3" />
+                </Button>
               </div>
             </div>
           ))}
         </div>
       )}
 
+      {/* Edit / Add Modal */}
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="font-display text-2xl uppercase tracking-wide">
-              {form.id ? "Edit Product" : "Add Product"}
+        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl bg-[#0F1624] border border-slate-800 text-slate-100">
+          <DialogHeader className="border-b border-slate-800 pb-4">
+            <DialogTitle className="font-display text-2xl font-bold uppercase tracking-wide text-white">
+              {form.id ? "✏️ Edit Product" : "✨ Add New Product"}
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div>
-              <Label htmlFor="title">Title</Label>
-              <Input id="title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
+
+          <div className="space-y-5 py-4">
+            {/* Title */}
+            <div className="space-y-1.5">
+              <Label htmlFor="title" className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                Product Title
+              </Label>
+              <Input
+                id="title"
+                value={form.title}
+                onChange={(e) => setForm({ ...form, title: e.target.value })}
+                className="bg-[#0B0F17] border-slate-800 text-white focus-visible:ring-[#FACC15]"
+                placeholder="Whey Protein Isolate 1KG"
+              />
             </div>
-            <div>
-              <Label htmlFor="description">Description</Label>
-              <Textarea id="description" rows={4} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+
+            {/* Description */}
+            <div className="space-y-1.5">
+              <Label htmlFor="description" className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                Description
+              </Label>
+              <Textarea
+                id="description"
+                rows={3}
+                value={form.description}
+                onChange={(e) => setForm({ ...form, description: e.target.value })}
+                className="bg-[#0B0F17] border-slate-800 text-white focus-visible:ring-[#FACC15]"
+                placeholder="Describe the item benefits, taste, quality..."
+              />
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label htmlFor="price">Best Price</Label>
-                <Input id="price" type="number" step="0.01" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="e.g. 1499" />
-                <p className="mt-1 text-[11px] text-muted-foreground">Selling price shown to customers.</p>
+
+            {/* Price Grid */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label
+                  htmlFor="price"
+                  className="text-xs font-semibold text-slate-300 uppercase tracking-wider text-[#FACC15]"
+                >
+                  Best Selling Price
+                </Label>
+                <Input
+                  id="price"
+                  type="number"
+                  step="0.01"
+                  value={form.price}
+                  onChange={(e) => setForm({ ...form, price: e.target.value })}
+                  placeholder="e.g. 1499"
+                  className="bg-[#0B0F17] border-slate-800 text-white focus-visible:ring-[#FACC15]"
+                />
+                <p className="text-[11px] text-slate-500">Price customers actually pay.</p>
               </div>
-              <div>
-                <Label htmlFor="compare">Original Price</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="compare" className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                  Original Price (MRP)
+                </Label>
                 <Input
                   id="compare"
                   type="number"
@@ -304,94 +394,222 @@ function ProductsAdminPage() {
                   value={form.compare_at_price}
                   onChange={(e) => setForm({ ...form, compare_at_price: e.target.value })}
                   placeholder="e.g. 1999"
+                  className="bg-[#0B0F17] border-slate-800 text-white focus-visible:ring-[#FACC15]"
                 />
-                <p className="mt-1 text-[11px] text-muted-foreground">Optional. Shown crossed out next to best price.</p>
+                <p className="text-[11px] text-slate-500">Will appear crossed out.</p>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label htmlFor="currency">Currency</Label>
-                <Input id="currency" value={form.currency} onChange={(e) => setForm({ ...form, currency: e.target.value })} placeholder="INR" />
+
+            {/* Currency & Category */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="currency" className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                  Currency
+                </Label>
+                <Input
+                  id="currency"
+                  value={form.currency}
+                  onChange={(e) => setForm({ ...form, currency: e.target.value })}
+                  placeholder="INR"
+                  className="bg-[#0B0F17] border-slate-800 text-white focus-visible:ring-[#FACC15]"
+                />
               </div>
-              <div>
-                <Label htmlFor="category">Category</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="category" className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                  Category
+                </Label>
                 <select
                   id="category"
                   value={form.category_id}
                   onChange={(e) => setForm({ ...form, category_id: e.target.value })}
-                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  className="flex h-9 w-full rounded-md border border-slate-800 bg-[#0B0F17] px-3 py-1 text-sm text-white shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#FACC15]"
                 >
-                  <option value="">— None —</option>
+                  <option value="" className="bg-[#0B0F17]">
+                    — None —
+                  </option>
                   {categories.map((c) => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
+                    <option key={c.id} value={c.id} className="bg-[#0B0F17]">
+                      {c.name}
+                    </option>
                   ))}
                 </select>
               </div>
             </div>
-            <div className="space-y-3">
-              <div>
-                <Label htmlFor="image">Main Image URL</Label>
-                <Input id="image" value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} placeholder="https://..." />
+
+            {/* Images Stack */}
+            <div className="space-y-3 bg-[#0B0F17]/60 p-4 rounded-xl border border-slate-800/80">
+              <p className="text-xs font-bold uppercase tracking-wider text-[#FACC15]">Product Gallery URLs</p>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="image" className="text-[11px] text-slate-400">
+                  Main Display Image
+                </Label>
+                <Input
+                  id="image"
+                  value={form.image_url}
+                  onChange={(e) => setForm({ ...form, image_url: e.target.value })}
+                  placeholder="https://image-link.com"
+                  className="bg-[#0B0F17] border-slate-800 text-white h-8 text-xs focus-visible:ring-[#FACC15]"
+                />
                 {form.image_url && (
-                  <img src={form.image_url} alt="preview" className="mt-2 h-24 w-24 rounded-md border border-border object-cover" />
+                  <img
+                    src={form.image_url}
+                    alt="preview"
+                    className="mt-2 h-16 w-16 rounded-md border border-slate-700 object-cover"
+                  />
                 )}
               </div>
-              <div>
-                <Label htmlFor="image2">Side Image 1 (Optional)</Label>
-                <Input id="image2" value={form.image_2} onChange={(e) => setForm({ ...form, image_2: e.target.value })} placeholder="https://..." />
-                {form.image_2 && (
-                  <img src={form.image_2} alt="preview 2" className="mt-2 h-24 w-24 rounded-md border border-border object-cover" />
-                )}
-              </div>
-              <div>
-                <Label htmlFor="image3">Side Image 2 (Optional)</Label>
-                <Input id="image3" value={form.image_3} onChange={(e) => setForm({ ...form, image_3: e.target.value })} placeholder="https://..." />
-                {form.image_3 && (
-                  <img src={form.image_3} alt="preview 3" className="mt-2 h-24 w-24 rounded-md border border-border object-cover" />
-                )}
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="image2" className="text-[11px] text-slate-400">
+                    Side Image 1
+                  </Label>
+                  <Input
+                    id="image2"
+                    value={form.image_2}
+                    onChange={(e) => setForm({ ...form, image_2: e.target.value })}
+                    placeholder="Optional"
+                    className="bg-[#0B0F17] border-slate-800 text-white h-8 text-xs focus-visible:ring-[#FACC15]"
+                  />
+                  {form.image_2 && (
+                    <img
+                      src={form.image_2}
+                      alt="preview 2"
+                      className="mt-2 h-12 w-12 rounded-md border border-slate-700 object-cover"
+                    />
+                  )}
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="image3" className="text-[11px] text-slate-400">
+                    Side Image 2
+                  </Label>
+                  <Input
+                    id="image3"
+                    value={form.image_3}
+                    onChange={(e) => setForm({ ...form, image_3: e.target.value })}
+                    placeholder="Optional"
+                    className="bg-[#0B0F17] border-slate-800 text-white h-8 text-xs focus-visible:ring-[#FACC15]"
+                  />
+                  {form.image_3 && (
+                    <img
+                      src={form.image_3}
+                      alt="preview 3"
+                      className="mt-2 h-12 w-12 rounded-md border border-slate-700 object-cover"
+                    />
+                  )}
+                </div>
               </div>
             </div>
-            <div className="space-y-3 rounded-md border border-border bg-muted/30 p-3">
-              <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Product Content</p>
-              <div>
-                <Label htmlFor="highlights">Key Highlights</Label>
+
+            {/* Info Grid Content */}
+            <div className="space-y-4 rounded-xl border border-slate-800 bg-[#0B0F17]/30 p-4">
+              <p className="text-xs font-bold uppercase tracking-wider text-[#FACC15]">Advanced Product Details</p>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="highlights" className="text-xs font-semibold text-slate-300">
+                  Key Highlights
+                </Label>
                 <Textarea
                   id="highlights"
-                  rows={4}
+                  rows={3}
                   value={form.highlights}
                   onChange={(e) => setForm({ ...form, highlights: e.target.value })}
-                  placeholder={"One bullet per line, e.g.\n25g protein per serving\nGrass-fed whey\nNo added sugar"}
+                  placeholder={"One point per line, e.g.\n25g pure whey protein\nRich in BCAA\nZero added sugar"}
+                  className="bg-[#0B0F17] border-slate-800 text-white focus-visible:ring-[#FACC15] text-xs"
                 />
-                <p className="mt-1 text-[11px] text-muted-foreground">One point per line. Shown as a bullet list on the product page.</p>
               </div>
-              <div>
-                <Label htmlFor="ingredients">Ingredients</Label>
-                <Textarea id="ingredients" rows={3} value={form.ingredients} onChange={(e) => setForm({ ...form, ingredients: e.target.value })} placeholder="Whey protein concentrate, cocoa, natural flavors…" />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="ingredients" className="text-xs font-semibold text-slate-300">
+                    Ingredients
+                  </Label>
+                  <Textarea
+                    id="ingredients"
+                    rows={2}
+                    value={form.ingredients}
+                    onChange={(e) => setForm({ ...form, ingredients: e.target.value })}
+                    className="bg-[#0B0F17] border-slate-800 text-white text-xs"
+                    placeholder="Whey, premium cocoa..."
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="how_to_use" className="text-xs font-semibold text-slate-300">
+                    How to Use
+                  </Label>
+                  <Textarea
+                    id="how_to_use"
+                    rows={2}
+                    value={form.how_to_use}
+                    onChange={(e) => setForm({ ...form, how_to_use: e.target.value })}
+                    className="bg-[#0B0F17] border-slate-800 text-white text-xs"
+                    placeholder="Mix 1 scoop with water..."
+                  />
+                </div>
               </div>
-              <div>
-                <Label htmlFor="how_to_use">How to Use</Label>
-                <Textarea id="how_to_use" rows={3} value={form.how_to_use} onChange={(e) => setForm({ ...form, how_to_use: e.target.value })} placeholder="Mix 1 scoop with 250ml water or milk…" />
-              </div>
-              <div>
-                <Label htmlFor="nutrition">Nutrition Info</Label>
-                <Textarea id="nutrition" rows={3} value={form.nutrition} onChange={(e) => setForm({ ...form, nutrition: e.target.value })} placeholder="Per serving: 120 kcal, 25g protein, 2g carbs…" />
+
+              <div className="space-y-1.5">
+                <Label htmlFor="nutrition" className="text-xs font-semibold text-slate-300">
+                  Nutrition Information
+                </Label>
+                <Textarea
+                  id="nutrition"
+                  rows={2}
+                  value={form.nutrition}
+                  onChange={(e) => setForm({ ...form, nutrition: e.target.value })}
+                  className="bg-[#0B0F17] border-slate-800 text-white text-xs"
+                  placeholder="Per serving: 120 kcal, 25g protein..."
+                />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label htmlFor="sort">Sort order</Label>
-                <Input id="sort" type="number" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: e.target.value })} />
+
+            {/* Controls */}
+            <div className="grid grid-cols-2 gap-4 items-center bg-[#0B0F17] p-3 rounded-xl border border-slate-800">
+              <div className="space-y-1">
+                <Label htmlFor="sort" className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                  Display Order
+                </Label>
+                <Input
+                  id="sort"
+                  type="number"
+                  value={form.sort_order}
+                  onChange={(e) => setForm({ ...form, sort_order: e.target.value })}
+                  className="bg-[#0F1624] border-slate-800 text-white h-9 focus-visible:ring-[#FACC15]"
+                />
               </div>
-              <div className="flex items-end gap-3 pb-2">
-                <Switch id="in_stock" checked={form.in_stock} onCheckedChange={(v) => setForm({ ...form, in_stock: v })} />
-                <Label htmlFor="in_stock">In stock</Label>
+              <div className="flex items-center justify-end gap-3 pt-4">
+                <Label
+                  htmlFor="in_stock"
+                  className="text-xs font-semibold text-slate-300 uppercase tracking-wider cursor-pointer"
+                >
+                  In Stock Status
+                </Label>
+                <Switch
+                  id="in_stock"
+                  checked={form.in_stock}
+                  onCheckedChange={(v) => setForm({ ...form, in_stock: v })}
+                  className="data-[state=checked]:bg-[#FACC15] data-[state=unchecked]:bg-slate-800"
+                />
               </div>
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)} disabled={saving}>Cancel</Button>
-            <Button onClick={save} disabled={saving} className="bg-primary text-primary-foreground hover:bg-primary/90">
-              {saving ? "Saving…" : form.id ? "Save changes" : "Add product"}
+
+          <DialogFooter className="border-t border-slate-800 pt-4 gap-2">
+            <Button
+              variant="ghost"
+              onClick={() => setOpen(false)}
+              disabled={saving}
+              className="text-slate-400 hover:text-white hover:bg-slate-900"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={save}
+              disabled={saving}
+              className="bg-[#FACC15] text-black font-bold hover:bg-[#E2B80D] min-w-[120px]"
+            >
+              {saving ? "Saving…" : form.id ? "Update Item" : "Publish Item"}
             </Button>
           </DialogFooter>
         </DialogContent>
