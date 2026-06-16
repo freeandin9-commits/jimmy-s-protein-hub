@@ -47,7 +47,6 @@ function HomePage() {
   const [isMuted, setIsMuted] = useState(true);
   const { settings } = useSiteSettings();
 
-  const whatsappNumber = settings?.whatsapp_number || "919142027275";
   const displayPhone = settings?.contact_phone || "919142027275";
   const scrollRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -61,10 +60,9 @@ function HomePage() {
 
   const toggleMute = () => {
     if (videoRef.current) {
-      // HTML Video element-ന്റെ പ്രോപ്പർട്ടി നേരിട്ട് മാറ്റുന്നു
-      const currentMuted = videoRef.current.muted;
-      videoRef.current.muted = !currentMuted;
-      setIsMuted(!currentMuted);
+      const nextMuted = !videoRef.current.muted;
+      videoRef.current.muted = nextMuted;
+      setIsMuted(nextMuted);
     }
   };
 
@@ -76,6 +74,9 @@ function HomePage() {
       })
       .catch(() => setLoading(false));
   }, []);
+
+  const isExternalCta = settings?.hero_cta_link?.startsWith("http");
+  const ctaText = settings?.hero_cta_text || "Buy Now";
 
   return (
     <div className="relative w-full">
@@ -152,21 +153,27 @@ function HomePage() {
             </h1>
             <p className="mt-6 max-w-md text-base text-muted-foreground md:text-lg">{settings?.hero_subtext}</p>
             <div className="mt-10 flex flex-wrap items-center gap-6">
-              <Button
-                asChild
-                size="lg"
-                className="btn-gold h-12 rounded-full px-8 font-bold uppercase tracking-[0.2em]"
-              >
-                {settings?.hero_cta_link?.startsWith("http") ? (
-                  <a href={settings.hero_cta_link}>
-                    {settings.hero_cta_text || "Buy Now"} <ArrowRight className="h-4 w-4" />
+              {isExternalCta ? (
+                <Button
+                  asChild
+                  size="lg"
+                  className="btn-gold h-12 rounded-full px-8 font-bold uppercase tracking-[0.2em]"
+                >
+                  <a href={settings?.hero_cta_link}>
+                    {ctaText} <ArrowRight className="h-4 w-4" />
                   </a>
-                ) : (
+                </Button>
+              ) : (
+                <Button
+                  asChild
+                  size="lg"
+                  className="btn-gold h-12 rounded-full px-8 font-bold uppercase tracking-[0.2em]"
+                >
                   <Link to={(settings?.hero_cta_link || "/products") as any}>
-                    {settings?.hero_cta_text || "Buy Now"} <ArrowRight className="h-4 w-4" />
+                    {ctaText} <ArrowRight className="h-4 w-4" />
                   </Link>
-                )}
-              </Button>
+                </Button>
+              )}
               {displayPhone && (
                 <a
                   href={`tel:${displayPhone.replace(/[^0-9+]/g, "")}`}
