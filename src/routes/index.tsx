@@ -64,8 +64,12 @@ function HomePage() {
 
   return (
     <div className="relative">
-      <SearchBar />
-      <AdsStrip />
+      {/* STICKY HEADER NAVIGATION AREA */}
+      <div className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-md">
+        <SearchBar />
+        <AdsStrip />
+      </div>
+
       <CategoriesSection />
 
       {/* HERO SECTION */}
