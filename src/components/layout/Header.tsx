@@ -14,7 +14,7 @@ export function Header() {
 
   // useSiteSettings ഹുക്ക് വഴി ഡാറ്റാബേസിൽ നിന്നുള്ള ഏറ്റവും പുതിയ ലോഗോ യുആർഎൽ എടുക്കുന്നു
   const { settings } = useSiteSettings();
-  const logoSrc = settings?.logo_url || logoImg;
+  const logoSrc = settings?.logo_url || logoAsset.url;
 
   // ഡെസ്ക്ടോപ്പ് ലിങ്കുകൾ വെളുപ്പ് നിറത്തിലും, ഹോവർ ചെയ്യുമ്പോൾ പ്രൈമറി/ഗോൾഡ് നിറത്തിലും വരാൻ
   const navLinkProps = {
