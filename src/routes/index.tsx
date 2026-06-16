@@ -35,11 +35,16 @@ function HomePage() {
   const [loading, setLoading] = useState(true);
   const { settings } = useSiteSettings();
 
-  // ഡാറ്റാബേസിൽ നിന്നുള്ള ഫോൺ നമ്പർ എടുക്കുന്നു (രണ്ട് ടൈപ്പ് കീയും ബാക്കപ്പായി നൽകി)
-  const phone = settings?.whatsapp_number || settings?.contact_phone || "919142027275";
+  // WhatsApp Chat-ന് വേണ്ടി മാത്രം Primary WhatsApp Link Gateway ഉപയോഗിക്കുന്നു
+  const whatsappNumber = settings?.whatsapp_number || "919142027275";
+
+  // Hero section-ലെ ഫോൺ നമ്പറിന് വേണ്ടി മാത്രം Dedicated Contact Line ഉപയോഗിക്കുന്നു
+  const displayPhone = settings?.contact_phone || "919142027275";
+
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const waUrl = `https://wa.me/${phone.replace(/[^0-9]/g, "")}?text=Hi,%20I'm%20interested%20in%20your%20products!`;
+  // WhatsApp URL (ഇത് എപ്പോഴും whatsapp_number-നെ മാത്രം ആശ്രയിച്ചിരിക്കും)
+  const waUrl = `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, "")}?text=Hi,%20I'm%20interested%20in%20your%20products!`;
 
   const scroll = (dir: "left" | "right") => {
     const el = scrollRef.current;
@@ -147,8 +152,11 @@ function HomePage() {
                   </Link>
                 )}
               </Button>
-              {phone && (
-                <a href={`tel:${phone}`} className="flex items-center gap-3 text-foreground">
+              {displayPhone && (
+                <a
+                  href={`tel:${displayPhone.replace(/[^0-9+]/g, "")}`}
+                  className="flex items-center gap-3 text-foreground"
+                >
                   <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/15 text-primary ring-1 ring-primary/30">
                     <Phone className="h-5 w-5" />
                   </span>
@@ -156,7 +164,7 @@ function HomePage() {
                     <span className="block text-[10px] font-bold uppercase tracking-[0.25em] text-muted-foreground">
                       Contact Us Daily
                     </span>
-                    <span className="block font-display text-xl tracking-wide">{phone}</span>
+                    <span className="block font-display text-xl tracking-wide">{displayPhone}</span>
                   </span>
                 </a>
               )}
@@ -314,12 +322,12 @@ function HomePage() {
             </div>
 
             <a
-              href={`tel:${phone}`}
+              href={`tel:${displayPhone.replace(/[^0-9+]/g, "")}`}
               className="inline-flex items-center gap-2 rounded-full bg-primary-foreground/10 px-4 py-2 text-sm font-bold tracking-wide text-primary-foreground hover:bg-primary-foreground/20 transition-all border border-primary-foreground/20"
               title="Call Us Now"
             >
               <Phone className="h-4 w-4 animate-[pulse_2s_infinite]" />
-              <span>{phone}</span>
+              <span>{displayPhone}</span>
             </a>
           </div>
 
