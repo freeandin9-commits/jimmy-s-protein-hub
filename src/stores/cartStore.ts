@@ -37,9 +37,7 @@ export const useCartStore = create<CartStore>()(
         const existing = items.find((i) => i.productId === item.productId);
         if (existing) {
           set({
-            items: items.map((i) =>
-              i.productId === item.productId ? { ...i, quantity: i.quantity + qty } : i,
-            ),
+            items: items.map((i) => (i.productId === item.productId ? { ...i, quantity: i.quantity + qty } : i)),
           });
         } else {
           set({ items: [...items, { ...item, quantity: qty }] });
@@ -51,13 +49,10 @@ export const useCartStore = create<CartStore>()(
           return;
         }
         set({
-          items: get().items.map((i) =>
-            i.productId === productId ? { ...i, quantity } : i,
-          ),
+          items: get().items.map((i) => (i.productId === productId ? { ...i, quantity } : i)),
         });
       },
-      removeItem: (productId) =>
-        set({ items: get().items.filter((i) => i.productId !== productId) }),
+      removeItem: (productId) => set({ items: get().items.filter((i) => i.productId !== productId) }),
       clearCart: () => set({ items: [] }),
     }),
     {
@@ -149,9 +144,15 @@ export function isAddressComplete(a: AddressDetails): boolean {
   );
 }
 
-// Format a numeric order number as "JP-0042"
+// Format a numeric order number as "NSDDMMYYYYxxxxx"
 export function formatOrderRef(n: number): string {
-  return `JP-${String(n).padStart(4, "0")}`;
+  const today = new Date();
+  const dd = String(today.getDate()).padStart(2, "0");
+  const mm = String(today.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+  const yyyy = today.getFullYear();
+  const uniqueCode = String(n).padStart(5, "0"); // 5 Digit Unique Code
+
+  return `NS${dd}${mm}${yyyy}${uniqueCode}`;
 }
 
 // Formats Indian phone for display: "98765 43210"
@@ -189,9 +190,7 @@ export function buildOrderText(
   const phoneFmt = normalizeIndianPhone(customer.phone);
 
   const addressBlock =
-    customer.deliveryMethod === "home"
-      ? ["*Delivery Address*", ...formatAddressLines(customer.address), ""]
-      : [];
+    customer.deliveryMethod === "home" ? ["*Delivery Address*", ...formatAddressLines(customer.address), ""] : [];
 
   const lines = [
     `🏋️ *New Order — Jimmy's Protein*`,
@@ -233,9 +232,7 @@ export function buildWhatsAppOrderUrl(
   businessHours: string,
   origin?: string,
 ) {
-  const text = encodeURIComponent(
-    buildOrderText(items, customer, orderId, businessHours, origin),
-  );
+  const text = encodeURIComponent(buildOrderText(items, customer, orderId, businessHours, origin));
   return `https://wa.me/${whatsappNumber}?text=${text}`;
 }
 
