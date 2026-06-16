@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPrice } from "@/lib/products";
+import { formatOrderRef } from "@/stores/cartStore";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { toast } from "sonner";
@@ -20,15 +21,6 @@ const statusColors: Record<Status, string> = {
   shipped: "bg-purple-500/10 text-purple-400 border border-purple-500/20",
   delivered: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
   cancelled: "bg-rose-500/10 text-rose-400 border border-rose-500/20",
-};
-
-// Order number "NS" + 10 digit dynamic string format ചെയ്യാനുള്ള helper function
-const generateNSOrderRef = (orderNumber: number | undefined | null, fallbackId: string) => {
-  if (typeof orderNumber === "number") {
-    // 10 digits ആക്കാൻ ആവശ്യത്തിന് zeros pad ചെയ്യുന്നു (e.g., NS0000000042)
-    return `NS${String(orderNumber).padStart(10, "0")}`;
-  }
-  return `NS-${String(fallbackId).slice(0, 8).toUpperCase()}`;
 };
 
 function OrdersPage() {
@@ -129,15 +121,17 @@ function OrdersPage() {
                 (data ?? []).map((o: any) => {
                   const items = (o.items as any[]) ?? [];
                   const summary = items.map((i) => `${i.qty}× ${i.title}`).join(", ");
-                  const orderRef = generateNSOrderRef(o.order_number, o.id);
-
+                  const orderRef =
+                    typeof o.order_number === "number"
+                      ? formatOrderRef(o.order_number)
+                      : `#${String(o.id).slice(0, 8)}`;
                   return (
                     <tr
                       key={o.id}
                       className="transition-colors hover:bg-zinc-800/40 cursor-pointer group"
                       onClick={() => setSelected(o)}
                     >
-                      <td className="p-4 font-mono text-xs font-bold text-amber-400 group-hover:text-amber-300 whitespace-nowrap">
+                      <td className="p-4 font-mono text-xs font-bold text-amber-400 group-hover:text-amber-300">
                         {orderRef}
                       </td>
                       <td className="p-4 text-xs text-zinc-400">
@@ -184,7 +178,10 @@ function OrdersPage() {
             <>
               <SheetHeader className="border-b border-zinc-800 pb-4 mb-6">
                 <div className="text-amber-400 font-mono text-xs font-bold tracking-widest uppercase mb-1">
-                  ORDER REFERENCE: {generateNSOrderRef(selected.order_number, selected.id)}
+                  ORDER REFERENCE:{" "}
+                  {typeof selected.order_number === "number"
+                    ? formatOrderRef(selected.order_number)
+                    : String(selected.id).slice(0, 8).toUpperCase()}
                 </div>
                 <SheetTitle className="font-display text-2xl font-black uppercase tracking-wider text-zinc-100">
                   ORDER DETAILS
