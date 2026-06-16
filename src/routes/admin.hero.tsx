@@ -6,15 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Upload, Trash2, Image as ImageIcon, Film, Save } from "lucide-react";
+import { Upload, Trash2, Image as ImageIcon, Film, Save, Phone } from "lucide-react";
 
 export const Route = createFileRoute("/admin/hero")({
   component: HeroAdminPage,
@@ -30,6 +24,7 @@ type HeroForm = {
   hero_image_url: string | null;
   hero_video_url: string | null;
   hero_media_type: "image" | "video";
+  contact_phone: string; // ഫോൺ നമ്പർ മാറ്റാൻ പുതിയ ഫീൽഡ്
 };
 
 function HeroAdminPage() {
@@ -37,11 +32,7 @@ function HeroAdminPage() {
   const { data, isLoading } = useQuery({
     queryKey: ["site_settings"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("site_settings")
-        .select("*")
-        .limit(1)
-        .maybeSingle();
+      const { data, error } = await supabase.from("site_settings").select("*").limit(1).maybeSingle();
       if (error) throw error;
       return data as any;
     },
@@ -64,6 +55,7 @@ function HeroAdminPage() {
         hero_image_url: data.hero_image_url ?? null,
         hero_video_url: data.hero_video_url ?? null,
         hero_media_type: (data.hero_media_type ?? "image") as "image" | "video",
+        contact_phone: data.contact_phone ?? "", // ഫോൺ നമ്പർ ലോഡ് ചെയ്യുന്നു
       });
     }
   }, [data, form]);
@@ -72,8 +64,7 @@ function HeroAdminPage() {
     return <div className="text-sm text-muted-foreground p-6">Loading…</div>;
   }
 
-  const update = <K extends keyof HeroForm>(k: K, v: HeroForm[K]) =>
-    setForm({ ...form, [k]: v });
+  const update = <K extends keyof HeroForm>(k: K, v: HeroForm[K]) => setForm({ ...form, [k]: v });
 
   const uploadFile = async (file: File, kind: "image" | "video") => {
     const setBusy = kind === "image" ? setUploadingImage : setUploadingVideo;
@@ -86,9 +77,7 @@ function HeroAdminPage() {
         upsert: false,
       });
       if (upErr) throw upErr;
-      const { data: signed } = await supabase.storage
-        .from("ads")
-        .createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
+      const { data: signed } = await supabase.storage.from("ads").createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
       if (!signed?.signedUrl) throw new Error("Failed to get URL");
       const patch =
         kind === "image"
@@ -134,21 +123,44 @@ function HeroAdminPage() {
         hero_cta_text: form.hero_cta_text,
         hero_cta_link: form.hero_cta_link,
         hero_media_type: form.hero_media_type,
+        contact_phone: form.contact_phone, // ഫോൺ നമ്പർ ഡാറ്റാബേസിലേക്ക് സേവ് ചെയ്യുന്നു
       } as any)
       .eq("id", form.id);
     setSaving(false);
     if (error) return toast.error(error.message);
     qc.invalidateQueries({ queryKey: ["site_settings"] });
-    toast.success("Hero section saved");
+    toast.success("Settings saved successfully");
   };
 
   return (
     <div className="max-w-3xl space-y-6 pb-12">
       <div>
-        <h1 className="font-display text-4xl uppercase tracking-wide">Hero Section</h1>
+        <h1 className="font-display text-4xl uppercase tracking-wide">Hero & Store Settings</h1>
         <p className="text-sm text-muted-foreground">
-          Edit the homepage hero — text, button, and the background image or video.
+          Edit the homepage hero text, background media, and general store details.
         </p>
+      </div>
+
+      {/* CONTACT INFO (ഫോൺ നമ്പർ മാറ്റാനുള്ള പുതിയ സെക്ഷൻ) */}
+      <div className="space-y-4 rounded-xl border border-border bg-card p-6">
+        <div className="flex items-center gap-2">
+          <Phone className="h-5 w-5 text-primary" />
+          <h2 className="font-display text-2xl uppercase tracking-wide">Contact Information</h2>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Update the daily contact and support phone number displayed on the website.
+        </p>
+        <div>
+          <Label htmlFor="contactPhone">Contact Phone Number</Label>
+          <Input
+            id="contactPhone"
+            type="tel"
+            value={form.contact_phone}
+            onChange={(e) => update("contact_phone", e.target.value)}
+            placeholder="+91 9876543210"
+            className="mt-1"
+          />
+        </div>
       </div>
 
       {/* MEDIA */}
@@ -158,10 +170,7 @@ function HeroAdminPage() {
             <h2 className="font-display text-2xl uppercase tracking-wide">Hero Media</h2>
             <p className="text-sm text-muted-foreground">Choose what shows on the right side of the hero.</p>
           </div>
-          <Select
-            value={form.hero_media_type}
-            onValueChange={(v) => update("hero_media_type", v as "image" | "video")}
-          >
+          <Select value={form.hero_media_type} onValueChange={(v) => update("hero_media_type", v as "image" | "video")}>
             <SelectTrigger className="w-[160px]">
               <SelectValue />
             </SelectTrigger>
@@ -180,11 +189,7 @@ function HeroAdminPage() {
             </div>
             <div className="flex aspect-video w-full items-center justify-center overflow-hidden rounded-md border border-border bg-muted/40">
               {form.hero_image_url ? (
-                <img
-                  src={form.hero_image_url}
-                  alt="Hero"
-                  className="h-full w-full object-cover"
-                />
+                <img src={form.hero_image_url} alt="Hero" className="h-full w-full object-cover" />
               ) : (
                 <span className="text-xs text-muted-foreground">No image yet</span>
               )}
@@ -224,13 +229,7 @@ function HeroAdminPage() {
             </div>
             <div className="flex aspect-video w-full items-center justify-center overflow-hidden rounded-md border border-border bg-muted/40">
               {form.hero_video_url ? (
-                <video
-                  src={form.hero_video_url}
-                  className="h-full w-full object-cover"
-                  controls
-                  muted
-                  playsInline
-                />
+                <video src={form.hero_video_url} className="h-full w-full object-cover" controls muted playsInline />
               ) : (
                 <span className="text-xs text-muted-foreground">No video yet</span>
               )}
@@ -324,7 +323,7 @@ function HeroAdminPage() {
           className="w-full bg-primary font-bold uppercase tracking-wider text-primary-foreground hover:bg-primary/90"
         >
           <Save className="mr-2 h-4 w-4" />
-          {saving ? "Saving…" : "Save Hero Section"}
+          {saving ? "Saving…" : "Save All Settings"}
         </Button>
       </form>
     </div>
