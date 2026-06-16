@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Upload, Trash2, Plus, Settings, Sliders, Image, HelpCircle, Save } from "lucide-react";
+import { Upload, Trash2, Plus, Settings, Sliders, Image, HelpCircle, Save, Eye, Sun, Moon } from "lucide-react";
 
 export const Route = createFileRoute("/admin/settings")({
   component: SettingsPage,
@@ -28,6 +28,11 @@ function SettingsPage() {
   const [faqs, setFaqs] = useState<any[]>([]);
   const [saving, setSaving] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
+
+  // ലോഗോ പ്രിവ്യൂ ബാക്ക്ഗ്രൗണ്ടും എഫക്റ്റുകളും ലോക്കലായി നിയന്ത്രിക്കാൻ
+  const [previewBg, setPreviewBg] = useState<"dark" | "light" | "grid">("grid");
+  const [imageFit, setImageFit] = useState<"contain" | "cover" | "scale-down">("contain");
+  const [logoPadding, setLogoPadding] = useState<string>("p-4");
 
   useEffect(() => {
     if (data && !form) {
@@ -159,6 +164,13 @@ function SettingsPage() {
     qc.invalidateQueries({ queryKey: ["site_settings"] });
   };
 
+  // ബാക്ക്ഗ്രൗണ്ട് സ്റ്റൈൽ പ്രിവ്യൂ തിട്ടപ്പെടുത്താൻ
+  const getBgClass = () => {
+    if (previewBg === "dark") return "bg-[#0B0F17]";
+    if (previewBg === "light") return "bg-white";
+    return "bg-[#0B0F17] bg-[linear-gradient(45deg,#141b2b_25%,transparent_25%),linear-gradient(-45deg,#141b2b_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#141b2b_75%),linear-gradient(-45deg,transparent_75%,#141b2b_75%)] bg-[size:20px_20px] bg-[position:0_0,0_10px,10px_-10px,-10px_0]";
+  };
+
   return (
     <div className="max-w-3xl space-y-8 bg-[#0B0F17] p-6 rounded-2xl min-h-screen text-slate-100 pb-16">
       {/* Top Header Grid Section */}
@@ -177,47 +189,151 @@ function SettingsPage() {
       </div>
 
       {/* Brand Identity / Identity Grid Component */}
-      <div className="space-y-4 rounded-xl border border-slate-800 bg-[#141B2B] p-6 shadow-xl">
-        <div className="flex items-center gap-2 text-[#FACC15] mb-1">
-          <Image className="h-4 w-4" />
-          <h2 className="font-display text-lg font-bold uppercase tracking-wider text-white">Brand Visual Identity</h2>
+      <div className="space-y-6 rounded-xl border border-slate-800 bg-[#141B2B] p-6 shadow-xl">
+        <div className="flex items-center justify-between border-b border-slate-800/60 pb-3">
+          <div className="flex items-center gap-2 text-[#FACC15]">
+            <Image className="h-4 w-4" />
+            <h2 className="font-display text-lg font-bold uppercase tracking-wider text-white">
+              Brand Visual Identity
+            </h2>
+          </div>
+          <span className="flex items-center gap-1 text-[10px] font-bold uppercase bg-slate-800 px-2.5 py-1 rounded-full text-slate-400">
+            <Eye className="h-3 w-3 text-[#FACC15]" /> Live Preview Engine
+          </span>
         </div>
+
         <p className="text-xs text-slate-400 max-w-2xl leading-relaxed">
           The main logomark serves as the primary visual indicator in the header stack. Transparency-optimized PNG
-          configurations with a max-height specification of 200px are highly recommended.
+          configurations are highly recommended. Use the tools below to check visibility on various themes.
         </p>
 
-        <div className="flex flex-col sm:flex-row sm:items-center gap-6 pt-3">
-          <div className="flex h-24 w-48 items-center justify-center rounded-xl border-2 border-dashed border-slate-800 bg-[#0B0F17] p-4 transition-colors hover:border-slate-700">
-            {form.logo_url ? (
-              <img src={form.logo_url} alt="Active Identity Brand" className="max-h-full max-w-full object-contain" />
-            ) : (
-              <span className="text-xs font-semibold text-slate-600">Fallback Text Logo Active</span>
-            )}
+        {/* ADVANCED LOGO PREVIEW BOX */}
+        <div className="grid gap-6 md:grid-cols-5 items-start pt-2">
+          {/* Main Interactive Screen */}
+          <div className="md:col-span-3 flex flex-col gap-2">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Active Canvas View</span>
+            <div
+              className={`relative flex h-44 w-full items-center justify-center rounded-xl border border-slate-800 transition-colors duration-300 overflow-hidden ${getBgClass()} ${logoPadding}`}
+            >
+              {form.logo_url ? (
+                <img
+                  src={form.logo_url}
+                  alt="Active Identity Brand"
+                  className={`max-h-full max-w-full transition-all duration-200 object-${imageFit}`}
+                />
+              ) : (
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-900/80 px-4 py-2 rounded-lg border border-slate-800">
+                  Fallback Text Logo Active
+                </span>
+              )}
+            </div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <label className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-lg bg-[#FACC15] px-4 text-xs font-bold uppercase tracking-wider text-black hover:bg-[#E2B80D] transition-colors shadow-md shadow-yellow-500/5">
-              <Upload className="h-4 w-4 stroke-[2.5]" />
-              {uploadingLogo ? "Processing Image..." : form.logo_url ? "Replace Identity" : "Upload Custom Logo"}
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                disabled={uploadingLogo}
-                onChange={(e) => e.target.files?.[0] && onLogoFile(e.target.files[0])}
-              />
-            </label>
-            {form.logo_url && (
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={deleteLogo}
-                className="h-10 px-4 text-xs font-bold uppercase bg-slate-900/60 border border-slate-800 text-slate-400 hover:bg-red-950/40 hover:text-red-400 hover:border-red-900/50 transition-all"
-              >
-                <Trash2 className="mr-2 h-4 w-4" /> Reset Default
-              </Button>
-            )}
+
+          {/* Canvas Controller Effects Toolbar */}
+          <div className="md:col-span-2 space-y-4 bg-[#0B0F17]/50 p-4 rounded-xl border border-slate-800/60 h-full justify-between flex flex-col">
+            <div>
+              <span className="text-[10px] font-bold text-[#FACC15] uppercase tracking-widest block mb-2.5">
+                Preview Effects Filter
+              </span>
+
+              {/* Background Theme Toggles */}
+              <div className="space-y-1.5 mb-3">
+                <label className="text-[10px] text-slate-400 font-medium uppercase tracking-wide">
+                  Canvas Background
+                </label>
+                <div className="grid grid-cols-3 gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setPreviewBg("grid")}
+                    className={`h-7 rounded text-[11px] font-bold uppercase transition-all ${previewBg === "grid" ? "bg-[#FACC15] text-black" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}`}
+                  >
+                    Grid
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPreviewBg("dark")}
+                    className={`h-7 rounded text-[11px] font-bold uppercase transition-all flex items-center justify-center gap-1 ${previewBg === "dark" ? "bg-slate-700 text-white border border-slate-500" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}`}
+                  >
+                    <Moon className="h-2.5 w-2.5" /> Dark
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPreviewBg("light")}
+                    className={`h-7 rounded text-[11px] font-bold uppercase transition-all flex items-center justify-center gap-1 ${previewBg === "light" ? "bg-white text-black font-extrabold" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}`}
+                  >
+                    <Sun className="h-2.5 w-2.5" /> Light
+                  </button>
+                </div>
+              </div>
+
+              {/* Aspect Ratio Scaling Controls */}
+              <div className="space-y-1.5 mb-3">
+                <label className="text-[10px] text-slate-400 font-medium uppercase tracking-wide">
+                  Image Fit Style
+                </label>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {(["contain", "cover", "scale-down"] as const).map((fit) => (
+                    <button
+                      key={fit}
+                      type="button"
+                      onClick={() => setImageFit(fit)}
+                      className={`h-7 rounded text-[10px] font-bold uppercase transition-all ${imageFit === fit ? "bg-slate-300 text-black" : "bg-slate-800 text-slate-400 hover:bg-slate-700"}`}
+                    >
+                      {fit === "scale-down" ? "Scale" : fit}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Inner Padding Scale */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] text-slate-400 font-medium uppercase tracking-wide">
+                  Viewport Margins
+                </label>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {[
+                    { label: "None", val: "p-0" },
+                    { label: "Medium", val: "p-4" },
+                    { label: "Large", val: "p-8" },
+                  ].map((p) => (
+                    <button
+                      key={p.val}
+                      type="button"
+                      onClick={() => setLogoPadding(p.val)}
+                      className={`h-7 rounded text-[10px] font-bold uppercase transition-all ${logoPadding === p.val ? "bg-slate-300 text-black" : "bg-slate-800 text-slate-400 hover:bg-slate-700"}`}
+                    >
+                      {p.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
+        </div>
+
+        {/* Action Button Controls */}
+        <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-800/40">
+          <label className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-lg bg-[#FACC15] px-4 text-xs font-bold uppercase tracking-wider text-black hover:bg-[#E2B80D] transition-colors shadow-md shadow-yellow-500/5">
+            <Upload className="h-4 w-4 stroke-[2.5]" />
+            {uploadingLogo ? "Processing Image..." : form.logo_url ? "Replace Identity" : "Upload Custom Logo"}
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              disabled={uploadingLogo}
+              onChange={(e) => e.target.files?.[0] && onLogoFile(e.target.files[0])}
+            />
+          </label>
+          {form.logo_url && (
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={deleteLogo}
+              className="h-10 px-4 text-xs font-bold uppercase bg-slate-900/60 border border-slate-800 text-slate-400 hover:bg-red-950/40 hover:text-red-400 hover:border-red-900/50 transition-all"
+            >
+              <Trash2 className="mr-2 h-4 w-4" /> Reset Default
+            </Button>
+          )}
         </div>
       </div>
 
