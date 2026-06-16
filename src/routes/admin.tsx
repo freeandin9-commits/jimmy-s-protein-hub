@@ -12,10 +12,10 @@ import {
   ExternalLink,
   Megaphone,
   Tags,
-  Image as ImageIcon,
+  ImageIcon,
   Sparkles,
   FileText,
-  UserCheck,
+  UserCheck, // About പേജിനുള്ള ഐക്കൺ
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -34,7 +34,7 @@ const navItems: NavItem[] = [
   { to: "/admin/products", label: "Products", icon: Package },
   { to: "/admin/categories", label: "Categories", icon: Tags },
   { to: "/admin/blogs", label: "Blogs", icon: FileText },
-  { to: "/admin/about", label: "About Page", icon: UserCheck },
+  { to: "/admin/about", label: "About Page", icon: UserCheck }, // പുതിയ About സെക്ഷൻ ലിങ്ക്
   { to: "/admin/hero", label: "Hero Section", icon: Sparkles },
   { to: "/admin/ads", label: "Ads", icon: Megaphone },
   { to: "/admin/shop-ads", label: "Shop Banners", icon: ImageIcon },
