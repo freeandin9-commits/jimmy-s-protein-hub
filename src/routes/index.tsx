@@ -34,10 +34,12 @@ function HomePage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const { settings } = useSiteSettings();
-  const phone = settings.whatsapp_number || "";
+
+  // ഡാറ്റാബേസിൽ നിന്നുള്ള ഫോൺ നമ്പർ എടുക്കുന്നു (രണ്ട് ടൈപ്പ് കീയും ബാക്കപ്പായി നൽകി)
+  const phone = settings?.whatsapp_number || settings?.contact_phone || "919142027275";
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const waUrl = `https://wa.me/${phone || "919142027275"}?text=Hi,%20I'm%20interested%20in%20your%20products!`;
+  const waUrl = `https://wa.me/${phone.replace(/[^0-9]/g, "")}?text=Hi,%20I'm%20interested%20in%20your%20products!`;
 
   const scroll = (dir: "left" | "right") => {
     const el = scrollRef.current;
@@ -120,28 +122,28 @@ function HomePage() {
 
         <div className="container relative mx-auto grid min-h-[640px] gap-10 px-4 py-16 md:grid-cols-2 md:py-20 lg:py-28">
           <div className="relative z-10 flex flex-col justify-center">
-            {settings.hero_badge_text && (
+            {settings?.hero_badge_text && (
               <span className="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.3em] text-primary backdrop-blur-sm">
                 <Dumbbell className="h-3.5 w-3.5" /> {settings.hero_badge_text}
               </span>
             )}
             <h1 className="font-display text-5xl uppercase leading-[0.95] tracking-tight md:text-6xl lg:text-7xl xl:text-[5.5rem]">
-              <span className="text-foreground">{settings.hero_headline}</span>
+              <span className="text-foreground">{settings?.hero_headline}</span>
             </h1>
-            <p className="mt-6 max-w-md text-base text-muted-foreground md:text-lg">{settings.hero_subtext}</p>
+            <p className="mt-6 max-w-md text-base text-muted-foreground md:text-lg">{settings?.hero_subtext}</p>
             <div className="mt-10 flex flex-wrap items-center gap-6">
               <Button
                 asChild
                 size="lg"
                 className="btn-gold h-12 rounded-full px-8 font-bold uppercase tracking-[0.2em]"
               >
-                {settings.hero_cta_link?.startsWith("http") ? (
+                {settings?.hero_cta_link?.startsWith("http") ? (
                   <a href={settings.hero_cta_link}>
                     {settings.hero_cta_text || "Buy Now"} <ArrowRight className="h-4 w-4" />
                   </a>
                 ) : (
-                  <Link to={(settings.hero_cta_link || "/products") as any}>
-                    {settings.hero_cta_text || "Buy Now"} <ArrowRight className="h-4 w-4" />
+                  <Link to={(settings?.hero_cta_link || "/products") as any}>
+                    {settings?.hero_cta_text || "Buy Now"} <ArrowRight className="h-4 w-4" />
                   </Link>
                 )}
               </Button>
@@ -173,7 +175,7 @@ function HomePage() {
             <div aria-hidden className="absolute h-[480px] w-[480px] rounded-full border border-accent/10" />
 
             <div className="relative animate-[float_6s_ease-in-out_infinite] [transform-style:preserve-3d] [transform:rotateY(-8deg)_rotateX(4deg)]">
-              {settings.hero_media_type === "video" && settings.hero_video_url ? (
+              {settings?.hero_media_type === "video" && settings?.hero_video_url ? (
                 <video
                   src={settings.hero_video_url}
                   className="relative max-h-[520px] w-auto rounded-2xl object-cover"
@@ -188,7 +190,7 @@ function HomePage() {
                 />
               ) : (
                 <img
-                  src={settings.hero_image_url || heroImg}
+                  src={settings?.hero_image_url || heroImg}
                   alt="Jimmy's Protein"
                   className="relative max-h-[520px] w-auto rounded-2xl object-cover"
                   style={{
@@ -312,12 +314,12 @@ function HomePage() {
             </div>
 
             <a
-              href="tel:+919142027275"
+              href={`tel:${phone}`}
               className="inline-flex items-center gap-2 rounded-full bg-primary-foreground/10 px-4 py-2 text-sm font-bold tracking-wide text-primary-foreground hover:bg-primary-foreground/20 transition-all border border-primary-foreground/20"
               title="Call Us Now"
             >
               <Phone className="h-4 w-4 animate-[pulse_2s_infinite]" />
-              <span>+91 91420 27275</span>
+              <span>{phone}</span>
             </a>
           </div>
 
