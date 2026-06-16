@@ -124,12 +124,12 @@ function AppShell() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      {/* MAIN NAVBAR STICKY */}
-      <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur-md border-b border-border/40">
+      {/* MAIN NAVBAR FIXED */}
+      <header className="fixed top-0 left-0 z-50 w-full">
         <Header />
       </header>
 
-      <main className="flex flex-1 flex-col">
+      <main className="flex flex-1 flex-col pt-16">
         <Outlet />
       </main>
       <Footer />
