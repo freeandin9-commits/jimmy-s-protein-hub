@@ -14,75 +14,54 @@ export function Header() {
   const { settings } = useSiteSettings();
   const logoSrc = settings.logo_url || logoImg;
 
-  // ഡെസ്ക്ടോപ്പ് ലിങ്കുകൾ ശുദ്ധമായ വെള്ള നിറത്തിലും, ഹോവർ ചെയ്യുമ്പോൾ ഗോൾഡ്/പ്രൈമറി നിറത്തിലും വരാൻ
   const navLinkProps = {
-    className: "text-sm font-semibold uppercase tracking-wider text-white/90 hover:text-[#FACC15] transition-colors",
-    activeProps: { className: "text-[#FACC15]" },
+    className: "text-sm font-semibold uppercase tracking-wider text-foreground/80 hover:text-primary transition-colors",
+    activeProps: { className: "text-primary" },
   };
 
   return (
-    // Background pure black (#000000) ആക്കി, ബോർഡർ മാറ്റിയിട്ടുണ്ട്
-    <header className="sticky top-0 z-40 bg-black text-white shadow-md">
+    <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link to="/" className="flex items-center gap-2" aria-label="Nutrin Sports home">
-          {/* ലോഗോ കറുപ്പ് ബാക്ക്ഗ്രൗണ്ടിൽ നന്നായി തെളിയാൻ ഇൻവേർട്ട് ഫിൽട്ടർ ആവശ്യമെങ്കിൽ നൽകാം */}
-          <img src={logoSrc} alt="Nutrin Sports" className="h-10 w-auto md:h-12 object-contain" />
+          <img src={logoSrc} alt="Nutrin Sports" className="h-10 w-auto md:h-12" />
         </Link>
 
-        {/* Desktop Navigation Links */}
         <nav className="hidden items-center gap-8 md:flex">
-          <Link to="/" {...navLinkProps}>
-            Home
-          </Link>
-          <Link to="/products" {...navLinkProps}>
-            Shop
-          </Link>
-          <Link to="/track" {...navLinkProps}>
-            Track Order
-          </Link>
-          <Link to="/about" {...navLinkProps}>
-            About
-          </Link>
-          <Link to="/blog" {...navLinkProps}>
-            Blog
-          </Link>
-          <Link to="/contact" {...navLinkProps}>
-            Contact
-          </Link>
+          <Link to="/" {...navLinkProps}>Home</Link>
+          <Link to="/products" {...navLinkProps}>Shop</Link>
+          <Link to="/track" {...navLinkProps}>Track Order</Link>
+          <Link to="/about" {...navLinkProps}>About</Link>
+          <Link to="/blog" {...navLinkProps}>Blog</Link>
+          <Link to="/contact" {...navLinkProps}>Contact</Link>
         </nav>
 
-        {/* Action Controls - Icons & Buttons */}
         <div className="flex items-center gap-2">
           <Button
             asChild
             variant="outline"
             size="sm"
-            className="hidden sm:inline-flex font-bold uppercase tracking-wider border-white/20 bg-transparent text-white hover:bg-white hover:text-black transition-colors"
+            className="hidden sm:inline-flex font-bold uppercase tracking-wider"
           >
             <Link to="/login">Admin</Link>
           </Button>
-
-          {/* Cart Icon Button - Pure White */}
           <Button
             variant="ghost"
             size="icon"
             onClick={open}
-            className="relative text-white hover:bg-white/10 hover:text-white"
+            className="relative"
             aria-label="Open cart"
           >
             <ShoppingCart className="h-5 w-5" />
             {totalItems > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#FACC15] px-1 text-[10px] font-bold text-black">
+              <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
                 {totalItems}
               </span>
             )}
           </Button>
-
-          {/* Mobile Menu Toggle Button */}
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden text-white hover:bg-white/10 hover:text-white"
+            className="md:hidden"
             onClick={() => setMobileOpen((v) => !v)}
             aria-label="Toggle menu"
           >
@@ -91,9 +70,8 @@ export function Header() {
         </div>
       </div>
 
-      {/* Mobile Drawer Menu - Pure Black with White Text */}
       {mobileOpen && (
-        <nav className="border-t border-white/10 bg-black md:hidden transition-all">
+        <nav className="border-t border-border/60 bg-background md:hidden">
           <div className="container mx-auto flex flex-col gap-1 px-4 py-3">
             {[
               { to: "/", label: "Home" },
@@ -107,8 +85,8 @@ export function Header() {
                 key={l.to}
                 to={l.to}
                 onClick={() => setMobileOpen(false)}
-                className="rounded-md px-3 py-2 text-sm font-semibold uppercase tracking-wider text-white/80 hover:bg-white/10 hover:text-[#FACC15] transition-all"
-                activeProps={{ className: "text-[#FACC15] bg-white/5" }}
+                className="rounded-md px-3 py-2 text-sm font-semibold uppercase tracking-wider text-foreground/80 hover:bg-secondary hover:text-primary"
+                activeProps={{ className: "text-primary bg-secondary" }}
               >
                 {l.label}
               </Link>
