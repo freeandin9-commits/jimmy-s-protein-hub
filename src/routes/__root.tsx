@@ -8,6 +8,7 @@ import { Footer } from "@/components/layout/Footer";
 import { CartDrawer } from "@/components/layout/CartDrawer";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/hooks/useAuth";
+import { WhatsAppWidget } from "@/components/WhatsAppWidget"; // WhatsAppWidget ഇംപോർട്ട് ചെയ്തു
 
 function NotFoundComponent() {
   return (
@@ -15,9 +16,7 @@ function NotFoundComponent() {
       <div className="max-w-md text-center">
         <h1 className="font-display text-8xl text-primary">404</h1>
         <h2 className="mt-4 font-display text-2xl uppercase tracking-wider text-foreground">Page not found</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          That page doesn't exist. Let's get you back to lifting.
-        </p>
+        <p className="mt-2 text-sm text-muted-foreground">That page doesn't exist. Let's get you back to lifting.</p>
         <div className="mt-6">
           <Link
             to="/"
@@ -37,15 +36,32 @@ export const Route = createRootRoute({
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Jimmy's Protein — Real Fuel. No Junk." },
-      { name: "description", content: "Premium protein powder for athletes who train hard. Clean ingredients, bold flavors, real results." },
+      {
+        name: "description",
+        content: "Premium protein powder for athletes who train hard. Clean ingredients, bold flavors, real results.",
+      },
       { property: "og:title", content: "Jimmy's Protein — Real Fuel. No Junk." },
-      { property: "og:description", content: "Premium protein powder for athletes who train hard. Clean ingredients, bold flavors, real results." },
+      {
+        property: "og:description",
+        content: "Premium protein powder for athletes who train hard. Clean ingredients, bold flavors, real results.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Jimmy's Protein — Real Fuel. No Junk." },
-      { name: "twitter:description", content: "Premium protein powder for athletes who train hard. Clean ingredients, bold flavors, real results." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a1d042ba-f197-43ca-85a6-cd2a06e686ec/id-preview-edf05c9f--a6dec7b2-1c45-4340-892d-dee33ed62e30.lovable.app-1777394069048.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a1d042ba-f197-43ca-85a6-cd2a06e686ec/id-preview-edf05c9f--a6dec7b2-1c45-4340-892d-dee33ed62e30.lovable.app-1777394069048.png" },
+      {
+        name: "twitter:description",
+        content: "Premium protein powder for athletes who train hard. Clean ingredients, bold flavors, real results.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a1d042ba-f197-43ca-85a6-cd2a06e686ec/id-preview-edf05c9f--a6dec7b2-1c45-4340-892d-dee33ed62e30.lovable.app-1777394069048.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a1d042ba-f197-43ca-85a6-cd2a06e686ec/id-preview-edf05c9f--a6dec7b2-1c45-4340-892d-dee33ed62e30.lovable.app-1777394069048.png",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -77,9 +93,12 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
-  const [queryClient] = useState(() => new QueryClient({
-    defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: false } },
-  }));
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: false } },
+      }),
+  );
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -112,6 +131,7 @@ function AppShell() {
       </main>
       <Footer />
       <CartDrawer />
+      <WhatsAppWidget /> {/* ഇവിടെ എല്ലാ കസ്റ്റമർ പേജുകളിലും WhatsApp പോപ്പ്-അപ്പ് കാണിക്കും */}
       <Toaster richColors position="top-center" />
     </div>
   );
