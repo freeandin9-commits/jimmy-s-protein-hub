@@ -28,7 +28,6 @@ import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
 import { Route as AdminBlogsRouteImport } from './routes/admin.blogs'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAdsRouteImport } from './routes/admin.ads'
-import { Route as AdminAboutRouteImport } from './routes/admin.about'
 
 const TrackRoute = TrackRouteImport.update({
   id: '/track',
@@ -125,11 +124,6 @@ const AdminAdsRoute = AdminAdsRouteImport.update({
   path: '/ads',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminAboutRoute = AdminAboutRouteImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => AdminRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -140,7 +134,6 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/products': typeof ProductsRoute
   '/track': typeof TrackRoute
-  '/admin/about': typeof AdminAboutRoute
   '/admin/ads': typeof AdminAdsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/blogs': typeof AdminBlogsRoute
@@ -161,7 +154,6 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/products': typeof ProductsRoute
   '/track': typeof TrackRoute
-  '/admin/about': typeof AdminAboutRoute
   '/admin/ads': typeof AdminAdsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/blogs': typeof AdminBlogsRoute
@@ -184,7 +176,6 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/products': typeof ProductsRoute
   '/track': typeof TrackRoute
-  '/admin/about': typeof AdminAboutRoute
   '/admin/ads': typeof AdminAdsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/blogs': typeof AdminBlogsRoute
@@ -208,7 +199,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/products'
     | '/track'
-    | '/admin/about'
     | '/admin/ads'
     | '/admin/analytics'
     | '/admin/blogs'
@@ -229,7 +219,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/products'
     | '/track'
-    | '/admin/about'
     | '/admin/ads'
     | '/admin/analytics'
     | '/admin/blogs'
@@ -251,7 +240,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/products'
     | '/track'
-    | '/admin/about'
     | '/admin/ads'
     | '/admin/analytics'
     | '/admin/blogs'
@@ -412,18 +400,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdsRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/about': {
-      id: '/admin/about'
-      path: '/about'
-      fullPath: '/admin/about'
-      preLoaderRoute: typeof AdminAboutRouteImport
-      parentRoute: typeof AdminRoute
-    }
   }
 }
 
 interface AdminRouteChildren {
-  AdminAboutRoute: typeof AdminAboutRoute
   AdminAdsRoute: typeof AdminAdsRoute
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminBlogsRoute: typeof AdminBlogsRoute
@@ -437,7 +417,6 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
-  AdminAboutRoute: AdminAboutRoute,
   AdminAdsRoute: AdminAdsRoute,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminBlogsRoute: AdminBlogsRoute,
