@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/ProductCard";
 import { fetchProducts, type Product } from "@/lib/products";
-import { Zap, Shield, Flame, ArrowRight, Phone, Dumbbell, ChevronLeft, ChevronRight } from "lucide-react";
+import { Zap, Shield, Flame, ArrowRight, Phone, Dumbbell, ChevronLeft, ChevronRight, Volume2, VolumeX } from "lucide-react";
 import heroImg from "@/assets/hero.jpg";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { AdsStrip } from "@/components/AdsStrip";
@@ -33,11 +33,13 @@ export const Route = createFileRoute("/")({
 function HomePage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isMuted, setIsMuted] = useState(true);
   const { settings } = useSiteSettings();
 
   const whatsappNumber = settings?.whatsapp_number || "919142027275";
   const displayPhone = settings?.contact_phone || "919142027275";
   const scrollRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const waUrl = `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, "")}?text=Hi,%20I'm%20interested%20in%20your%20products!`;
 
@@ -46,6 +48,13 @@ function HomePage() {
     if (!el) return;
     const amount = el.clientWidth * 0.8;
     el.scrollBy({ left: dir === "left" ? -amount : amount, behavior: "smooth" });
+  };
+
+  const toggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !videoRef.current.muted;
+      setIsMuted(videoRef.current.muted);
+    }
   };
 
   useEffect(() => {
@@ -59,9 +68,7 @@ function HomePage() {
 
   return (
     <div className="relative w-full">
-      {/* SEARCH BAR & ADS STRIP 
-        മെയിൻ ഹെഡർ ബാറിന്റെ തൊട്ടുതാഴെയായി കൃത്യമായി ഒട്ടിനിൽക്കാൻ top-[73px] നൽകിയിരിക്കുന്നു.
-      */}
+      {/* SEARCH BAR & ADS STRIP */}
       <div className="sticky top-[73px] z-40 w-full border-b border-border/40 bg-background/95 backdrop-blur-md">
         <SearchBar />
         <AdsStrip />
@@ -179,18 +186,29 @@ function HomePage() {
 
             <div className="relative animate-[float_6s_ease-in-out_infinite] [transform-style:preserve-3d] [transform:rotateY(-8deg)_rotateX(4deg)]">
               {settings?.hero_media_type === "video" && settings?.hero_video_url ? (
-                <video
-                  src={settings.hero_video_url}
-                  className="relative max-h-[520px] w-auto rounded-2xl object-cover"
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  style={{
-                    boxShadow:
-                      "0 50px 80px -20px oklch(0 0 0 / 0.7), 0 25px 40px -15px oklch(0.72 0.16 160 / 0.45), 0 0 0 1px oklch(1 0 0 / 0.05) inset",
-                  }}
-                />
+                <div className="relative group/video">
+                  <video
+                    ref={videoRef}
+                    src={settings.hero_video_url}
+                    className="relative max-h-[520px] w-auto rounded-2xl object-cover"
+                    autoPlay
+                    muted={isMuted}
+                    loop
+                    playsInline
+                    style={{
+                      boxShadow:
+                        "0 50px 80px -20px oklch(0 0 0 / 0.7), 0 25px 40px -15px oklch(0.72 0.16 160 / 0.45), 0 0 0 1px oklch(1 0 0 / 0.05) inset",
+                    }}
+                  />
+                  <button
+                    onClick={toggleMute}
+                    type="button"
+                    className="absolute bottom-4 right-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-md transition-all hover:bg-black/80 hover:scale-105"
+                    aria-label={isMuted ? "Unmute video" : "Mute video"}
+                  >
+                    {isMuted ? <VolumeX className="h-5 w-5 text-destructive" /> : <Volume2 className="h-5 w-5 text-primary" />}
+                  </button>
+                </div>
               ) : (
                 <img
                   src={settings?.hero_image_url || heroImg}
@@ -292,69 +310,4 @@ function HomePage() {
       {/* INSTAGRAM SECTION */}
       <section
         className="relative py-20 md:py-28 overflow-hidden before:content-[''] before:absolute before:inset-0 before:bg-cover before:bg-center before:bg-no-repeat before:bg-fixed before:pointer-events-none"
-        style={{ "--bg-image": `url(${heroImg})` } as React.CSSProperties}
-      >
-        <style>{`
-          section[style*="--bg-image"]::before {
-            background-image: var(--bg-image);
-          }
-        `}</style>
-
-        <div className="absolute inset-0 bg-black/60" aria-hidden />
-
-        <div className="relative z-10 [&_section]:bg-transparent [&_div]:bg-transparent [&_header]:bg-transparent">
-          <InstagramSection />
-        </div>
-      </section>
-
-      {/* CTA STRIP */}
-      <section className="border-t border-border bg-primary text-primary-foreground">
-        <div className="container mx-auto flex flex-col items-center gap-4 px-4 py-12 text-center md:flex-row md:justify-between md:text-left">
-          <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6">
-            <div>
-              <h3 className="font-display text-3xl uppercase tracking-wide md:text-4xl">Ready to level up?</h3>
-              <p className="mt-1 opacity-80">Order on WhatsApp. Fast confirmation. No checkout headache.</p>
-            </div>
-
-            <a
-              href={`tel:${displayPhone.replace(/[^0-9+]/g, "")}`}
-              className="inline-flex items-center gap-2 rounded-full bg-primary-foreground/10 px-4 py-2 text-sm font-bold tracking-wide text-primary-foreground hover:bg-primary-foreground/20 transition-all border border-primary-foreground/20"
-              title="Call Us Now"
-            >
-              <Phone className="h-4 w-4 animate-[pulse_2s_infinite]" />
-              <span>{displayPhone}</span>
-            </a>
-          </div>
-
-          <Button
-            asChild
-            size="lg"
-            variant="outline"
-            className="h-12 border-primary-foreground bg-transparent px-8 font-bold uppercase tracking-wider text-primary-foreground hover:bg-primary-foreground hover:text-primary"
-          >
-            <Link to="/products">Shop the range</Link>
-          </Button>
-        </div>
-      </section>
-
-      {/* FLOATING WHATSAPP POP-UP WIDGET */}
-      <div className="fixed bottom-6 left-6 z-50 flex items-center group">
-        <a
-          href={waUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-2xl transition-transform duration-300 hover:scale-110 relative"
-          aria-label="Chat on WhatsApp"
-        >
-          <span className="absolute inset-0 rounded-full bg-[#25D366]/40 animate-ping pointer-events-none" />
-          <svg className="h-7 w-7 fill-current relative z-10" viewBox="0 0 24 24">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.452 5.705 1.453h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-          </svg>
-        </a>
-        <span className="absolute left-20 scale-0 transition-all rounded bg-card border border-border px-3 py-1.5 text-xs font-semibold text-foreground shadow-xl group-hover:scale-100 whitespace-nowrap origin-left">
-          Chat with us! 💬
-        </span>
-      </div>
-    </div>
-  );
-}
+        style={{ "--bg-
