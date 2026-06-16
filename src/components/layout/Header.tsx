@@ -25,14 +25,15 @@ export function Header() {
   };
 
   return (
-    // Background pure white (#ffffff) ആക്കി, കറുത്ത ടെക്സ്റ്റും നേർത്ത ബോർഡറും നൽകിയിട്ടുണ്ട്
+    // ലോഗോയുടെ വലിപ്പത്തിനനുസരിച്ച് ഹെഡർ ഹൈറ്റ് h-16 ൽ നിന്നും h-20 ആയി വർദ്ധിപ്പിച്ചു
     <header className="sticky top-0 z-40 bg-white text-black border-b border-slate-200 shadow-sm">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+      <div className="container mx-auto flex h-20 items-center justify-between px-4">
         <Link to="/" className="flex items-center gap-2" aria-label="Nutrin Sports home">
+          {/* ലോഗോ വലിപ്പം കൂട്ടാൻ h-12 md:h-16 നൽകി */}
           <img
             src={logoSrc}
             alt="Nutrin Sports"
-            className="h-10 w-auto md:h-12 object-contain transition-all duration-300"
+            className="h-12 w-auto md:h-16 object-contain transition-all duration-300"
             key={logoSrc} // ലോഗോ മാറുമ്പോൾ ഇമേജ് കംപോണന്റ് ഉടൻ റീ-റെൻഡർ ആകാൻ ഒരു key നൽകി
           />
         </Link>
