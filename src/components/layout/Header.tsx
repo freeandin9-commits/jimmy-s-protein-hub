@@ -11,12 +11,8 @@ export function Header() {
   const open = useCartStore((s) => s.open);
   const totalItems = items.reduce((s, i) => s + i.quantity, 0);
   const [mobileOpen, setMobileOpen] = useState(false);
-
-  // സെറ്റിങ്സ് ഇവിടെ നിന്നും ലൈവ് ആയി റീഡ് ചെയ്യുന്നു
   const { settings } = useSiteSettings();
-
-  // പുതിയ logo_url ഉണ്ടെങ്കിൽ അത് കാണിക്കും, ഇല്ലെങ്കിൽ ഡിഫോൾട്ട് logoImg
-  const logoSrc = settings?.logo_url || logoImg;
+  const logoSrc = settings.logo_url || logoImg;
 
   // ഡെസ്ക്ടോപ്പ് ലിങ്കുകൾ ശുദ്ധമായ കറുപ്പ് നിറത്തിലും, ഹോവർ ചെയ്യുമ്പോൾ പ്രൈമറി/ഗോൾഡ് നിറത്തിലും വരാൻ
   const navLinkProps = {
@@ -29,12 +25,7 @@ export function Header() {
     <header className="sticky top-0 z-40 bg-white text-black border-b border-slate-200 shadow-sm">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link to="/" className="flex items-center gap-2" aria-label="Nutrin Sports home">
-          <img
-            src={logoSrc}
-            alt="Nutrin Sports"
-            className="h-10 w-auto md:h-12 object-contain transition-all duration-300"
-            key={logoSrc} // ലോഗോ മാറുമ്പോൾ ഇമേജ് കംപോണന്റ് ഉടൻ റീ-റെൻഡർ ആകാൻ ഒരു key നൽകി
-          />
+          <img src={logoSrc} alt="Nutrin Sports" className="h-10 w-auto md:h-12 object-contain" />
         </Link>
 
         {/* Desktop Navigation Links */}
