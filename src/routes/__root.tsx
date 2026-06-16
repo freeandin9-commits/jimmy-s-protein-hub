@@ -125,7 +125,12 @@ function AppShell() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Header />
+      {/* STICKY CONTAINER FOR MAIN NAVIGATION 
+        ഇത് എല്ലാ പേജുകളിലും മെയിൻ നാവിഗേഷൻ ബാറിനെ മുകളിൽ ലോക്ക് ചെയ്തു നിർത്തും.
+      */}
+      <div className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur-md border-b border-border/40">
+        <Header />
+      </div>
       <main className="flex flex-1 flex-col">
         <Outlet />
       </main>
