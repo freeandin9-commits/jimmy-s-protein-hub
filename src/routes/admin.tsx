@@ -12,9 +12,10 @@ import {
   ExternalLink,
   Megaphone,
   Tags,
-  Image as ImageIcon,
+  ImageIcon,
   Sparkles,
-  FileText, // Added FileText for Blogs
+  FileText,
+  UserCheck, // About പേജിനുള്ള ഐക്കൺ
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -32,7 +33,8 @@ const navItems: NavItem[] = [
   { to: "/admin/orders", label: "Orders", icon: ShoppingBag },
   { to: "/admin/products", label: "Products", icon: Package },
   { to: "/admin/categories", label: "Categories", icon: Tags },
-  { to: "/admin/blogs", label: "Blogs", icon: FileText }, // Added Blogs Nav Link here
+  { to: "/admin/blogs", label: "Blogs", icon: FileText },
+  { to: "/admin/about", label: "About Page", icon: UserCheck }, // പുതിയ About സെക്ഷൻ ലിങ്ക്
   { to: "/admin/hero", label: "Hero Section", icon: Sparkles },
   { to: "/admin/ads", label: "Ads", icon: Megaphone },
   { to: "/admin/shop-ads", label: "Shop Banners", icon: ImageIcon },
@@ -77,7 +79,6 @@ function AdminLayout() {
     <div className="flex min-h-screen bg-zinc-950 text-zinc-100 antialiased selection:bg-yellow-400 selection:text-zinc-950">
       {/* Sidebar (Desktop) */}
       <aside className="hidden w-64 flex-col border-r border-zinc-800 bg-zinc-900/50 backdrop-blur-md md:flex">
-        {/* Brand Header */}
         <div className="flex h-20 items-center gap-2.5 border-b border-zinc-800/80 px-6">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-yellow-400 text-zinc-950 shadow-lg shadow-yellow-400/10">
             <Dumbbell className="h-5 w-5 stroke-[2.5]" />
@@ -90,7 +91,6 @@ function AdminLayout() {
           </div>
         </div>
 
-        {/* Navigation Items */}
         <nav className="flex-1 space-y-1.5 p-4 overflow-y-auto">
           {navItems.map((item) => {
             const active = item.exact ? location.pathname === item.to : location.pathname.startsWith(item.to);
@@ -113,7 +113,6 @@ function AdminLayout() {
           })}
         </nav>
 
-        {/* Footer Area */}
         <div className="border-t border-zinc-800/80 p-4 space-y-2 bg-zinc-900/20">
           <Link
             to="/"
@@ -141,7 +140,6 @@ function AdminLayout() {
 
       {/* Mobile Structure */}
       <div className="flex flex-1 flex-col min-w-0">
-        {/* Mobile Top Header */}
         <header className="flex h-16 items-center justify-between border-b border-zinc-800 bg-zinc-900 px-4 md:hidden">
           <div className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded bg-yellow-400 text-zinc-950">
@@ -159,7 +157,6 @@ function AdminLayout() {
           </Button>
         </header>
 
-        {/* Mobile Horizontal Navigation Track */}
         <nav className="flex gap-2 overflow-x-auto border-b border-zinc-800 bg-zinc-900/40 px-4 py-2.5 scrollbar-none md:hidden">
           {navItems.map((item) => {
             const active = item.exact ? location.pathname === item.to : location.pathname.startsWith(item.to);
@@ -178,13 +175,8 @@ function AdminLayout() {
           })}
         </nav>
 
-        {/* Main Interface Window */}
         <main className="flex-1 overflow-y-auto p-5 md:p-8 bg-zinc-950">
           <div className="mx-auto max-w-7xl">
-            {/* This <Outlet /> dynamically injects sub-routes. 
-              When on '/admin' it loads DashboardPage from admin.index.tsx
-              When on '/admin/blogs' it loads AdminBlogsPage from admin.blogs.tsx 
-            */}
             <Outlet />
           </div>
         </main>
