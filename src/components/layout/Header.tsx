@@ -24,7 +24,7 @@ export function Header() {
 
   return (
     // Background pure black (#000000) ആക്കി, വെളുത്ത ടെക്സ്റ്റും നേർത്ത ബോർഡറും നൽകിയിട്ടുണ്ട്
-    <header className="sticky top-0 z-40 bg-black text-white border-b border-zinc-800 shadow-sm">
+    <header className="bg-black text-white border-b border-zinc-800 shadow-sm">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link to="/" className="flex items-center gap-2" aria-label="Nutrin Sports home">
           {/* ലോഗോ കറുപ്പ് പശ്ചാത്തലത്തിലും വ്യക്തമായി കാണാൻ ഇമേജ് സ്റ്റൈൽ മെച്ചപ്പെടുത്തിയിട്ടുണ്ട്.
