@@ -14,7 +14,7 @@ import {
   Tags,
   Image as ImageIcon,
   Sparkles,
-  FileText,
+  FileText, // Added FileText for Blogs
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -32,7 +32,7 @@ const navItems: NavItem[] = [
   { to: "/admin/orders", label: "Orders", icon: ShoppingBag },
   { to: "/admin/products", label: "Products", icon: Package },
   { to: "/admin/categories", label: "Categories", icon: Tags },
-  { to: "/admin/blogs", label: "Blogs", icon: FileText }, // Added Blogs Nav Item
+  { to: "/admin/blogs", label: "Blogs", icon: FileText }, // Added Blogs Nav Link here
   { to: "/admin/hero", label: "Hero Section", icon: Sparkles },
   { to: "/admin/ads", label: "Ads", icon: Megaphone },
   { to: "/admin/shop-ads", label: "Shop Banners", icon: ImageIcon },
@@ -72,8 +72,6 @@ function AdminLayout() {
     await signOut();
     navigate({ to: "/login" });
   };
-
-  const isMainAdminDashboard = location.pathname === "/admin";
 
   return (
     <div className="flex min-h-screen bg-zinc-950 text-zinc-100 antialiased selection:bg-yellow-400 selection:text-zinc-950">
@@ -183,33 +181,11 @@ function AdminLayout() {
         {/* Main Interface Window */}
         <main className="flex-1 overflow-y-auto p-5 md:p-8 bg-zinc-950">
           <div className="mx-auto max-w-7xl">
-            {isMainAdminDashboard ? (
-              /* Core Main Dashboard Overview Content */
-              <div className="space-y-6">
-                <div className="border-b border-zinc-800 pb-5">
-                  <h1 className="text-2xl font-black tracking-wider text-yellow-400 uppercase font-display flex items-center gap-2">
-                    <LayoutDashboard className="h-6 w-6 stroke-[2]" /> Control Dashboard
-                  </h1>
-                  <p className="text-xs text-zinc-400 mt-1">
-                    Welcome to your store backend summary center. Select a panel from the menu to manage items.
-                  </p>
-                </div>
-
-                {/* Simple Welcome Summary Dashboard Stats Cards placeholder */}
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  <div className="p-5 bg-zinc-900/40 border border-zinc-800 rounded-xl">
-                    <span className="text-[10px] font-bold tracking-widest uppercase text-zinc-500">Quick Track</span>
-                    <h3 className="text-lg font-bold text-zinc-200 mt-1">Jimmy's Analytics</h3>
-                    <p className="text-xs text-zinc-400 mt-2">
-                      Check the Analytics page to view advanced traffic reports.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              /* Dynamically renders nested routes such as /admin/blogs */
-              <Outlet />
-            )}
+            {/* This <Outlet /> dynamically injects sub-routes. 
+              When on '/admin' it loads DashboardPage from admin.index.tsx
+              When on '/admin/blogs' it loads AdminBlogsPage from admin.blogs.tsx 
+            */}
+            <Outlet />
           </div>
         </main>
       </div>

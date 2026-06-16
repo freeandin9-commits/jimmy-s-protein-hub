@@ -25,6 +25,7 @@ import { Route as AdminProductsRouteImport } from './routes/admin.products'
 import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
 import { Route as AdminHeroRouteImport } from './routes/admin.hero'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
+import { Route as AdminBlogsRouteImport } from './routes/admin.blogs'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAdsRouteImport } from './routes/admin.ads'
 
@@ -108,6 +109,11 @@ const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
   path: '/categories',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminBlogsRoute = AdminBlogsRouteImport.update({
+  id: '/blogs',
+  path: '/blogs',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
@@ -130,6 +136,7 @@ export interface FileRoutesByFullPath {
   '/track': typeof TrackRoute
   '/admin/ads': typeof AdminAdsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/blogs': typeof AdminBlogsRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/hero': typeof AdminHeroRoute
   '/admin/orders': typeof AdminOrdersRoute
@@ -149,6 +156,7 @@ export interface FileRoutesByTo {
   '/track': typeof TrackRoute
   '/admin/ads': typeof AdminAdsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/blogs': typeof AdminBlogsRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/hero': typeof AdminHeroRoute
   '/admin/orders': typeof AdminOrdersRoute
@@ -170,6 +178,7 @@ export interface FileRoutesById {
   '/track': typeof TrackRoute
   '/admin/ads': typeof AdminAdsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/blogs': typeof AdminBlogsRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/hero': typeof AdminHeroRoute
   '/admin/orders': typeof AdminOrdersRoute
@@ -192,6 +201,7 @@ export interface FileRouteTypes {
     | '/track'
     | '/admin/ads'
     | '/admin/analytics'
+    | '/admin/blogs'
     | '/admin/categories'
     | '/admin/hero'
     | '/admin/orders'
@@ -211,6 +221,7 @@ export interface FileRouteTypes {
     | '/track'
     | '/admin/ads'
     | '/admin/analytics'
+    | '/admin/blogs'
     | '/admin/categories'
     | '/admin/hero'
     | '/admin/orders'
@@ -231,6 +242,7 @@ export interface FileRouteTypes {
     | '/track'
     | '/admin/ads'
     | '/admin/analytics'
+    | '/admin/blogs'
     | '/admin/categories'
     | '/admin/hero'
     | '/admin/orders'
@@ -367,6 +379,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCategoriesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/blogs': {
+      id: '/admin/blogs'
+      path: '/blogs'
+      fullPath: '/admin/blogs'
+      preLoaderRoute: typeof AdminBlogsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/analytics': {
       id: '/admin/analytics'
       path: '/analytics'
@@ -387,6 +406,7 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminAdsRoute: typeof AdminAdsRoute
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
+  AdminBlogsRoute: typeof AdminBlogsRoute
   AdminCategoriesRoute: typeof AdminCategoriesRoute
   AdminHeroRoute: typeof AdminHeroRoute
   AdminOrdersRoute: typeof AdminOrdersRoute
@@ -399,6 +419,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAdsRoute: AdminAdsRoute,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
+  AdminBlogsRoute: AdminBlogsRoute,
   AdminCategoriesRoute: AdminCategoriesRoute,
   AdminHeroRoute: AdminHeroRoute,
   AdminOrdersRoute: AdminOrdersRoute,
