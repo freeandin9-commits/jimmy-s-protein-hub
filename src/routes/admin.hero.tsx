@@ -166,7 +166,7 @@ function HeroAdminPage() {
         </div>
         <div className="max-w-md space-y-1.5">
           <Label htmlFor="contactPhone" className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
-            WhatsApp Broadcast Line
+            Contact Broadcast Line
           </Label>
           <div className="relative">
             <Input
