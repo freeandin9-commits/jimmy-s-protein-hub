@@ -24,7 +24,7 @@ type HeroForm = {
   hero_image_url: string | null;
   hero_video_url: string | null;
   hero_media_type: "image" | "video";
-  contact_phone: string; // ഫോൺ നമ്പർ മാറ്റാൻ പുതിയ ഫീൽഡ്
+  whatsapp_number: string; // ഹോം പേജിലെ ഫോൺ നമ്പറുമായി ലിങ്ക് ചെയ്തു
 };
 
 function HeroAdminPage() {
@@ -55,7 +55,7 @@ function HeroAdminPage() {
         hero_image_url: data.hero_image_url ?? null,
         hero_video_url: data.hero_video_url ?? null,
         hero_media_type: (data.hero_media_type ?? "image") as "image" | "video",
-        contact_phone: data.contact_phone ?? "", // ഫോൺ നമ്പർ ലോഡ് ചെയ്യുന്നു
+        whatsapp_number: data.whatsapp_number ?? data.contact_phone ?? "", // രണ്ട് ഫീൽഡുകളിൽ നിന്നും ഫോൺ നമ്പർ സപ്പോർട്ട് ചെയ്യുന്നു
       });
     }
   }, [data, form]);
@@ -123,7 +123,8 @@ function HeroAdminPage() {
         hero_cta_text: form.hero_cta_text,
         hero_cta_link: form.hero_cta_link,
         hero_media_type: form.hero_media_type,
-        contact_phone: form.contact_phone, // ഫോൺ നമ്പർ ഡാറ്റാബേസിലേക്ക് സേവ് ചെയ്യുന്നു
+        whatsapp_number: form.whatsapp_number, // രണ്ട് ഫീൽഡുകളിലും ഒരേപോലെ വാല്യൂ സേവ് ആകും
+        contact_phone: form.whatsapp_number,
       } as any)
       .eq("id", form.id);
     setSaving(false);
@@ -141,7 +142,7 @@ function HeroAdminPage() {
         </p>
       </div>
 
-      {/* CONTACT INFO (ഫോൺ നമ്പർ മാറ്റാനുള്ള പുതിയ സെക്ഷൻ) */}
+      {/* CONTACT INFO */}
       <div className="space-y-4 rounded-xl border border-border bg-card p-6">
         <div className="flex items-center gap-2">
           <Phone className="h-5 w-5 text-primary" />
@@ -151,12 +152,12 @@ function HeroAdminPage() {
           Update the daily contact and support phone number displayed on the website.
         </p>
         <div>
-          <Label htmlFor="contactPhone">Contact Phone Number</Label>
+          <Label htmlFor="contactPhone">Contact Phone Number / WhatsApp</Label>
           <Input
             id="contactPhone"
             type="tel"
-            value={form.contact_phone}
-            onChange={(e) => update("contact_phone", e.target.value)}
+            value={form.whatsapp_number}
+            onChange={(e) => update("whatsapp_number", e.target.value)}
             placeholder="+91 9876543210"
             className="mt-1"
           />
