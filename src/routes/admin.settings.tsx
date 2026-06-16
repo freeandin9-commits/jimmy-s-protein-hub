@@ -106,8 +106,10 @@ function SettingsPage() {
         .update({ logo_url: signed.signedUrl } as any)
         .eq("id", form.id);
       if (error) throw error;
+
       setForm({ ...form, logo_url: signed.signedUrl });
-      qc.invalidateQueries({ queryKey: ["site_settings"] });
+      // റിയൽ-ടൈം ആയി മാറ്റങ്ങൾ ഹെഡറിലും വരാൻ ക്വറി ഇൻവാലിഡേറ്റ് ചെയ്യുന്നു
+      await qc.invalidateQueries({ queryKey: ["site_settings"] });
       toast.success("Logo updated successfully");
     } catch (e: any) {
       toast.error(e.message ?? "Upload failed");
@@ -123,8 +125,9 @@ function SettingsPage() {
       .update({ logo_url: null } as any)
       .eq("id", form.id);
     if (error) return toast.error(error.message);
+
     setForm({ ...form, logo_url: null });
-    qc.invalidateQueries({ queryKey: ["site_settings"] });
+    await qc.invalidateQueries({ queryKey: ["site_settings"] });
     toast.success("Logo removed");
   };
 
@@ -161,7 +164,7 @@ function SettingsPage() {
       return;
     }
     toast.success("All configurations saved live");
-    qc.invalidateQueries({ queryKey: ["site_settings"] });
+    await qc.invalidateQueries({ queryKey: ["site_settings"] });
   };
 
   // ബാക്ക്ഗ്രൗണ്ട് സ്റ്റൈൽ പ്രിവ്യൂ തിട്ടപ്പെടുത്താൻ
