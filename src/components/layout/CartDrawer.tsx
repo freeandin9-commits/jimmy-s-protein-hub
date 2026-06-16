@@ -5,7 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft, Copy, Send, CheckCircle } from "lucide-react";
 import {
   useCartStore,
@@ -38,20 +44,6 @@ const initialForm: CustomerDetails = {
   paymentMethod: "cod",
   couponCode: "",
 };
-
-// Custom Order ID ജനറേറ്റ് ചെയ്യാനുള്ള ഹെൽപ്പർ ഫങ്ഷൻ (Format: NSDDMMYYYY12345)
-function generateCustomOrderId(): string {
-  const now = new Date();
-
-  const day = String(now.getDate()).padStart(2, "0");
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const year = now.getFullYear();
-
-  // 5 അക്കങ്ങളുള്ള യുണീക് റാൻഡം നമ്പർ
-  const randomNumber = Math.floor(10000 + Math.random() * 90000);
-
-  return `NS${day}${month}${year}${randomNumber}`;
-}
 
 export function CartDrawer() {
   const { items, isOpen, setOpen, updateQuantity, removeItem, clearCart } = useCartStore();
@@ -88,7 +80,8 @@ export function CartDrawer() {
     e.preventDefault();
     const name = form.name.trim();
     if (name.length < 2) return toast.error("Please enter your name");
-    if (!isValidIndianPhone(form.phone)) return toast.error("Please enter a valid 10-digit Indian mobile number");
+    if (!isValidIndianPhone(form.phone))
+      return toast.error("Please enter a valid 10-digit Indian mobile number");
     if (form.deliveryMethod === "home") {
       const a = form.address;
       if (!a.house.trim()) return toast.error("Please enter house / flat / building");
@@ -96,7 +89,8 @@ export function CartDrawer() {
       if (!a.city.trim()) return toast.error("Please enter city / town / village");
       if (!a.state) return toast.error("Please select your state");
       if (!a.district) return toast.error("Please select your district");
-      if (!PINCODE_REGEX.test(a.pincode.trim())) return toast.error("Please enter a valid 6-digit pincode");
+      if (!PINCODE_REGEX.test(a.pincode.trim()))
+        return toast.error("Please enter a valid 6-digit pincode");
       if (!isAddressComplete(a)) return toast.error("Please complete your address");
     }
     setStep("review");
@@ -105,7 +99,6 @@ export function CartDrawer() {
   const handleConfirm = async () => {
     if (submitting) return;
     setSubmitting(true);
-
     const customer: CustomerDetails = {
       ...form,
       name: form.name.trim().slice(0, 200),
@@ -121,29 +114,20 @@ export function CartDrawer() {
       notes: form.notes?.trim().slice(0, 500) || undefined,
       couponCode: form.couponCode?.trim().slice(0, 50) || undefined,
     };
-
-    // തനതായ കസ്റ്റം ഐഡി ജനറേറ്റ് ചെയ്യുന്നു
-    const customId = generateCustomOrderId();
-
-    // ഡാറ്റാബേസിലേക്ക് ഒറിജിനൽ പാരാമീറ്ററുകൾ മാത്രം അയക്കുന്നു (Build Error ഒഴിവാക്കാൻ)
     const { orderRef } = await logOrderToDatabase([...items], customer);
     setSubmitting(false);
-
     if (!orderRef) {
       toast.error("Could not save the order. Please try again.");
       return;
     }
-
-    // വിജയകരമായി സേവ് ആയാൽ നമ്മുടെ കസ്റ്റം ഫോർമാറ്റ് ഐഡി സെറ്റ് ചെയ്യുന്നു
-    setConfirmedRef(customId);
+    setConfirmedRef(orderRef);
     setConfirmed(true);
-    toast.success(`Order ${customId} confirmed!`);
+    toast.success(`Order ${orderRef} confirmed!`);
   };
 
   const finalizeAndSend = async (mode: "whatsapp" | "copy") => {
     if (submitting) return;
     setSubmitting(true);
-
     const customer: CustomerDetails = {
       ...form,
       name: form.name.trim().slice(0, 200),
@@ -166,11 +150,8 @@ export function CartDrawer() {
     let orderRef = confirmedRef;
     if (!orderRef) {
       const result = await logOrderToDatabase(itemsSnapshot, customer);
-      if (result && result.orderRef) {
-        orderRef = generateCustomOrderId();
-      }
+      orderRef = result.orderRef;
     }
-
     if (!orderRef) {
       setSubmitting(false);
       toast.error("Could not save the order. Please try again.");
@@ -197,7 +178,6 @@ export function CartDrawer() {
       window.open(url, "_blank", "noopener,noreferrer");
     }
 
-    setSubmitting(false);
     clearCart();
     reset();
     setOpen(false);
@@ -246,21 +226,11 @@ export function CartDrawer() {
                       </div>
                       <div className="mt-auto flex items-center justify-between pt-2">
                         <div className="flex items-center gap-1 rounded-md border border-border">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7"
-                            onClick={() => updateQuantity(i.productId, i.quantity - 1)}
-                          >
+                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => updateQuantity(i.productId, i.quantity - 1)}>
                             <Minus className="h-3 w-3" />
                           </Button>
                           <span className="w-8 text-center text-sm font-semibold">{i.quantity}</span>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7"
-                            onClick={() => updateQuantity(i.productId, i.quantity + 1)}
-                          >
+                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => updateQuantity(i.productId, i.quantity + 1)}>
                             <Plus className="h-3 w-3" />
                           </Button>
                         </div>
@@ -274,9 +244,7 @@ export function CartDrawer() {
 
             <div className="space-y-3 border-t border-border pt-4">
               <div className="flex justify-between text-sm text-muted-foreground">
-                <span>
-                  {itemCount} item{itemCount !== 1 ? "s" : ""}
-                </span>
+                <span>{itemCount} item{itemCount !== 1 ? "s" : ""}</span>
               </div>
               <div className="flex justify-between text-lg">
                 <span className="font-display tracking-wider">TOTAL</span>
@@ -306,13 +274,8 @@ export function CartDrawer() {
 
               <div className="space-y-2">
                 <Label htmlFor="cust-name">Full name *</Label>
-                <Input
-                  id="cust-name"
-                  required
-                  maxLength={200}
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                />
+                <Input id="cust-name" required maxLength={200} value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })} />
               </div>
 
               <div className="space-y-2">
@@ -412,9 +375,7 @@ export function CartDrawer() {
                         </SelectTrigger>
                         <SelectContent>
                           {INDIA_STATES.map((s) => (
-                            <SelectItem key={s} value={s}>
-                              {s}
-                            </SelectItem>
+                            <SelectItem key={s} value={s}>{s}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
@@ -431,9 +392,7 @@ export function CartDrawer() {
                         </SelectTrigger>
                         <SelectContent>
                           {districts.map((d) => (
-                            <SelectItem key={d} value={d}>
-                              {d}
-                            </SelectItem>
+                            <SelectItem key={d} value={d}>{d}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
@@ -449,7 +408,9 @@ export function CartDrawer() {
                       maxLength={6}
                       placeholder="6-digit pincode"
                       value={form.address.pincode}
-                      onChange={(e) => updateAddress({ pincode: e.target.value.replace(/\D/g, "").slice(0, 6) })}
+                      onChange={(e) =>
+                        updateAddress({ pincode: e.target.value.replace(/\D/g, "").slice(0, 6) })
+                      }
                     />
                   </div>
                 </div>
@@ -476,23 +437,15 @@ export function CartDrawer() {
 
               <div className="space-y-2">
                 <Label htmlFor="cust-coupon">Coupon code (optional)</Label>
-                <Input
-                  id="cust-coupon"
-                  maxLength={50}
+                <Input id="cust-coupon" maxLength={50}
                   value={form.couponCode}
-                  onChange={(e) => setForm({ ...form, couponCode: e.target.value })}
-                />
+                  onChange={(e) => setForm({ ...form, couponCode: e.target.value })} />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="cust-notes">Notes (optional)</Label>
-                <Textarea
-                  id="cust-notes"
-                  maxLength={500}
-                  rows={2}
-                  value={form.notes}
-                  onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                />
+                <Textarea id="cust-notes" maxLength={500} rows={2}
+                  value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
               </div>
             </div>
 
@@ -553,26 +506,14 @@ export function CartDrawer() {
                   </div>
                 )}
                 <div className="pt-1 text-xs">
-                  Delivery:{" "}
-                  <span className="font-semibold">
-                    {form.deliveryMethod === "home" ? "Home Delivery" : "Store Pickup"}
-                  </span>
+                  Delivery: <span className="font-semibold">{form.deliveryMethod === "home" ? "Home Delivery" : "Store Pickup"}</span>
                 </div>
                 <div className="text-xs">
-                  Payment:{" "}
-                  <span className="font-semibold">
-                    {form.paymentMethod === "cod"
-                      ? "Cash on Delivery"
-                      : form.paymentMethod === "upi"
-                        ? "UPI / Online"
-                        : "Bank Transfer"}
+                  Payment: <span className="font-semibold">
+                    {form.paymentMethod === "cod" ? "Cash on Delivery" : form.paymentMethod === "upi" ? "UPI / Online" : "Bank Transfer"}
                   </span>
                 </div>
-                {form.couponCode && (
-                  <div className="text-xs">
-                    Coupon: <span className="font-semibold">{form.couponCode}</span>
-                  </div>
-                )}
+                {form.couponCode && <div className="text-xs">Coupon: <span className="font-semibold">{form.couponCode}</span></div>}
                 {form.notes && <div className="text-xs">Notes: {form.notes}</div>}
               </section>
 
@@ -583,9 +524,7 @@ export function CartDrawer() {
                 <ul className="space-y-2">
                   {items.map((i) => (
                     <li key={i.productId} className="flex justify-between gap-2">
-                      <span>
-                        {i.quantity}× {i.productTitle}
-                      </span>
+                      <span>{i.quantity}× {i.productTitle}</span>
                       <span className="font-semibold">{formatPrice(i.price * i.quantity, i.currency)}</span>
                     </li>
                   ))}
@@ -593,8 +532,7 @@ export function CartDrawer() {
               </section>
 
               <div className="text-xs text-muted-foreground">
-                Estimated delivery: 2-4 business days. We confirm within business hours (
-                {settings.business_hours || "Mon-Sat 10am-8pm"}).
+                Estimated delivery: 2-4 business days. We confirm within business hours ({settings.business_hours || "Mon-Sat 10am-8pm"}).
               </div>
             </div>
 
