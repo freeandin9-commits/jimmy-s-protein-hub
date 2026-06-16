@@ -29,7 +29,6 @@ function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
 
-  // ലോഗോ പ്രിവ്യൂ ബാക്ക്ഗ്രൗണ്ടും എഫക്റ്റുകളും ലോക്കലായി നിയന്ത്രിക്കാൻ
   const [previewBg, setPreviewBg] = useState<"dark" | "light" | "grid">("grid");
   const [imageFit, setImageFit] = useState<"contain" | "cover" | "scale-down">("contain");
   const [logoPadding, setLogoPadding] = useState<string>("p-4");
@@ -89,26 +88,36 @@ function SettingsPage() {
     setFaqs(faqs.filter((_, i) => i !== index));
   };
 
+  // ഹെഡറിൽ ലോഗോ കാണാത്ത പ്രശ്നം പരിഹരിച്ച ഫങ്ക്ഷൻ
   const onLogoFile = async (file: File) => {
     setUploadingLogo(true);
     try {
       const ext = file.name.split(".").pop() || "png";
       const path = `logos/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+
+      // 1. ഫയൽ അപ്‌ലോഡ് ചെയ്യുന്നു
       const { error: upErr } = await supabase.storage.from("ads").upload(path, file, {
         contentType: file.type,
         upsert: false,
       });
       if (upErr) throw upErr;
-      const { data: signed } = await supabase.storage.from("ads").createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
-      if (!signed?.signedUrl) throw new Error("Failed to get URL");
+
+      // 2. പബ്ലിക് URL നിർമ്മിക്കുന്നു (Signed URL ചിലപ്പോൾ എക്സ്പയർ ആകാം, അതുകൊണ്ട് Public URL ആണ് സുരക്ഷിതം)
+      const { data: urlData } = supabase.storage.from("ads").getPublicUrl(path);
+      const publicUrl = urlData?.publicUrl;
+
+      if (!publicUrl) throw new Error("Failed to generate Public URL");
+
+      // 3. ഡാറ്റാബേസ് പുതിയ പബ്ലിക് യുആർഎൽ വെച്ച് അപ്‌ഡേറ്റ് ചെയ്യുന്നു
       const { error } = await supabase
         .from("site_settings")
-        .update({ logo_url: signed.signedUrl } as any)
+        .update({ logo_url: publicUrl } as any)
         .eq("id", form.id);
       if (error) throw error;
 
-      setForm({ ...form, logo_url: signed.signedUrl });
-      // റിയൽ-ടൈം ആയി മാറ്റങ്ങൾ ഹെഡറിലും വരാൻ ക്വറി ഇൻവാലിഡേറ്റ് ചെയ്യുന്നു
+      setForm({ ...form, logo_url: publicUrl });
+
+      // 4. ഹെഡറിലും മറ്റ് പേജുകളിലും ഉടനടി മാറ്റം വരാൻ കാഷെ ക്ലിയർ ചെയ്യുന്നു
       await qc.invalidateQueries({ queryKey: ["site_settings"] });
       toast.success("Logo updated successfully");
     } catch (e: any) {
@@ -167,7 +176,6 @@ function SettingsPage() {
     await qc.invalidateQueries({ queryKey: ["site_settings"] });
   };
 
-  // ബാക്ക്ഗ്രൗണ്ട് സ്റ്റൈൽ പ്രിവ്യൂ തിട്ടപ്പെടുത്താൻ
   const getBgClass = () => {
     if (previewBg === "dark") return "bg-[#0B0F17]";
     if (previewBg === "light") return "bg-white";
@@ -176,7 +184,6 @@ function SettingsPage() {
 
   return (
     <div className="max-w-3xl space-y-8 bg-[#0B0F17] p-6 rounded-2xl min-h-screen text-slate-100 pb-16">
-      {/* Top Header Grid Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/80 pb-6">
         <div className="flex items-center gap-3">
           <div className="bg-slate-800/80 p-2.5 rounded-xl text-[#FACC15] shadow-inner">
@@ -191,7 +198,6 @@ function SettingsPage() {
         </div>
       </div>
 
-      {/* Brand Identity / Identity Grid Component */}
       <div className="space-y-6 rounded-xl border border-slate-800 bg-[#141B2B] p-6 shadow-xl">
         <div className="flex items-center justify-between border-b border-slate-800/60 pb-3">
           <div className="flex items-center gap-2 text-[#FACC15]">
@@ -210,9 +216,7 @@ function SettingsPage() {
           configurations are highly recommended. Use the tools below to check visibility on various themes.
         </p>
 
-        {/* ADVANCED LOGO PREVIEW BOX */}
         <div className="grid gap-6 md:grid-cols-5 items-start pt-2">
-          {/* Main Interactive Screen */}
           <div className="md:col-span-3 flex flex-col gap-2">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Active Canvas View</span>
             <div
@@ -232,14 +236,12 @@ function SettingsPage() {
             </div>
           </div>
 
-          {/* Canvas Controller Effects Toolbar */}
           <div className="md:col-span-2 space-y-4 bg-[#0B0F17]/50 p-4 rounded-xl border border-slate-800/60 h-full justify-between flex flex-col">
             <div>
               <span className="text-[10px] font-bold text-[#FACC15] uppercase tracking-widest block mb-2.5">
                 Preview Effects Filter
               </span>
 
-              {/* Background Theme Toggles */}
               <div className="space-y-1.5 mb-3">
                 <label className="text-[10px] text-slate-400 font-medium uppercase tracking-wide">
                   Canvas Background
@@ -269,7 +271,6 @@ function SettingsPage() {
                 </div>
               </div>
 
-              {/* Aspect Ratio Scaling Controls */}
               <div className="space-y-1.5 mb-3">
                 <label className="text-[10px] text-slate-400 font-medium uppercase tracking-wide">
                   Image Fit Style
@@ -288,7 +289,6 @@ function SettingsPage() {
                 </div>
               </div>
 
-              {/* Inner Padding Scale */}
               <div className="space-y-1.5">
                 <label className="text-[10px] text-slate-400 font-medium uppercase tracking-wide">
                   Viewport Margins
@@ -314,7 +314,6 @@ function SettingsPage() {
           </div>
         </div>
 
-        {/* Action Button Controls */}
         <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-800/40">
           <label className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-lg bg-[#FACC15] px-4 text-xs font-bold uppercase tracking-wider text-black hover:bg-[#E2B80D] transition-colors shadow-md shadow-yellow-500/5">
             <Upload className="h-4 w-4 stroke-[2.5]" />
@@ -340,14 +339,12 @@ function SettingsPage() {
         </div>
       </div>
 
-      {/* Global Metadata Configuration Content Section */}
       <form onSubmit={save} className="space-y-6 rounded-xl border border-slate-800 bg-[#141B2B] p-6 shadow-xl">
         <div className="flex items-center gap-2 text-[#FACC15] pb-2 border-b border-slate-800/60">
           <Sliders className="h-4 w-4" />
           <h2 className="font-display text-lg font-bold uppercase tracking-wider text-white">System Configuration</h2>
         </div>
 
-        {/* WhatsApp Core Trigger Number */}
         <div className="space-y-1.5">
           <Label htmlFor="wa" className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
             Primary WhatsApp Link Gateway
@@ -365,7 +362,6 @@ function SettingsPage() {
           </p>
         </div>
 
-        {/* Hero Meta Parameters */}
         <div className="space-y-4 rounded-xl bg-[#0B0F17]/40 p-4 border border-slate-800/40">
           <p className="text-[11px] font-bold uppercase tracking-wider text-[#FACC15]">Hero Showcase Settings</p>
 
@@ -397,7 +393,6 @@ function SettingsPage() {
           </div>
         </div>
 
-        {/* Channels Information Layer */}
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label htmlFor="email" className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
@@ -426,7 +421,6 @@ function SettingsPage() {
           </div>
         </div>
 
-        {/* Social Ecosystem URLs */}
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label htmlFor="ig" className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
@@ -454,7 +448,6 @@ function SettingsPage() {
           </div>
         </div>
 
-        {/* Distribution / Logistic parameters */}
         <div className="space-y-1.5">
           <Label htmlFor="addr" className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
             Physical Office Premises
@@ -485,7 +478,6 @@ function SettingsPage() {
           </p>
         </div>
 
-        {/* --- Accordion FAQ Support Core Segment --- */}
         <div className="pt-6 border-t border-slate-800 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-800/40">
             <div className="flex items-center gap-2 text-[#FACC15]">
@@ -554,7 +546,6 @@ function SettingsPage() {
           </div>
         </div>
 
-        {/* Submission Push Pipeline Control */}
         <div className="pt-4 border-t border-slate-800/60">
           <Button
             type="submit"
