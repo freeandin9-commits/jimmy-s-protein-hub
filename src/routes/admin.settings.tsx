@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Upload, Trash2, Plus } from "lucide-react";
+import { Upload, Trash2, Plus, Settings, Sliders, Image, HelpCircle, Save } from "lucide-react";
 
 export const Route = createFileRoute("/admin/settings")({
   component: SettingsPage,
@@ -57,7 +57,16 @@ function SettingsPage() {
     }
   }, [data, form]);
 
-  if (isLoading || !form) return <div className="text-sm text-muted-foreground p-6">Loading…</div>;
+  if (isLoading || !form) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-[#0B0F17] text-slate-400">
+        <div className="flex flex-col items-center gap-2">
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#FACC15] border-t-transparent" />
+          <span className="text-sm font-medium">Loading premium settings...</span>
+        </div>
+      </div>
+    );
+  }
 
   const update = (k: string, v: any) => setForm({ ...form, [k]: v });
 
@@ -94,7 +103,7 @@ function SettingsPage() {
       if (error) throw error;
       setForm({ ...form, logo_url: signed.signedUrl });
       qc.invalidateQueries({ queryKey: ["site_settings"] });
-      toast.success("Logo updated");
+      toast.success("Logo updated successfully");
     } catch (e: any) {
       toast.error(e.message ?? "Upload failed");
     } finally {
@@ -132,7 +141,6 @@ function SettingsPage() {
       business_hours: form.business_hours,
     };
 
-    // ടേബിളിൽ കോളം ഉണ്ടെങ്കിൽ മാത്രം ഫയൽ സേവ് ചെയ്യാനായി സുരക്ഷിതമായി അപ്ഡേറ്റ് ചെയ്യുന്നു
     if ("faq" in form || filteredFaqs.length > 0) {
       updateData.faq = filteredFaqs;
     }
@@ -147,193 +155,279 @@ function SettingsPage() {
       toast.error(error.message);
       return;
     }
-    toast.success("Settings saved");
+    toast.success("All configurations saved live");
     qc.invalidateQueries({ queryKey: ["site_settings"] });
   };
 
   return (
-    <div className="max-w-2xl space-y-6 pb-12">
-      <div>
-        <h1 className="font-display text-4xl uppercase tracking-wide">Settings</h1>
-        <p className="text-sm text-muted-foreground">
-          Edit your site content and contact info. Changes go live immediately.
-        </p>
+    <div className="max-w-3xl space-y-8 bg-[#0B0F17] p-6 rounded-2xl min-h-screen text-slate-100 pb-16">
+      {/* Top Header Grid Section */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/80 pb-6">
+        <div className="flex items-center gap-3">
+          <div className="bg-slate-800/80 p-2.5 rounded-xl text-[#FACC15] shadow-inner">
+            <Settings className="h-6 w-6" />
+          </div>
+          <div>
+            <h1 className="font-display text-4xl font-extrabold uppercase tracking-wide text-white">Settings</h1>
+            <p className="text-sm text-slate-400 mt-0.5">
+              Customize storefront appearance, communications metadata, and content rules.
+            </p>
+          </div>
+        </div>
       </div>
 
-      <div className="space-y-3 rounded-xl border border-border bg-card p-6">
-        <div>
-          <h2 className="font-display text-2xl uppercase tracking-wide">Logo</h2>
-          <p className="text-sm text-muted-foreground">
-            Shown in the site header. Recommended: transparent PNG, max ~200px tall.
-          </p>
+      {/* Brand Identity / Identity Grid Component */}
+      <div className="space-y-4 rounded-xl border border-slate-800 bg-[#141B2B] p-6 shadow-xl">
+        <div className="flex items-center gap-2 text-[#FACC15] mb-1">
+          <Image className="h-4 w-4" />
+          <h2 className="font-display text-lg font-bold uppercase tracking-wider text-white">Brand Visual Identity</h2>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="flex h-20 w-40 items-center justify-center rounded-md border border-border bg-muted/40 p-2">
+        <p className="text-xs text-slate-400 max-w-2xl leading-relaxed">
+          The main logomark serves as the primary visual indicator in the header stack. Transparency-optimized PNG
+          configurations with a max-height specification of 200px are highly recommended.
+        </p>
+
+        <div className="flex flex-col sm:flex-row sm:items-center gap-6 pt-3">
+          <div className="flex h-24 w-48 items-center justify-center rounded-xl border-2 border-dashed border-slate-800 bg-[#0B0F17] p-4 transition-colors hover:border-slate-700">
             {form.logo_url ? (
-              <img src={form.logo_url} alt="Logo" className="max-h-full max-w-full object-contain" />
+              <img src={form.logo_url} alt="Active Identity Brand" className="max-h-full max-w-full object-contain" />
             ) : (
-              <span className="text-xs text-muted-foreground">No logo (default)</span>
+              <span className="text-xs font-semibold text-slate-600">Fallback Text Logo Active</span>
             )}
           </div>
           <div className="flex flex-wrap gap-2">
-            <label className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-md border border-input bg-background px-3 text-sm font-semibold hover:bg-secondary">
-              <Upload className="h-4 w-4" />
-              {uploadingLogo ? "Uploading…" : form.logo_url ? "Change / Upload" : "Upload Logo"}
+            <label className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-lg bg-[#FACC15] px-4 text-xs font-bold uppercase tracking-wider text-black hover:bg-[#E2B80D] transition-colors shadow-md shadow-yellow-500/5">
+              <Upload className="h-4 w-4 stroke-[2.5]" />
+              {uploadingLogo ? "Processing Image..." : form.logo_url ? "Replace Identity" : "Upload Custom Logo"}
               <input
                 type="file"
                 accept="image/*"
                 className="hidden"
+                disabled={uploadingLogo}
                 onChange={(e) => e.target.files?.[0] && onLogoFile(e.target.files[0])}
               />
             </label>
             {form.logo_url && (
-              <Button type="button" variant="outline" onClick={deleteLogo}>
-                <Trash2 className="mr-2 h-4 w-4" /> Delete
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={deleteLogo}
+                className="h-10 px-4 text-xs font-bold uppercase bg-slate-900/60 border border-slate-800 text-slate-400 hover:bg-red-950/40 hover:text-red-400 hover:border-red-900/50 transition-all"
+              >
+                <Trash2 className="mr-2 h-4 w-4" /> Reset Default
               </Button>
             )}
           </div>
         </div>
       </div>
 
-      <form onSubmit={save} className="space-y-5 rounded-xl border border-border bg-card p-6">
-        <div>
-          <Label htmlFor="wa">WhatsApp Number</Label>
+      {/* Global Metadata Configuration Content Section */}
+      <form onSubmit={save} className="space-y-6 rounded-xl border border-slate-800 bg-[#141B2B] p-6 shadow-xl">
+        <div className="flex items-center gap-2 text-[#FACC15] pb-2 border-b border-slate-800/60">
+          <Sliders className="h-4 w-4" />
+          <h2 className="font-display text-lg font-bold uppercase tracking-wider text-white">System Configuration</h2>
+        </div>
+
+        {/* WhatsApp Core Trigger Number */}
+        <div className="space-y-1.5">
+          <Label htmlFor="wa" className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+            Primary WhatsApp Link Gateway
+          </Label>
           <Input
             id="wa"
             value={form.whatsapp_number || ""}
             onChange={(e) => update("whatsapp_number", e.target.value)}
-            placeholder="919876543210"
-            className="mt-1"
+            placeholder="e.g. 919876543210"
+            className="bg-[#0B0F17] border-slate-800 text-white focus-visible:ring-[#FACC15] font-mono tracking-wide"
           />
-          <p className="mt-1 text-xs text-muted-foreground">
-            Country code + number, no + or spaces. E.g. India: 919876543210
+          <p className="text-[11px] text-slate-500">
+            Provide the complete international dialing code without any symbols, operators, or leading zeros (e.g.,
+            India prefix sequence: 91XXXXXXXXXX).
           </p>
         </div>
-        <div>
-          <Label htmlFor="head">Hero Headline</Label>
-          <Input
-            id="head"
-            value={form.hero_headline || ""}
-            onChange={(e) => update("hero_headline", e.target.value)}
-            className="mt-1"
-          />
+
+        {/* Hero Meta Parameters */}
+        <div className="space-y-4 rounded-xl bg-[#0B0F17]/40 p-4 border border-slate-800/40">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-[#FACC15]">Hero Showcase Settings</p>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="head" className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+              Prominent Header Text
+            </Label>
+            <Input
+              id="head"
+              value={form.hero_headline || ""}
+              onChange={(e) => update("hero_headline", e.target.value)}
+              className="bg-[#0B0F17] border-slate-800 text-white focus-visible:ring-[#FACC15]"
+              placeholder="Inject core value statement headline..."
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="sub" className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+              Subtext Context Segment
+            </Label>
+            <Textarea
+              id="sub"
+              value={form.hero_subtext || ""}
+              onChange={(e) => update("hero_subtext", e.target.value)}
+              rows={2}
+              className="bg-[#0B0F17] border-slate-800 text-white focus-visible:ring-[#FACC15] text-sm"
+              placeholder="Inject secondary descriptive messaging hooks..."
+            />
+          </div>
         </div>
-        <div>
-          <Label htmlFor="sub">Hero Subtext</Label>
-          <Textarea
-            id="sub"
-            value={form.hero_subtext || ""}
-            onChange={(e) => update("hero_subtext", e.target.value)}
-            rows={2}
-            className="mt-1"
-          />
-        </div>
+
+        {/* Channels Information Layer */}
         <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <Label htmlFor="email">Contact Email</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="email" className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+              Support Email Vector
+            </Label>
             <Input
               id="email"
               type="email"
               value={form.contact_email || ""}
               onChange={(e) => update("contact_email", e.target.value)}
-              className="mt-1"
+              className="bg-[#0B0F17] border-slate-800 text-white focus-visible:ring-[#FACC15]"
+              placeholder="operations@brand.com"
             />
           </div>
-          <div>
-            <Label htmlFor="phone">Contact Phone</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="phone" className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+              Dedicated Contact Line
+            </Label>
             <Input
               id="phone"
               value={form.contact_phone || ""}
               onChange={(e) => update("contact_phone", e.target.value)}
-              className="mt-1"
+              className="bg-[#0B0F17] border-slate-800 text-white focus-visible:ring-[#FACC15]"
+              placeholder="+91 XXXXX XXXXX"
             />
           </div>
         </div>
+
+        {/* Social Ecosystem URLs */}
         <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <Label htmlFor="ig">Instagram URL</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="ig" className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+              Instagram Handle Link
+            </Label>
             <Input
               id="ig"
               value={form.instagram_url || ""}
               onChange={(e) => update("instagram_url", e.target.value)}
-              placeholder="https://instagram.com/..."
-              className="mt-1"
+              placeholder="https://instagram.com/brand_id"
+              className="bg-[#0B0F17] border-slate-800 text-white focus-visible:ring-[#FACC15]"
             />
           </div>
-          <div>
-            <Label htmlFor="fb">Facebook URL</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="fb" className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+              Facebook Brand Location
+            </Label>
             <Input
               id="fb"
               value={form.facebook_url || ""}
               onChange={(e) => update("facebook_url", e.target.value)}
-              placeholder="https://facebook.com/..."
-              className="mt-1"
+              placeholder="https://facebook.com/brand_page"
+              className="bg-[#0B0F17] border-slate-800 text-white focus-visible:ring-[#FACC15]"
             />
           </div>
         </div>
-        <div>
-          <Label htmlFor="addr">Address</Label>
+
+        {/* Distribution / Logistic parameters */}
+        <div className="space-y-1.5">
+          <Label htmlFor="addr" className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+            Physical Office Premises
+          </Label>
           <Textarea
             id="addr"
             value={form.address || ""}
             onChange={(e) => update("address", e.target.value)}
             rows={2}
-            className="mt-1"
+            className="bg-[#0B0F17] border-slate-800 text-white focus-visible:ring-[#FACC15] text-sm"
+            placeholder="Provide registered mailing physical warehouse coordinate entries..."
           />
         </div>
-        <div>
-          <Label htmlFor="bh">Business Hours</Label>
+
+        <div className="space-y-1.5">
+          <Label htmlFor="bh" className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+            Operational Schedule Parameters
+          </Label>
           <Input
             id="bh"
             value={form.business_hours ?? ""}
             onChange={(e) => update("business_hours", e.target.value)}
-            placeholder="Mon-Sat 10am-8pm"
-            className="mt-1"
+            placeholder="e.g. Monday - Saturday: 09:00 AM - 06:00 PM"
+            className="bg-[#0B0F17] border-slate-800 text-white focus-visible:ring-[#FACC15]"
           />
-          <p className="mt-1 text-xs text-muted-foreground">Shown to customers in the cart and on WhatsApp messages.</p>
+          <p className="text-[11px] text-slate-500">
+            This string displays transparently within active checkout steps and pre-filled user payloads.
+          </p>
         </div>
 
-        {/* --- FAQ Manager --- */}
-        <div className="pt-4 border-t border-border space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <Label className="text-lg font-display uppercase tracking-wide">Manage FAQs</Label>
-              <p className="text-xs text-muted-foreground">These questions will show up on the Contact page.</p>
+        {/* --- Accordion FAQ Support Core Segment --- */}
+        <div className="pt-6 border-t border-slate-800 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-800/40">
+            <div className="flex items-center gap-2 text-[#FACC15]">
+              <HelpCircle className="h-4 w-4" />
+              <Label className="text-lg font-bold uppercase tracking-wider text-white cursor-default">
+                Knowledge Base Configuration
+              </Label>
             </div>
-            <Button type="button" variant="outline" size="sm" onClick={addFaq} className="gap-1">
-              <Plus className="h-4 w-4" /> Add FAQ
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={addFaq}
+              className="bg-slate-800 text-slate-200 hover:bg-[#FACC15] hover:text-black text-xs font-bold uppercase tracking-wider self-start sm:self-auto transition-all"
+            >
+              <Plus className="h-3.5 w-3.5 mr-1.5 stroke-[3]" /> Add FAQ Node
             </Button>
           </div>
+          <p className="text-xs text-slate-400">
+            Maintain customer self-service modules published on the global storefront layout.
+          </p>
 
-          <div className="space-y-4">
+          <div className="space-y-4 pt-2">
             {faqs.map((faq, index) => (
-              <div key={index} className="relative space-y-2 rounded-lg border border-border bg-muted/30 p-4">
+              <div
+                key={index}
+                className="relative space-y-3 rounded-xl border border-slate-800/80 bg-[#0B0F17]/60 p-4 shadow-inner transition-all hover:border-slate-700/60"
+              >
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="absolute right-2 top-2 h-8 w-8 text-destructive hover:bg-destructive/10"
+                  className="absolute right-3 top-3 h-7 w-7 text-slate-500 hover:text-red-400 hover:bg-red-950/40 rounded-lg transition-colors"
                   onClick={() => removeFaq(index)}
+                  title="Remove Item Node"
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
-                <div className="pr-8">
-                  <Label className="text-xs">Question {index + 1}</Label>
+
+                <div className="pr-8 space-y-1">
+                  <Label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    Query Variable {index + 1}
+                  </Label>
                   <Input
                     value={faq?.q || ""}
                     onChange={(e) => handleFaqChange(index, "q", e.target.value)}
-                    placeholder="e.g., How long does delivery take?"
-                    className="mt-1"
+                    placeholder="Enter interactive customer query prompt string..."
+                    className="bg-[#0B0F17] border-slate-800 text-white focus-visible:ring-[#FACC15] h-9 text-xs"
                   />
                 </div>
-                <div>
-                  <Label className="text-xs">Answer</Label>
+
+                <div className="space-y-1">
+                  <Label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    Resolution Statement Output
+                  </Label>
                   <Textarea
                     value={faq?.a || ""}
                     onChange={(e) => handleFaqChange(index, "a", e.target.value)}
-                    placeholder="e.g., Delivery takes 2-5 business days."
+                    placeholder="Enter comprehensive supporting explanation paragraph content..."
                     rows={2}
-                    className="mt-1"
+                    className="bg-[#0B0F17] border-slate-800 text-white focus-visible:ring-[#FACC15] text-xs"
                   />
                 </div>
               </div>
@@ -341,13 +435,17 @@ function SettingsPage() {
           </div>
         </div>
 
-        <Button
-          type="submit"
-          disabled={saving}
-          className="w-full bg-primary font-bold uppercase tracking-wider text-primary-foreground hover:bg-primary/90"
-        >
-          {saving ? "Saving…" : "Save Settings"}
-        </Button>
+        {/* Submission Push Pipeline Control */}
+        <div className="pt-4 border-t border-slate-800/60">
+          <Button
+            type="submit"
+            disabled={saving}
+            className="w-full h-11 bg-[#FACC15] font-extrabold uppercase tracking-widest text-black hover:bg-[#E2B80D] disabled:opacity-50 transition-all duration-200 text-xs shadow-lg shadow-yellow-500/5 flex items-center justify-center gap-2"
+          >
+            <Save className="h-4 w-4 stroke-[2.5]" />
+            {saving ? "Deploying Parameters Live..." : "Commit Settings Live"}
+          </Button>
+        </div>
       </form>
     </div>
   );
