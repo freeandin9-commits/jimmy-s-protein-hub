@@ -8,7 +8,7 @@ import { Footer } from "@/components/layout/Footer";
 import { CartDrawer } from "@/components/layout/CartDrawer";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/hooks/useAuth";
-import { WhatsAppWidget } from "@/components/WhatsAppWidget"; // WhatsAppWidget ഇംപോർട്ട് ചെയ്തു
+import { WhatsAppWidget } from "@/components/WhatsAppWidget";
 
 function NotFoundComponent() {
   return (
@@ -110,7 +110,6 @@ function RootComponent() {
 }
 
 function AppShell() {
-  // Hide store chrome on admin/login routes
   const path = useRouterState({ select: (s) => s.location.pathname });
   const isAdminRoute = path.startsWith("/admin") || path === "/login";
 
@@ -125,18 +124,17 @@ function AppShell() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      {/* STICKY CONTAINER FOR MAIN NAVIGATION 
-        ഇത് എല്ലാ പേജുകളിലും മെയിൻ നാവിഗേഷൻ ബാറിനെ മുകളിൽ ലോക്ക് ചെയ്തു നിർത്തും.
-      */}
-      <div className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur-md border-b border-border/40">
+      {/* MAIN NAVBAR STICKY */}
+      <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur-md border-b border-border/40">
         <Header />
-      </div>
+      </header>
+
       <main className="flex flex-1 flex-col">
         <Outlet />
       </main>
       <Footer />
       <CartDrawer />
-      <WhatsAppWidget /> {/* ഇവിടെ എല്ലാ കസ്റ്റമർ പേജുകളിലും WhatsApp പോപ്പ്-അപ്പ് കാണിക്കും */}
+      <WhatsAppWidget />
       <Toaster richColors position="top-center" />
     </div>
   );
