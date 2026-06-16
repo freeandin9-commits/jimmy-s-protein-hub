@@ -11,8 +11,10 @@ export function Header() {
   const open = useCartStore((s) => s.open);
   const totalItems = items.reduce((s, i) => s + i.quantity, 0);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  // useSiteSettings ഹുക്ക് വഴി ഡാറ്റാബേസിൽ നിന്നുള്ള ഏറ്റവും പുതിയ ലോഗോ യുആർഎൽ എടുക്കുന്നു
   const { settings } = useSiteSettings();
-  const logoSrc = settings.logo_url || logoImg;
+  const logoSrc = settings?.logo_url || logoImg;
 
   // ഡെസ്ക്ടോപ്പ് ലിങ്കുകൾ വെളുപ്പ് നിറത്തിലും, ഹോവർ ചെയ്യുമ്പോൾ പ്രൈമറി/ഗോൾഡ് നിറത്തിലും വരാൻ
   const navLinkProps = {
@@ -25,7 +27,14 @@ export function Header() {
     <header className="sticky top-0 z-40 bg-black text-white border-b border-zinc-800 shadow-sm">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link to="/" className="flex items-center gap-2" aria-label="Nutrin Sports home">
-          <img src={logoSrc} alt="Nutrin Sports" className="h-10 w-auto md:h-12 object-contain brightness-0 invert" />
+          {/* ലോഗോ കറുപ്പ് പശ്ചാത്തലത്തിലും വ്യക്തമായി കാണാൻ ഇമേജ് സ്റ്റൈൽ മെച്ചപ്പെടുത്തിയിട്ടുണ്ട്.
+            നിങ്ങളുടെ ഒറിജിനൽ ലോഗോ കറുത്തതാണെങ്കിൽ അത് വെളുപ്പിക്കാൻ 'brightness-0 invert' സഹായിക്കും.
+          */}
+          <img
+            src={logoSrc}
+            alt="Nutrin Sports"
+            className="h-10 w-auto md:h-12 object-contain transition-all duration-300"
+          />
         </Link>
 
         {/* Desktop Navigation Links */}
