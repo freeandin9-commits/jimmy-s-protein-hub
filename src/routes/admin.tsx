@@ -1,16 +1,26 @@
 import { createFileRoute, Outlet, Link, useNavigate, useLocation } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { LayoutDashboard, ShoppingBag, Package, Settings, BarChart3, LogOut, Dumbbell, ExternalLink, Megaphone, Tags, Image as ImageIcon, Sparkles } from "lucide-react";
+import {
+  LayoutDashboard,
+  ShoppingBag,
+  Package,
+  Settings,
+  BarChart3,
+  LogOut,
+  Dumbbell,
+  ExternalLink,
+  Megaphone,
+  Tags,
+  Image as ImageIcon,
+  Sparkles,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
-    meta: [
-      { title: "Admin — Jimmy's Protein" },
-      { name: "robots", content: "noindex, nofollow" },
-    ],
+    meta: [{ title: "Admin — Jimmy's Protein" }, { name: "robots", content: "noindex, nofollow" }],
   }),
   component: AdminLayout,
 });
@@ -47,8 +57,11 @@ function AdminLayout() {
 
   if (loading || !user || !isAdmin) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="text-sm text-muted-foreground">Loading admin…</div>
+      <div className="flex min-h-screen items-center justify-center bg-zinc-950 text-zinc-100">
+        <div className="flex flex-col items-center gap-3">
+          <Dumbbell className="h-8 w-8 text-yellow-400 animate-pulse" />
+          <div className="text-sm tracking-widest uppercase font-medium text-zinc-400">Loading admin panel…</div>
+        </div>
       </div>
     );
   }
@@ -59,79 +72,101 @@ function AdminLayout() {
   };
 
   return (
-    <div className="flex min-h-screen bg-background">
-      {/* Sidebar */}
-      <aside className="hidden w-64 flex-col border-r border-border bg-card md:flex">
-        <div className="flex h-16 items-center gap-2 border-b border-border px-6">
-          <Dumbbell className="h-5 w-5 text-primary" />
-          <span className="font-display text-xl tracking-wider text-primary">JIMMY'S</span>
-          <span className="font-display text-xl tracking-wider">ADMIN</span>
+    <div className="flex min-h-screen bg-zinc-950 text-zinc-100 antialiased selection:bg-yellow-400 selection:text-zinc-950">
+      {/* Sidebar (Desktop) */}
+      <aside className="hidden w-64 flex-col border-r border-zinc-800 bg-zinc-900/50 backdrop-blur-md md:flex">
+        {/* Brand Header */}
+        <div className="flex h-20 items-center gap-2.5 border-b border-zinc-800/80 px-6">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-yellow-400 text-zinc-950 shadow-lg shadow-yellow-400/10">
+            <Dumbbell className="h-5 w-5 stroke-[2.5]" />
+          </div>
+          <div className="flex flex-col">
+            <span className="font-display font-black text-lg tracking-wider text-yellow-400 leading-none">JIMMY'S</span>
+            <span className="text-[10px] font-bold tracking-[0.2em] text-zinc-400 uppercase mt-0.5">
+              Control Center
+            </span>
+          </div>
         </div>
 
-        <nav className="flex-1 space-y-1 p-4">
+        {/* Navigation Items */}
+        <nav className="flex-1 space-y-1.5 p-4 overflow-y-auto">
           {navItems.map((item) => {
-            const active = item.exact
-              ? location.pathname === item.to
-              : location.pathname.startsWith(item.to);
+            const active = item.exact ? location.pathname === item.to : location.pathname.startsWith(item.to);
             return (
               <Link
                 key={item.to}
                 to={item.to as any}
-                className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-semibold uppercase tracking-wider transition-colors ${
+                className={`flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-xs font-bold uppercase tracking-widest transition-all duration-200 group ${
                   active
-                    ? "bg-primary text-primary-foreground"
-                    : "text-foreground/70 hover:bg-secondary hover:text-foreground"
+                    ? "bg-yellow-400 text-zinc-950 shadow-md shadow-yellow-400/10"
+                    : "text-zinc-400 hover:bg-zinc-800/60 hover:text-zinc-100"
                 }`}
               >
-                <item.icon className="h-4 w-4" />
+                <item.icon
+                  className={`h-4 w-4 shrink-0 transition-transform duration-200 ${active ? "stroke-[2.5]" : "group-hover:scale-110"}`}
+                />
                 {item.label}
               </Link>
             );
           })}
         </nav>
 
-        <div className="border-t border-border p-4 space-y-2">
+        {/* Footer Area */}
+        <div className="border-t border-zinc-800/80 p-4 space-y-2 bg-zinc-900/20">
           <Link
             to="/"
-            className="flex items-center gap-2 rounded-md px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:bg-secondary hover:text-foreground"
+            className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-wider text-zinc-400 hover:bg-zinc-800/60 hover:text-yellow-400 transition-colors"
           >
-            <ExternalLink className="h-3 w-3" />
-            View Store
+            <ExternalLink className="h-3.5 w-3.5" />
+            Live Storefront
           </Link>
           <button
             onClick={handleSignOut}
-            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs font-semibold uppercase tracking-wider text-destructive hover:bg-destructive/10"
+            className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-wider text-red-400 hover:bg-red-500/10 transition-colors"
           >
-            <LogOut className="h-3 w-3" />
+            <LogOut className="h-3.5 w-3.5" />
             Sign out
           </button>
-          <p className="px-3 pt-2 text-[10px] text-muted-foreground truncate" title={user.email ?? ""}>
-            {user.email}
-          </p>
+
+          <div className="mt-2 border-t border-zinc-800/50 pt-3 px-3 flex items-center gap-2">
+            <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+            <p className="text-[10px] text-zinc-500 font-medium truncate flex-1" title={user.email ?? ""}>
+              {user.email}
+            </p>
+          </div>
         </div>
       </aside>
 
-      {/* Mobile top bar */}
-      <div className="flex flex-1 flex-col">
-        <header className="flex h-14 items-center justify-between border-b border-border bg-card px-4 md:hidden">
-          <span className="font-display text-lg tracking-wider text-primary">JIMMY'S ADMIN</span>
-          <Button variant="ghost" size="sm" onClick={handleSignOut}>
+      {/* Mobile Structure */}
+      <div className="flex flex-1 flex-col min-w-0">
+        {/* Mobile Top Header */}
+        <header className="flex h-16 items-center justify-between border-b border-zinc-800 bg-zinc-900 px-4 md:hidden">
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded bg-yellow-400 text-zinc-950">
+              <Dumbbell className="h-4 w-4 stroke-[2.5]" />
+            </div>
+            <span className="font-display font-black text-md tracking-wider text-yellow-400">JIMMY'S ADMIN</span>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleSignOut}
+            className="text-zinc-400 hover:text-red-400 hover:bg-red-500/10 h-9 w-9 p-0"
+          >
             <LogOut className="h-4 w-4" />
           </Button>
         </header>
 
-        {/* Mobile nav pill row */}
-        <nav className="flex gap-1 overflow-x-auto border-b border-border bg-card px-2 py-2 md:hidden">
+        {/* Mobile Horizontal Navigation Track */}
+        <nav className="flex gap-2 overflow-x-auto border-b border-zinc-800 bg-zinc-900/40 px-4 py-2.5 scrollbar-none md:hidden">
           {navItems.map((item) => {
-            const active = item.exact
-              ? location.pathname === item.to
-              : location.pathname.startsWith(item.to);
+            const active = item.exact ? location.pathname === item.to : location.pathname.startsWith(item.to);
             return (
               <Link
                 key={item.to}
                 to={item.to as any}
-                className={`flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold uppercase tracking-wider ${
-                  active ? "bg-primary text-primary-foreground" : "bg-secondary text-foreground/80"
+                className={`flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-widest transition-colors ${
+                  active ? "bg-yellow-400 text-zinc-950" : "bg-zinc-800 text-zinc-400 hover:text-zinc-200"
                 }`}
               >
                 <item.icon className="h-3 w-3" />
@@ -141,8 +176,11 @@ function AdminLayout() {
           })}
         </nav>
 
-        <main className="flex-1 overflow-y-auto p-4 md:p-8">
-          <Outlet />
+        {/* Main Interface Window */}
+        <main className="flex-1 overflow-y-auto p-5 md:p-8 bg-zinc-950">
+          <div className="mx-auto max-w-7xl">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>
