@@ -25,22 +25,16 @@ export function Header() {
   };
 
   return (
-    // ലോഗോയുടെ വലിപ്പത്തിനനുസരിച്ച് ഹെഡർ ഹൈറ്റ് h-20 ആയി നിലനിർത്തിയിരിക്കുന്നു
+    // ലോഗോയുടെ വലിപ്പത്തിനനുസരിച്ച് ഹെഡർ ഹൈറ്റ് h-16 ൽ നിന്നും h-20 ആയി വർദ്ധിപ്പിച്ചു
     <header className="sticky top-0 z-40 bg-white text-black border-b border-slate-200 shadow-sm">
       <div className="container mx-auto flex h-20 items-center justify-between px-4">
         <Link to="/" className="flex items-center gap-2" aria-label="Nutrin Sports home">
-          {/* HD Quality & Crisp Rendering ഉറപ്പാക്കാൻ നിർദ്ദേശിച്ച ശൈലികൾ ചേർത്തു */}
+          {/* ലോഗോ വലിപ്പം കൂട്ടാൻ h-12 md:h-16 നൽകി */}
           <img
             src={logoSrc}
             alt="Nutrin Sports"
-            className="h-12 w-auto md:h-16 object-contain antialiased will-change-transform"
-            style={{
-              imageRendering: "auto",
-              transform: "translateZ(0)", // GPU ഹാർഡ്‌വെയർ ആക്സിലറേഷൻ വഴി ക്വാളിറ്റി കൂട്ടുന്നു
-            }}
-            loading="eager" // ലോഗോ പെട്ടെന്ന് ഹൈ-ക്വാളിറ്റിയിൽ ലോഡ് ആകാൻ
-            decoding="async"
-            key={logoSrc} // ലോഗോ മാറുമ്പോൾ ഇമേജ് കംപോണന്റ് ഉടൻ റീ-റെൻഡർ ആകാൻ
+            className="h-12 w-auto md:h-16 object-contain transition-all duration-300"
+            key={logoSrc} // ലോഗോ മാറുമ്പോൾ ഇമേജ് കംപോണന്റ് ഉടൻ റീ-റെൻഡർ ആകാൻ ഒരു key നൽകി
           />
         </Link>
 
