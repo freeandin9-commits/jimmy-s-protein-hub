@@ -6,15 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Trash2, Upload, Plus, Settings2, Image as ImageIcon } from "lucide-react";
+import { Trash2, Upload, Plus, Settings2, Image as ImageIcon, Sparkles, Sliders } from "lucide-react";
 import { AdFitPreview } from "@/components/admin/AdFitPreview";
 
 export const Route = createFileRoute("/admin/shop-ads")({
@@ -98,7 +92,7 @@ function ShopAdsPage() {
       const { data } = await supabase.storage.from("ads").createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
       if (!data?.signedUrl) throw new Error("Failed to get URL");
       setImageUrl(data.signedUrl);
-      toast.success("Image uploaded — adjust fit then publish");
+      toast.success("Image uploaded successfully");
     } catch (e: any) {
       toast.error(e.message ?? "Upload failed");
     } finally {
@@ -136,7 +130,7 @@ function ShopAdsPage() {
     setZoom(1);
     qc.invalidateQueries({ queryKey: ["admin", "shop_ads"] });
     qc.invalidateQueries({ queryKey: ["shop_ads", "public"] });
-    toast.success("Shop banner published");
+    toast.success("Shop banner published live");
   };
 
   const toggleActive = async (id: string, active: boolean) => {
@@ -156,7 +150,10 @@ function ShopAdsPage() {
     id: string,
     patch: { fit_mode?: string; focal_x?: number; focal_y?: number; zoom?: number },
   ) => {
-    await supabase.from("shop_ads").update(patch as any).eq("id", id);
+    await supabase
+      .from("shop_ads")
+      .update(patch as any)
+      .eq("id", id);
     qc.invalidateQueries({ queryKey: ["admin", "shop_ads"] });
     qc.invalidateQueries({ queryKey: ["shop_ads", "public"] });
   };
@@ -170,56 +167,85 @@ function ShopAdsPage() {
   };
 
   const categoryName = (id: string | null) =>
-    id ? categories.find((c) => c.id === id)?.name ?? "—" : "All Products";
+    id ? (categories.find((c) => c.id === id)?.name ?? "—") : "All Products";
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="font-display text-4xl uppercase tracking-wide flex items-center gap-2">
-          <ImageIcon className="h-7 w-7" /> Shop Banners
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Slider banners shown on the Shop page under the search bar. Pick a category to show the banner only on that
-          category — or choose <strong>All Products</strong> to show it when no category is selected.
-        </p>
+    <div className="max-w-4xl space-y-8 bg-[#0B0F17] p-6 rounded-2xl min-h-screen text-slate-100 pb-16">
+      {/* Top Main Header */}
+      <div className="flex items-center gap-3 border-b border-slate-800/80 pb-6">
+        <div className="bg-slate-800/80 p-2.5 rounded-xl text-[#FACC15] shadow-inner">
+          <ImageIcon className="h-6 w-6" />
+        </div>
+        <div>
+          <h1 className="font-display text-4xl font-extrabold uppercase tracking-wide text-white">Shop Banners</h1>
+          <p className="text-sm text-slate-400 mt-1 leading-relaxed">
+            Configure target sliders positioned directly underneath the storefront search framework.
+          </p>
+        </div>
       </div>
 
-      <div className="rounded-xl border border-border bg-card p-5 space-y-4">
-        <h2 className="font-display text-2xl uppercase tracking-wide flex items-center gap-2">
-          <Plus className="h-5 w-5" /> New Banner
-        </h2>
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <Label>Title (optional)</Label>
-            <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Summer Sale" />
+      {/* Creator Panel Card */}
+      <div className="rounded-xl border border-slate-800 bg-[#141B2B] p-6 shadow-xl space-y-5">
+        <div className="flex items-center gap-2 text-[#FACC15] pb-2 border-b border-slate-800/40">
+          <Plus className="h-4 w-4 stroke-[2.5]" />
+          <h2 className="font-display text-lg font-bold uppercase tracking-wider text-white">Create Campaign Banner</h2>
+        </div>
+
+        <div className="grid gap-5 md:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Campaign Title</Label>
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="e.g., Seasonal Deal Pack"
+              className="bg-[#0B0F17] border-slate-800 text-white focus-visible:ring-[#FACC15]"
+            />
           </div>
-          <div>
-            <Label>Category</Label>
+          <div className="space-y-1.5">
+            <Label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+              Target Grid Category
+            </Label>
             <Select value={categoryId} onValueChange={setCategoryId}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select category" />
+              <SelectTrigger className="bg-[#0B0F17] border-slate-800 text-white focus:ring-[#FACC15]">
+                <SelectValue placeholder="Select target scope" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={ALL_VALUE}>All Products (shown when no category selected)</SelectItem>
+              <SelectContent className="bg-[#141B2B] border-slate-800 text-slate-200">
+                <SelectItem value={ALL_VALUE} className="focus:bg-[#FACC15] focus:text-black">
+                  All Products fallback context
+                </SelectItem>
                 {categories.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>
+                  <SelectItem key={c.id} value={c.id} className="focus:bg-[#FACC15] focus:text-black">
                     {c.name}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
-          <div className="md:col-span-2">
-            <Label>Link URL (optional)</Label>
-            <Input value={linkUrl} onChange={(e) => setLinkUrl(e.target.value)} placeholder="/products or https://…" />
+          <div className="md:col-span-2 space-y-1.5">
+            <Label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+              Redirection Target URL
+            </Label>
+            <Input
+              value={linkUrl}
+              onChange={(e) => setLinkUrl(e.target.value)}
+              placeholder="/collections/protein-isolate or dynamic external links"
+              className="bg-[#0B0F17] border-slate-800 text-white focus-visible:ring-[#FACC15]"
+            />
           </div>
-          <div className="md:col-span-2">
-            <Label>Image URL</Label>
+          <div className="md:col-span-2 space-y-1.5">
+            <Label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+              Media Location Source
+            </Label>
             <div className="flex gap-2">
-              <Input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="https://… or upload" />
-              <label className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-md border border-input bg-background px-3 text-sm font-semibold hover:bg-secondary">
+              <Input
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                placeholder="Paste remote media CDN URL stream or activate localized upload"
+                className="bg-[#0B0F17] border-slate-800 text-white focus-visible:ring-[#FACC15]"
+              />
+              <label className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-lg bg-slate-800 border border-slate-700 px-4 text-xs font-bold uppercase tracking-wider text-slate-200 hover:bg-slate-700 transition-colors whitespace-nowrap">
                 <Upload className="h-4 w-4" />
-                {uploading ? "Uploading…" : "Upload"}
+                {uploading ? "Uploading..." : "Upload Asset"}
                 <input
                   type="file"
                   accept="image/*"
@@ -231,93 +257,150 @@ function ShopAdsPage() {
           </div>
         </div>
 
-        <div>
-          <Label className="mb-2 block">Fit & Position Preview</Label>
-          <AdFitPreview
-            imageUrl={imageUrl}
-            fitMode={fitMode}
-            focalX={focalX}
-            focalY={focalY}
-            zoom={zoom}
-            onChange={(v) => {
-              setFitMode(v.fitMode);
-              setFocalX(v.focalX);
-              setFocalY(v.focalY);
-              setZoom(v.zoom);
-            }}
-          />
+        {/* Preview Frame Component Integration */}
+        <div className="space-y-2 pt-2">
+          <Label className="text-xs font-semibold text-[#FACC15] uppercase tracking-wider block">
+            Positioning Tuning Engine
+          </Label>
+          <div className="rounded-xl border border-slate-800 bg-[#0B0F17]/60 p-1">
+            <AdFitPreview
+              imageUrl={imageUrl}
+              fitMode={fitMode}
+              focalX={focalX}
+              focalY={focalY}
+              zoom={zoom}
+              onChange={(v) => {
+                setFitMode(v.fitMode);
+                setFocalX(v.focalX);
+                setFocalY(v.focalY);
+                setZoom(v.zoom);
+              }}
+            />
+          </div>
         </div>
 
-        <Button onClick={addAd} disabled={saving || uploading}>
-          {saving ? "Publishing…" : "Publish Banner"}
-        </Button>
+        <div className="pt-2">
+          <Button
+            onClick={addAd}
+            disabled={saving || uploading}
+            className="h-11 bg-[#FACC15] font-extrabold uppercase tracking-widest text-black hover:bg-[#E2B80D] disabled:opacity-40 transition-all duration-200 text-xs shadow-lg shadow-yellow-500/5 px-6"
+          >
+            {saving ? "Deploying Node..." : "Publish Cluster Banner"}
+          </Button>
+        </div>
       </div>
 
-      <div className="rounded-xl border border-border bg-card p-5">
-        <h2 className="font-display text-2xl uppercase tracking-wide">All Banners</h2>
+      {/* Database Node Table Layer */}
+      <div className="rounded-xl border border-slate-800 bg-[#141B2B] p-6 shadow-xl space-y-4">
+        <div className="flex items-center gap-2 text-[#FACC15] pb-2 border-b border-slate-800/40">
+          <Sparkles className="h-4 w-4" />
+          <h2 className="font-display text-lg font-bold uppercase tracking-wider text-white">Active Queue Registry</h2>
+        </div>
+
         {isLoading ? (
-          <p className="mt-4 text-sm text-muted-foreground">Loading…</p>
+          <div className="py-6 flex justify-center items-center gap-2 text-slate-500 text-xs font-medium uppercase tracking-wider">
+            <div className="h-4 w-4 animate-spin rounded-full border border-slate-600 border-t-transparent" />
+            Synchronizing data modules...
+          </div>
         ) : ads.length === 0 ? (
-          <p className="mt-4 text-sm text-muted-foreground">No banners yet.</p>
+          <p className="text-xs text-slate-500 py-4 font-medium italic">
+            No interactive banner sets mapped into memory.
+          </p>
         ) : (
-          <ul className="mt-4 space-y-5">
+          <ul className="space-y-6 pt-2">
             {ads.map((ad) => (
-              <li key={ad.id} className="rounded-lg border border-border p-3">
-                <div className="relative aspect-[16/6] w-full overflow-hidden rounded-lg border border-border bg-card md:aspect-[21/7]">
+              <li
+                key={ad.id}
+                className="rounded-xl border border-slate-800/80 bg-[#0B0F17]/40 p-4 transition-all hover:border-slate-700/60 shadow-inner"
+              >
+                {/* Visual Viewport Box */}
+                <div className="relative aspect-[16/5] w-full overflow-hidden rounded-xl border border-slate-800 bg-[#0B0F17] md:aspect-[21/6]">
                   <img
                     src={ad.image_url}
-                    alt={ad.title || "Banner preview"}
+                    alt={ad.title || "Banner configuration track"}
                     className="h-full w-full object-cover"
                     style={{
                       objectPosition: `${ad.focal_x}% ${ad.focal_y}%`,
                       transform: ad.zoom !== 1 ? `scale(${ad.zoom})` : undefined,
                     }}
                   />
-                </div>
-
-                <div className="mt-3 flex flex-wrap items-center gap-3">
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate font-semibold">{ad.title || "(no title)"}</div>
-                    <div className="text-xs text-muted-foreground">
-                      Category: <span className="font-semibold">{categoryName(ad.category_id)}</span>
+                  {!ad.active && (
+                    <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center">
+                      <span className="text-[10px] font-black uppercase tracking-widest bg-red-950 text-red-400 border border-red-900/50 px-3 py-1 rounded-full shadow-lg">
+                        Offline Queue Locked
+                      </span>
                     </div>
-                    <div className="truncate text-xs text-muted-foreground">{ad.link_url || "no link"}</div>
-                  </div>
-
-                  <Select
-                    value={ad.category_id ?? ALL_VALUE}
-                    onValueChange={(v) => updateCategory(ad.id, v)}
-                  >
-                    <SelectTrigger className="w-[200px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value={ALL_VALUE}>All Products</SelectItem>
-                      {categories.map((c) => (
-                        <SelectItem key={c.id} value={c.id}>
-                          {c.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setExpandedId(expandedId === ad.id ? null : ad.id)}
-                  >
-                    <Settings2 className="mr-1 h-4 w-4" /> Adjust
-                  </Button>
-                  <div className="flex items-center gap-2">
-                    <Switch checked={ad.active} onCheckedChange={(v) => toggleActive(ad.id, v)} />
-                    <span className="text-xs">{ad.active ? "On" : "Off"}</span>
-                  </div>
-                  <Button variant="ghost" size="icon" onClick={() => remove(ad.id)}>
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
+                  )}
                 </div>
+
+                {/* Configuration Action Bar */}
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-4 pt-3 border-t border-slate-800/40">
+                  <div className="min-w-0 flex-1 space-y-0.5">
+                    <div className="truncate text-sm font-bold text-white">{ad.title || "(Untitled Asset Node)"}</div>
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-400">
+                      <span>
+                        Scope: <strong className="text-slate-300 font-semibold">{categoryName(ad.category_id)}</strong>
+                      </span>
+                      <span className="text-slate-600">•</span>
+                      <span className="truncate font-mono text-slate-500">
+                        {ad.link_url || "No link parameter mapping"}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-3">
+                    <Select value={ad.category_id ?? ALL_VALUE} onValueChange={(v) => updateCategory(ad.id, v)}>
+                      <SelectTrigger className="w-[170px] bg-[#0B0F17] border-slate-800 text-xs h-9 text-slate-200">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#141B2B] border-slate-800 text-slate-200 text-xs">
+                        <SelectItem value={ALL_VALUE}>All Products</SelectItem>
+                        {categories.map((c) => (
+                          <SelectItem key={c.id} value={c.id}>
+                            {c.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setExpandedId(expandedId === ad.id ? null : ad.id)}
+                      className={`h-9 text-xs font-bold uppercase tracking-wider border transition-all ${
+                        expandedId === ad.id
+                          ? "bg-[#FACC15] text-black border-[#FACC15] hover:bg-[#E2B80D]"
+                          : "bg-slate-900/80 text-slate-400 border-slate-800 hover:bg-slate-800 hover:text-white"
+                      }`}
+                    >
+                      <Settings2 className="mr-1.5 h-3.5 w-3.5" /> Coordinates
+                    </Button>
+
+                    <div className="flex items-center gap-2 bg-[#0B0F17] border border-slate-800 px-3 h-9 rounded-lg shadow-inner">
+                      <Switch
+                        checked={ad.active}
+                        onCheckedChange={(v) => toggleActive(ad.id, v)}
+                        className="data-[state=checked]:bg-[#FACC15] data-[state=unchecked]:bg-slate-800"
+                      />
+                      <span className="text-[11px] font-black uppercase tracking-wider w-6 text-center text-slate-400">
+                        {ad.active ? "On" : "Off"}
+                      </span>
+                    </div>
+
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => remove(ad.id)}
+                      className="h-9 w-9 text-slate-500 hover:text-red-400 hover:bg-red-950/30 rounded-lg border border-transparent hover:border-red-900/40 transition-colors"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Sub-Editor Frame Integration */}
                 {expandedId === ad.id && (
-                  <div className="mt-4 border-t border-border pt-4">
+                  <div className="mt-4 border-t border-slate-800/80 pt-4 bg-[#0B0F17]/30 p-4 rounded-xl border border-slate-800/50">
                     <BannerFitEditor ad={ad} onSave={(patch) => updateFit(ad.id, patch)} />
                   </div>
                 )}
@@ -342,25 +425,32 @@ function BannerFitEditor({
   const [focalY, setFocalY] = useState(ad.focal_y);
   const [zoom, setZoom] = useState(ad.zoom);
   const [saving, setSaving] = useState(false);
-  const dirty =
-    fitMode !== ad.fit_mode || focalX !== ad.focal_x || focalY !== ad.focal_y || zoom !== ad.zoom;
+  const dirty = fitMode !== ad.fit_mode || focalX !== ad.focal_x || focalY !== ad.focal_y || zoom !== ad.zoom;
 
   return (
-    <div className="space-y-3">
-      <AdFitPreview
-        imageUrl={ad.image_url}
-        fitMode={fitMode}
-        focalX={focalX}
-        focalY={focalY}
-        zoom={zoom}
-        onChange={(v) => {
-          setFitMode(v.fitMode);
-          setFocalX(v.focalX);
-          setFocalY(v.focalY);
-          setZoom(v.zoom);
-        }}
-      />
-      <div className="flex justify-end gap-2">
+    <div className="space-y-4">
+      <div className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">
+        <Sliders className="h-3.5 w-3.5 text-[#FACC15]" />
+        <span>Active Matrix Fine-Tuning</span>
+      </div>
+
+      <div className="rounded-lg border border-slate-800 bg-[#0B0F17] p-1">
+        <AdFitPreview
+          imageUrl={ad.image_url}
+          fitMode={fitMode}
+          focalX={focalX}
+          focalY={focalY}
+          zoom={zoom}
+          onChange={(v) => {
+            setFitMode(v.fitMode);
+            setFocalX(v.focalX);
+            setFocalY(v.focalY);
+            setZoom(v.zoom);
+          }}
+        />
+      </div>
+
+      <div className="flex justify-end gap-2 pt-1">
         <Button
           variant="outline"
           size="sm"
@@ -371,8 +461,9 @@ function BannerFitEditor({
             setFocalY(ad.focal_y);
             setZoom(ad.zoom);
           }}
+          className="bg-transparent border-slate-800 text-slate-400 hover:bg-slate-800 hover:text-white text-xs font-bold uppercase tracking-wider"
         >
-          Reset
+          Reset Engine
         </Button>
         <Button
           size="sm"
@@ -381,15 +472,16 @@ function BannerFitEditor({
             setSaving(true);
             try {
               await onSave({ fit_mode: fitMode, focal_x: focalX, focal_y: focalY, zoom });
-              toast.success("Saved");
+              toast.success("Coordinates updated");
             } catch (e: any) {
               toast.error(e?.message ?? "Save failed");
             } finally {
               setSaving(false);
             }
           }}
+          className="bg-[#FACC15] text-black hover:bg-[#E2B80D] text-xs font-bold uppercase tracking-wider px-4"
         >
-          {saving ? "Saving…" : "Save changes"}
+          {saving ? "Storing Matrix..." : "Apply Matrix"}
         </Button>
       </div>
     </div>
