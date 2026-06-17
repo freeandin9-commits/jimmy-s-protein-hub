@@ -22,7 +22,6 @@ import { SearchBar } from "@/components/SearchBar";
 import { CategoriesSection } from "@/components/CategoriesSection";
 import { InstagramSection } from "@/components/InstagramSection";
 import { TrustBadges } from "@/components/TrustBadges";
-import { TalkToUs } from "@/components/TalkToUs";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -322,9 +321,6 @@ function HomePage() {
       </section>
 
       <TrustBadges />
-
-      {/* TALK TO US */}
-      <TalkToUs />
 
       {/* INSTAGRAM SECTION */}
       <InstagramSection />
