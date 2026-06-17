@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, Link, useNavigate, useLocation } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client"; // Supabase client import ചെയ്യുക
 import {
   LayoutDashboard,
   ShoppingBag,
@@ -15,7 +16,8 @@ import {
   ImageIcon,
   Sparkles,
   FileText,
-  UserCheck, // About പേജിനുള്ള ഐക്കൺ
+  UserCheck,
+  Trash2, // Trash2 ഐക്കൺ ഇംപോർട്ട് ചെയ്തു
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -34,7 +36,7 @@ const navItems: NavItem[] = [
   { to: "/admin/products", label: "Products", icon: Package },
   { to: "/admin/categories", label: "Categories", icon: Tags },
   { to: "/admin/blogs", label: "Blogs", icon: FileText },
-  { to: "/admin/about", label: "About Page", icon: UserCheck }, // പുതിയ About സെക്ഷൻ ലിങ്ക്
+  { to: "/admin/about", label: "About Page", icon: UserCheck },
   { to: "/admin/hero", label: "Hero Section", icon: Sparkles },
   { to: "/admin/ads", label: "Ads", icon: Megaphone },
   { to: "/admin/shop-ads", label: "Shop Banners", icon: ImageIcon },
@@ -46,6 +48,7 @@ function AdminLayout() {
   const { user, isAdmin, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [isClearing, setIsClearing] = useState(false);
 
   useEffect(() => {
     if (loading) return;
@@ -58,6 +61,29 @@ function AdminLayout() {
       navigate({ to: "/" });
     }
   }, [user, isAdmin, loading, navigate]);
+
+  const handleClearHistory = async () => {
+    const confirmed = window.confirm(
+      "തീർച്ചയാണോ? എല്ലാ ഹിസ്റ്ററി ഡാറ്റയും ശാശ്വതമായി നീക്കം ചെയ്യപ്പെടും. ഇത് തിരിച്ചെടുക്കാൻ കഴിയില്ല.",
+    );
+
+    if (confirmed) {
+      setIsClearing(true);
+      try {
+        // ഇక్కడ 'your_history_table' മാറ്റി നിങ്ങളുടെ ടേബിളിന്റെ പേര് നൽകുക
+        const { error } = await supabase.from("your_history_table").delete().neq("id", 0);
+
+        if (error) throw error;
+
+        toast.success("ഹിസ്റ്ററി വിജയകരമായി ക്ലിയർ ചെയ്തു.");
+        window.location.reload();
+      } catch (err) {
+        toast.error("ഹിസ്റ്ററി ക്ലിയർ ചെയ്യുന്നതിൽ പരാജയപ്പെട്ടു.");
+      } finally {
+        setIsClearing(false);
+      }
+    }
+  };
 
   if (loading || !user || !isAdmin) {
     return (
@@ -77,7 +103,6 @@ function AdminLayout() {
 
   return (
     <div className="flex min-h-screen bg-zinc-950 text-zinc-100 antialiased selection:bg-yellow-400 selection:text-zinc-950">
-      {/* Sidebar (Desktop) */}
       <aside className="hidden w-64 flex-col border-r border-zinc-800 bg-zinc-900/50 backdrop-blur-md md:flex">
         <div className="flex h-20 items-center gap-2.5 border-b border-zinc-800/80 px-6">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-yellow-400 text-zinc-950 shadow-lg shadow-yellow-400/10">
@@ -114,67 +139,37 @@ function AdminLayout() {
         </nav>
 
         <div className="border-t border-zinc-800/80 p-4 space-y-2 bg-zinc-900/20">
+          <button
+            onClick={handleClearHistory}
+            disabled={isClearing}
+            className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-wider text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+            {isClearing ? "Clearing..." : "Clear Data History"}
+          </button>
+
           <Link
             to="/"
             className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-wider text-zinc-400 hover:bg-zinc-800/60 hover:text-yellow-400 transition-colors"
           >
-            <ExternalLink className="h-3.5 w-3.5" />
-            Live Storefront
+            <ExternalLink className="h-3.5 w-3.5" /> Live Storefront
           </Link>
+
           <button
             onClick={handleSignOut}
             className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-wider text-red-400 hover:bg-red-500/10 transition-colors"
           >
-            <LogOut className="h-3.5 w-3.5" />
-            Sign out
+            <LogOut className="h-3.5 w-3.5" /> Sign out
           </button>
 
           <div className="mt-2 border-t border-zinc-800/50 pt-3 px-3 flex items-center gap-2">
             <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            <p className="text-[10px] text-zinc-500 font-medium truncate flex-1" title={user.email ?? ""}>
-              {user.email}
-            </p>
+            <p className="text-[10px] text-zinc-500 font-medium truncate flex-1">{user.email}</p>
           </div>
         </div>
       </aside>
 
-      {/* Mobile Structure */}
       <div className="flex flex-1 flex-col min-w-0">
-        <header className="flex h-16 items-center justify-between border-b border-zinc-800 bg-zinc-900 px-4 md:hidden">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded bg-yellow-400 text-zinc-950">
-              <Dumbbell className="h-4 w-4 stroke-[2.5]" />
-            </div>
-            <span className="font-display font-black text-md tracking-wider text-yellow-400">JIMMY'S ADMIN</span>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleSignOut}
-            className="text-zinc-400 hover:text-red-400 hover:bg-red-500/10 h-9 w-9 p-0"
-          >
-            <LogOut className="h-4 w-4" />
-          </Button>
-        </header>
-
-        <nav className="flex gap-2 overflow-x-auto border-b border-zinc-800 bg-zinc-900/40 px-4 py-2.5 scrollbar-none md:hidden">
-          {navItems.map((item) => {
-            const active = item.exact ? location.pathname === item.to : location.pathname.startsWith(item.to);
-            return (
-              <Link
-                key={item.to}
-                to={item.to as any}
-                className={`flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-widest transition-colors ${
-                  active ? "bg-yellow-400 text-zinc-950" : "bg-zinc-800 text-zinc-400 hover:text-zinc-200"
-                }`}
-              >
-                <item.icon className="h-3 w-3" />
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
-
         <main className="flex-1 overflow-y-auto p-5 md:p-8 bg-zinc-950">
           <div className="mx-auto max-w-7xl">
             <Outlet />
