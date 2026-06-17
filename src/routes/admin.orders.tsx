@@ -123,7 +123,7 @@ function OrdersPage() {
                   const summary = items.map((i) => `${i.qty}× ${i.title}`).join(", ");
                   const orderRef =
                     typeof o.order_number === "number"
-                      ? formatOrderRef(o.order_number)
+                      ? formatOrderRef(o.order_number, o.created_at)
                       : `#${String(o.id).slice(0, 8)}`;
                   return (
                     <tr
