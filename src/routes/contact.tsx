@@ -100,6 +100,20 @@ function ContactPage() {
           <p className="mt-3 text-sm font-bold text-primary group-hover:underline">Chat now →</p>
         </a>
 
+        {settings.contact_phone && (
+          <a
+            href={`tel:${settings.contact_phone.replace(/[^0-9+]/g, "")}`}
+            className="group rounded-xl border border-border bg-card p-6 transition-all hover:border-primary hover:shadow-[var(--shadow-glow)]"
+          >
+            <Phone className="h-8 w-8 text-primary" />
+            <h3 className="mt-4 font-display text-2xl uppercase tracking-wide">Call</h3>
+            <p className="mt-1 text-sm text-muted-foreground">Talk to us directly. Quick answers.</p>
+            <p className="mt-3 text-sm font-bold text-primary group-hover:underline break-all">
+              {settings.contact_phone}
+            </p>
+          </a>
+        )}
+
         <a
           href={emailHref}
           className="group rounded-xl border border-border bg-card p-6 transition-all hover:border-primary hover:shadow-[var(--shadow-glow)]"
