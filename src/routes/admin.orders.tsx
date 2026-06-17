@@ -180,7 +180,7 @@ function OrdersPage() {
                 <div className="text-amber-400 font-mono text-xs font-bold tracking-widest uppercase mb-1">
                   ORDER REFERENCE:{" "}
                   {typeof selected.order_number === "number"
-                    ? formatOrderRef(selected.order_number)
+                    ? formatOrderRef(selected.order_number, selected.created_at)
                     : String(selected.id).slice(0, 8).toUpperCase()}
                 </div>
                 <SheetTitle className="font-display text-2xl font-black uppercase tracking-wider text-zinc-100">
