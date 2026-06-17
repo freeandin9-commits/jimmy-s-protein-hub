@@ -149,9 +149,13 @@ export function isAddressComplete(a: AddressDetails): boolean {
   );
 }
 
-// Format a numeric order number as "JP-0042"
-export function formatOrderRef(n: number): string {
-  return `JP-${String(n).padStart(4, "0")}`;
+// Format order ref as NSDDMMYYYY00000 (NS + Date + 5-digit order number)
+export function formatOrderRef(order_number: number, created_at: string): string {
+  const d = new Date(created_at);
+  const dd = String(d.getDate()).padStart(2, "0");
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const yyyy = d.getFullYear();
+  return `NS${dd}${mm}${yyyy}${String(order_number).padStart(5, "0")}`;
 }
 
 // Formats Indian phone for display: "98765 43210"
@@ -286,7 +290,7 @@ export async function logOrderToDatabase(
     });
     if (error) throw error;
     const num = typeof data === "number" ? data : null;
-    return { orderNumber: num, orderRef: num != null ? formatOrderRef(num) : "" };
+    return { orderNumber: num, orderRef: num != null ? formatOrderRef(num, new Date().toISOString()) : "" };
   } catch (err) {
     console.error("Order log failed:", err);
     return { orderNumber: null, orderRef: "" };

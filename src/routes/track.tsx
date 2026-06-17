@@ -37,10 +37,21 @@ function TrackPage() {
   const [result, setResult] = useState<any | null>(null);
   const [notFound, setNotFound] = useState(false);
 
+  const parseOrderInput = (input: string): number | null => {
+    const trimmed = input.trim();
+    const digits = trimmed.replace(/\D/g, "");
+    if (!digits) return null;
+    if (/^NS/i.test(trimmed) && digits.length > 8) {
+      // Full format NSDDMMYYYY00000 — last 5 digits are the order number
+      return parseInt(digits.slice(-5), 10);
+    }
+    return parseInt(digits, 10);
+  };
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const digits = orderRef.replace(/\D/g, "");
-    if (!digits) { toast.error("Enter your order number"); return; }
+    const orderNum = parseOrderInput(orderRef);
+    if (orderNum == null) { toast.error("Enter your order number"); return; }
     const phoneDigits = phone.replace(/\D/g, "");
     if (phoneDigits.length < 6) { toast.error("Enter the phone number you ordered with"); return; }
 
@@ -48,7 +59,7 @@ function TrackPage() {
     setNotFound(false);
     setResult(null);
     const { data, error } = await supabase.rpc("track_order" as any, {
-      p_order_number: parseInt(digits, 10),
+      p_order_number: orderNum,
       p_phone: phoneDigits,
     });
     setLoading(false);
@@ -81,7 +92,7 @@ function TrackPage() {
             <Label htmlFor="ref">Order number</Label>
             <Input
               id="ref"
-              placeholder="e.g. JP-0042 or 42"
+              placeholder="e.g. NS1706202600000 or 42"
               value={orderRef}
               onChange={(e) => setOrderRef(e.target.value)}
               className="mt-1"
@@ -118,7 +129,7 @@ function TrackPage() {
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Order</div>
-                <div className="font-mono text-lg font-bold">{formatOrderRef(result.order_number)}</div>
+                <div className="font-mono text-lg font-bold">{formatOrderRef(result.order_number, result.created_at)}</div>
                 <div className="text-xs text-muted-foreground">
                   Placed {new Date(result.created_at).toLocaleString()}
                 </div>
