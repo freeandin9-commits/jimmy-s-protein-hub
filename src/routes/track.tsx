@@ -129,7 +129,7 @@ function TrackPage() {
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Order</div>
-                <div className="font-mono text-lg font-bold">{formatOrderRef(result.order_number)}</div>
+                <div className="font-mono text-lg font-bold">{formatOrderRef(result.order_number, result.created_at)}</div>
                 <div className="text-xs text-muted-foreground">
                   Placed {new Date(result.created_at).toLocaleString()}
                 </div>
