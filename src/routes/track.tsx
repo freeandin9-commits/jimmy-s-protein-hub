@@ -37,10 +37,21 @@ function TrackPage() {
   const [result, setResult] = useState<any | null>(null);
   const [notFound, setNotFound] = useState(false);
 
+  const parseOrderInput = (input: string): number | null => {
+    const trimmed = input.trim();
+    const digits = trimmed.replace(/\D/g, "");
+    if (!digits) return null;
+    if (/^NS/i.test(trimmed) && digits.length > 8) {
+      // Full format NSDDMMYYYY00000 — last 5 digits are the order number
+      return parseInt(digits.slice(-5), 10);
+    }
+    return parseInt(digits, 10);
+  };
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const digits = orderRef.replace(/\D/g, "");
-    if (!digits) { toast.error("Enter your order number"); return; }
+    const orderNum = parseOrderInput(orderRef);
+    if (orderNum == null) { toast.error("Enter your order number"); return; }
     const phoneDigits = phone.replace(/\D/g, "");
     if (phoneDigits.length < 6) { toast.error("Enter the phone number you ordered with"); return; }
 
@@ -48,7 +59,7 @@ function TrackPage() {
     setNotFound(false);
     setResult(null);
     const { data, error } = await supabase.rpc("track_order" as any, {
-      p_order_number: parseInt(digits, 10),
+      p_order_number: orderNum,
       p_phone: phoneDigits,
     });
     setLoading(false);
