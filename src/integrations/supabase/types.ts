@@ -263,6 +263,7 @@ export type Database = {
       }
       site_settings: {
         Row: {
+          about_content: Json | null
           address: string
           business_hours: string
           contact_email: string
@@ -284,6 +285,7 @@ export type Database = {
           whatsapp_number: string
         }
         Insert: {
+          about_content?: Json | null
           address?: string
           business_hours?: string
           contact_email?: string
@@ -305,6 +307,7 @@ export type Database = {
           whatsapp_number?: string
         }
         Update: {
+          about_content?: Json | null
           address?: string
           business_hours?: string
           contact_email?: string
