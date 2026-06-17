@@ -92,7 +92,7 @@ function TrackPage() {
             <Label htmlFor="ref">Order number</Label>
             <Input
               id="ref"
-              placeholder="e.g. JP-0042 or 42"
+              placeholder="e.g. NS1706202600000 or 42"
               value={orderRef}
               onChange={(e) => setOrderRef(e.target.value)}
               className="mt-1"
