@@ -33,18 +33,23 @@ function AdminAboutPage() {
   });
 
   // Supabase-ൽ നിന്ന് നിലവിലുള്ള വിവരങ്ങൾ എടുക്കുക
+  const [settingsId, setSettingsId] = useState<string | null>(null);
+
   useEffect(() => {
     async function fetchAboutData() {
       try {
         const { data, error } = await supabase
           .from("site_settings")
-          .select("value")
-          .eq("key", "about_page_content")
-          .single();
+          .select("id, about_content")
+          .limit(1)
+          .maybeSingle();
 
-        if (error && error.code !== "PGRST116") throw error; // PGRST116 means row not found
-        if (data?.value) {
-          setFormData((prev) => ({ ...prev, ...data.value }));
+        if (error) throw error;
+        if (data) {
+          setSettingsId(data.id);
+          if (data.about_content && typeof data.about_content === "object") {
+            setFormData((prev) => ({ ...prev, ...(data.about_content as Record<string, string>) }));
+          }
         }
       } catch (err) {
         console.error("Error fetching about page settings:", err);
@@ -55,16 +60,16 @@ function AdminAboutPage() {
     fetchAboutData();
   }, []);
 
-  // Form സബ്മിറ്റ് ചെയ്യുമ്പോൾ Supabase-ലേക്ക് അപ്‌ഡേറ്റ് ചെയ്യുക
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
 
     try {
-      const { error } = await supabase.from("site_settings").upsert(
-        { key: "about_page_content", value: formData },
-        { onConflict: "key" }
-      );
+      if (!settingsId) throw new Error("Site settings row not found.");
+      const { error } = await supabase
+        .from("site_settings")
+        .update({ about_content: formData })
+        .eq("id", settingsId);
 
       if (error) throw error;
       toast.success("About page contents updated successfully!");
