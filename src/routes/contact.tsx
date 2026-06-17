@@ -87,7 +87,7 @@ function ContactPage() {
         Orders, refills, wholesale, sponsorships — easiest way is WhatsApp. We reply fast.
       </p>
 
-      <div className="mt-10 grid gap-6 md:grid-cols-3">
+      <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <a
           href={waLink}
           target="_blank"
