@@ -290,7 +290,7 @@ export async function logOrderToDatabase(
     });
     if (error) throw error;
     const num = typeof data === "number" ? data : null;
-    return { orderNumber: num, orderRef: num != null ? formatOrderRef(num) : "" };
+    return { orderNumber: num, orderRef: num != null ? formatOrderRef(num, new Date().toISOString()) : "" };
   } catch (err) {
     console.error("Order log failed:", err);
     return { orderNumber: null, orderRef: "" };
