@@ -46,11 +46,11 @@ function HomePage() {
   const [loading, setLoading] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
   const { settings } = useSiteSettings();
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const whatsappNumber = settings?.whatsapp_number || "919142027275";
   const displayPhone = settings?.contact_phone || "919142027275";
   const scrollRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
 
   const waUrl = `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, "")}?text=Hi,%20I'm%20interested%20in%20your%20products!`;
 
@@ -59,13 +59,6 @@ function HomePage() {
     if (!el) return;
     const amount = el.clientWidth * 0.8;
     el.scrollBy({ left: dir === "left" ? -amount : amount, behavior: "smooth" });
-  };
-
-  const toggleMute = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !videoRef.current.muted;
-      setIsMuted(videoRef.current.muted);
-    }
   };
 
   useEffect(() => {
@@ -197,13 +190,13 @@ function HomePage() {
 
             <div className="relative animate-[float_6s_ease-in-out_infinite] [transform-style:preserve-3d] [transform:rotateY(-8deg)_rotateX(4deg)]">
               {settings?.hero_media_type === "video" && settings?.hero_video_url ? (
-                <div className="relative group/video">
+                <div className="relative group">
                   <video
                     ref={videoRef}
                     src={settings.hero_video_url}
                     className="relative max-h-[520px] w-auto rounded-2xl object-cover"
                     autoPlay
-                    muted
+                    muted={isMuted}
                     loop
                     playsInline
                     style={{
@@ -212,16 +205,10 @@ function HomePage() {
                     }}
                   />
                   <button
-                    onClick={toggleMute}
-                    type="button"
-                    className="absolute bottom-4 right-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-md transition-all hover:bg-black/80 hover:scale-105"
-                    aria-label={isMuted ? "Unmute video" : "Mute video"}
+                    onClick={() => setIsMuted(!isMuted)}
+                    className="absolute bottom-4 right-4 rounded-full bg-black/50 p-2 text-white backdrop-blur-md transition hover:bg-black/70"
                   >
-                    {isMuted ? (
-                      <VolumeX className="h-5 w-5 text-destructive" />
-                    ) : (
-                      <Volume2 className="h-5 w-5 text-primary" />
-                    )}
+                    {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
                   </button>
                 </div>
               ) : (
