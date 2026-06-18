@@ -68,6 +68,25 @@ function HomePage() {
     }
   };
 
+  // IntersectionObserver to auto-mute when video leaves viewport
+  useEffect(() => {
+    const videoElement = videoRef.current;
+    if (!videoElement) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting && !videoElement.muted) {
+          videoElement.muted = true;
+          setIsMuted(true);
+        }
+      },
+      { threshold: 0.1 },
+    );
+
+    observer.observe(videoElement);
+    return () => observer.disconnect();
+  }, []);
+
   useEffect(() => {
     fetchProducts(6)
       .then((p) => {
@@ -203,7 +222,7 @@ function HomePage() {
                     src={settings.hero_video_url}
                     className="relative max-h-[520px] w-auto rounded-2xl object-cover"
                     autoPlay
-                    muted
+                    muted={isMuted}
                     loop
                     playsInline
                     style={{
