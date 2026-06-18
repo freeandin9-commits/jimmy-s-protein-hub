@@ -77,6 +77,27 @@ function HomePage() {
       .catch(() => setLoading(false));
   }, []);
 
+  // Auto-mute hero video when it scrolls out of view
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting && !video.muted) {
+            video.muted = true;
+            setIsMuted(true);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(video);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div className="relative w-full">
       {/* SEARCH BAR & ADS STRIP */}
