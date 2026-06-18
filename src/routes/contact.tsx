@@ -9,7 +9,8 @@ export const Route = createFileRoute("/contact")({
       { title: "Contact — Jimmy's Protein" },
       {
         name: "description",
-        content: "Questions about products, orders, or wholesale? Reach Jimmy's Protein on WhatsApp, email, or social.",
+        content:
+          "Questions about products, orders, or wholesale? Reach Jimmy's Protein on call, WhatsApp, email, or social.",
       },
       { property: "og:title", content: "Contact — Jimmy's Protein" },
       { property: "og:description", content: "Get in touch with Jimmy's Protein." },
@@ -39,7 +40,6 @@ function ContactPage() {
   const emailHref = settings.contact_email ? `mailto:${settings.contact_email}` : "#";
   const instagramHref = settings.instagram_url || "#";
 
-  // Safe fallback parsing for settings.faq to prevent type errors
   let faqList: FAQItem[] = [];
   const faqRaw = (settings as any).faq;
   if (faqRaw && Array.isArray(faqRaw)) {
@@ -49,7 +49,6 @@ function ContactPage() {
     }));
   }
 
-  // If empty, use default ones
   if (faqList.length === 0) {
     faqList = [
       {
@@ -84,22 +83,12 @@ function ContactPage() {
       <p className="text-sm font-bold uppercase tracking-widest text-primary">Get in touch</p>
       <h1 className="mt-2 font-display text-5xl uppercase tracking-wide md:text-6xl">Talk to us</h1>
       <p className="mt-3 max-w-xl text-muted-foreground">
-        Orders, refills, wholesale, sponsorships — easiest way is WhatsApp. We reply fast.
+        Orders, refills, wholesale, sponsorships — reach out to us via call, WhatsApp, or email.
       </p>
 
+      {/* ക്രമം: Call -> WhatsApp -> Email -> Instagram */}
       <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <a
-          href={waLink}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group rounded-xl border border-border bg-card p-6 transition-all hover:border-primary hover:shadow-[var(--shadow-glow)]"
-        >
-          <MessageCircle className="h-8 w-8 text-primary" />
-          <h3 className="mt-4 font-display text-2xl uppercase tracking-wide">WhatsApp</h3>
-          <p className="mt-1 text-sm text-muted-foreground">Fastest reply. Order, ask anything.</p>
-          <p className="mt-3 text-sm font-bold text-primary group-hover:underline">Chat now →</p>
-        </a>
-
+        {/* 1. Call */}
         {settings.contact_phone && (
           <a
             href={`tel:${settings.contact_phone.replace(/[^0-9+]/g, "")}`}
@@ -114,6 +103,20 @@ function ContactPage() {
           </a>
         )}
 
+        {/* 2. WhatsApp */}
+        <a
+          href={waLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group rounded-xl border border-border bg-card p-6 transition-all hover:border-primary hover:shadow-[var(--shadow-glow)]"
+        >
+          <MessageCircle className="h-8 w-8 text-primary" />
+          <h3 className="mt-4 font-display text-2xl uppercase tracking-wide">WhatsApp</h3>
+          <p className="mt-1 text-sm text-muted-foreground">Fastest reply. Order, ask anything.</p>
+          <p className="mt-3 text-sm font-bold text-primary group-hover:underline">Chat now →</p>
+        </a>
+
+        {/* 3. Email */}
         <a
           href={emailHref}
           className="group rounded-xl border border-border bg-card p-6 transition-all hover:border-primary hover:shadow-[var(--shadow-glow)]"
@@ -126,6 +129,7 @@ function ContactPage() {
           </p>
         </a>
 
+        {/* 4. Instagram */}
         <a
           href={instagramHref}
           target="_blank"
