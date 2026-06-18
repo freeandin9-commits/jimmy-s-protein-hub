@@ -23,8 +23,8 @@ export function Header() {
   return (
     <header className="bg-black text-white border-b border-zinc-800 shadow-sm">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        {/* ലോഗോ കൺടൈനർ (ഇടത് വശം) */}
-        <div className="flex-shrink-0">
+        {/* ലോഗോ കൺടൈനർ: flex-shrink-0 ഉപയോഗിച്ച് ഇതിനെ ഇടത് വശത്ത് തന്നെ നിർത്തുന്നു */}
+        <div className="flex items-center flex-shrink-0 mr-4">
           <Link to="/" className="flex items-center" aria-label="Nutrin Sports home">
             <img
               src={logoSrc}
@@ -34,8 +34,8 @@ export function Header() {
           </Link>
         </div>
 
-        {/* Desktop Navigation Links (മധ്യഭാഗത്തേക്ക് ക്രമീകരിച്ചു) */}
-        <nav className="hidden items-center gap-8 md:flex flex-1 justify-center">
+        {/* Desktop Navigation Links: flex-grow ഇല്ലാത്തതുകൊണ്ട് ഇത് ലോഗോയ്ക്ക് ശേഷം വരുന്നു */}
+        <nav className="hidden md:flex items-center gap-8 flex-grow justify-center">
           <Link to="/" {...navLinkProps}>
             Home
           </Link>
@@ -56,7 +56,7 @@ export function Header() {
           </Link>
         </nav>
 
-        {/* Action Controls (വലത് വശം) */}
+        {/* Action Controls: വലത് വശത്ത് ഐക്കണുകൾ */}
         <div className="flex items-center gap-2 flex-shrink-0">
           <Button
             asChild
