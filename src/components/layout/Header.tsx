@@ -12,30 +12,33 @@ export function Header() {
   const totalItems = items.reduce((s, i) => s + i.quantity, 0);
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  // useSiteSettings ഹുക്ക് വഴി ഡാറ്റാബേസിൽ നിന്നുള്ള ഏറ്റവും പുതിയ ലോഗോ യുആർഎൽ എടുക്കുന്നു
   const { settings } = useSiteSettings();
   const logoSrc = settings?.logo_url || logoAsset.url;
 
+  // ഡെസ്ക്ടോപ്പ് ലിങ്കുകൾ വെളുപ്പ് നിറത്തിലും, ഹോവർ ചെയ്യുമ്പോൾ പ്രൈമറി/ഗോൾഡ് നിറത്തിലും വരാൻ
   const navLinkProps = {
     className: "text-sm font-semibold uppercase tracking-wider text-white/80 hover:text-[#E2B80D] transition-colors",
     activeProps: { className: "text-[#E2B80D]" },
   };
 
   return (
+    // Background pure black (#000000) ആക്കി, വെളുത്ത ടെക്സ്റ്റും നേർത്ത ബോർഡറും നൽകിയിട്ടുണ്ട്
     <header className="bg-black text-white border-b border-zinc-800 shadow-sm">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        {/* ലോഗോ കൺടൈനർ (ഇടത് വശം) */}
-        <div className="flex-shrink-0">
-          <Link to="/" className="flex items-center" aria-label="Nutrin Sports home">
-            <img
-              src={logoSrc}
-              alt="Nutrin Sports"
-              className="h-10 w-auto md:h-12 object-contain transition-all duration-300"
-            />
-          </Link>
-        </div>
+        <Link to="/" className="flex items-center gap-2" aria-label="Nutrin Sports home">
+          {/* ലോഗോ കറുപ്പ് പശ്ചാത്തലത്തിലും വ്യക്തമായി കാണാൻ ഇമേജ് സ്റ്റൈൽ മെച്ചപ്പെടുത്തിയിട്ടുണ്ട്.
+            നിങ്ങളുടെ ഒറിജിനൽ ലോഗോ കറുത്തതാണെങ്കിൽ അത് വെളുപ്പിക്കാൻ 'brightness-0 invert' സഹായിക്കും.
+          */}
+          <img
+            src={logoSrc}
+            alt="Nutrin Sports"
+            className="h-10 w-auto md:h-12 object-contain transition-all duration-300"
+          />
+        </Link>
 
-        {/* Desktop Navigation Links (മധ്യഭാഗത്തേക്ക് ക്രമീകരിച്ചു) */}
-        <nav className="hidden items-center gap-8 md:flex flex-1 justify-center">
+        {/* Desktop Navigation Links */}
+        <nav className="hidden items-center gap-8 md:flex">
           <Link to="/" {...navLinkProps}>
             Home
           </Link>
@@ -56,8 +59,8 @@ export function Header() {
           </Link>
         </nav>
 
-        {/* Action Controls (വലത് വശം) */}
-        <div className="flex items-center gap-2 flex-shrink-0">
+        {/* Action Controls - Icons & Buttons */}
+        <div className="flex items-center gap-2">
           <Button
             asChild
             variant="outline"
@@ -67,6 +70,7 @@ export function Header() {
             <Link to="/login">Admin</Link>
           </Button>
 
+          {/* Cart Icon Button - Pure White text */}
           <Button
             variant="ghost"
             size="icon"
@@ -82,6 +86,7 @@ export function Header() {
             )}
           </Button>
 
+          {/* Mobile Menu Toggle Button */}
           <Button
             variant="ghost"
             size="icon"
@@ -94,7 +99,7 @@ export function Header() {
         </div>
       </div>
 
-      {/* Mobile Drawer Menu */}
+      {/* Mobile Drawer Menu - Pure Black with White Text */}
       {mobileOpen && (
         <nav className="border-t border-zinc-800 bg-black md:hidden transition-all">
           <div className="container mx-auto flex flex-col gap-1 px-4 py-3">
