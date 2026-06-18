@@ -85,18 +85,21 @@ function HomePage() {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (!entry.isIntersecting && !video.muted) {
-            video.muted = true;
-            setIsMuted(true);
+          // Mute as soon as more than half of the video is out of view
+          if (entry.intersectionRatio < 0.5) {
+            if (!video.muted) {
+              video.muted = true;
+              setIsMuted(true);
+            }
           }
         });
       },
-      { threshold: 0.1 }
+      { threshold: [0, 0.25, 0.5, 0.75, 1] }
     );
 
     observer.observe(video);
     return () => observer.disconnect();
-  }, []);
+  }, [settings?.hero_media_type, settings?.hero_video_url]);
 
   return (
     <div className="relative w-full">
