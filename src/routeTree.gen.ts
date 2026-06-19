@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TrackRouteImport } from './routes/track'
 import { Route as ProductsRouteImport } from './routes/products'
+import { Route as OrdersRouteImport } from './routes/orders'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as BlogRouteImport } from './routes/blog'
@@ -38,6 +39,11 @@ const TrackRoute = TrackRouteImport.update({
 const ProductsRoute = ProductsRouteImport.update({
   id: '/products',
   path: '/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrdersRoute = OrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -138,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/login': typeof LoginRoute
+  '/orders': typeof OrdersRoute
   '/products': typeof ProductsRoute
   '/track': typeof TrackRoute
   '/admin/about': typeof AdminAboutRoute
@@ -159,6 +166,7 @@ export interface FileRoutesByTo {
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/login': typeof LoginRoute
+  '/orders': typeof OrdersRoute
   '/products': typeof ProductsRoute
   '/track': typeof TrackRoute
   '/admin/about': typeof AdminAboutRoute
@@ -182,6 +190,7 @@ export interface FileRoutesById {
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/login': typeof LoginRoute
+  '/orders': typeof OrdersRoute
   '/products': typeof ProductsRoute
   '/track': typeof TrackRoute
   '/admin/about': typeof AdminAboutRoute
@@ -206,6 +215,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/contact'
     | '/login'
+    | '/orders'
     | '/products'
     | '/track'
     | '/admin/about'
@@ -227,6 +237,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/contact'
     | '/login'
+    | '/orders'
     | '/products'
     | '/track'
     | '/admin/about'
@@ -249,6 +260,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/contact'
     | '/login'
+    | '/orders'
     | '/products'
     | '/track'
     | '/admin/about'
@@ -272,6 +284,7 @@ export interface RootRouteChildren {
   BlogRoute: typeof BlogRoute
   ContactRoute: typeof ContactRoute
   LoginRoute: typeof LoginRoute
+  OrdersRoute: typeof OrdersRoute
   ProductsRoute: typeof ProductsRoute
   TrackRoute: typeof TrackRoute
   ProductHandleRoute: typeof ProductHandleRoute
@@ -291,6 +304,13 @@ declare module '@tanstack/react-router' {
       path: '/products'
       fullPath: '/products'
       preLoaderRoute: typeof ProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/orders': {
+      id: '/orders'
+      path: '/orders'
+      fullPath: '/orders'
+      preLoaderRoute: typeof OrdersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -459,6 +479,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogRoute: BlogRoute,
   ContactRoute: ContactRoute,
   LoginRoute: LoginRoute,
+  OrdersRoute: OrdersRoute,
   ProductsRoute: ProductsRoute,
   TrackRoute: TrackRoute,
   ProductHandleRoute: ProductHandleRoute,

@@ -48,6 +48,9 @@ export function Header() {
           <Link to="/track" {...navLinkProps}>
             Track Order
           </Link>
+          <Link to="/orders" {...navLinkProps}>
+            My Orders
+          </Link>
           <Link to="/about" {...navLinkProps}>
             About
           </Link>
