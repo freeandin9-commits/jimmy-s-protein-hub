@@ -110,6 +110,7 @@ export function Header() {
               { to: "/", label: "Home" },
               { to: "/products", label: "Shop" },
               { to: "/track", label: "Track Order" },
+              { to: "/orders", label: "My Orders" },
               { to: "/about", label: "About" },
               { to: "/blog", label: "Blog" },
               { to: "/contact", label: "Contact" },
