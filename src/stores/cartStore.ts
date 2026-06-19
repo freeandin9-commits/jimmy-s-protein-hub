@@ -243,6 +243,39 @@ export function buildWhatsAppOrderUrl(
   return `https://wa.me/${whatsappNumber}?text=${text}`;
 }
 
+export interface SavedOrderRef {
+  orderNumber: number;
+  phone: string;
+  createdAt: string;
+}
+
+const ORDER_HISTORY_KEY = "nutrin-order-history";
+
+export function getSavedOrders(): SavedOrderRef[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(ORDER_HISTORY_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveOrderRef(ref: SavedOrderRef) {
+  if (typeof window === "undefined") return;
+  const existing = getSavedOrders().filter((o) => o.orderNumber !== ref.orderNumber);
+  const next = [ref, ...existing].slice(0, 50);
+  localStorage.setItem(ORDER_HISTORY_KEY, JSON.stringify(next));
+}
+
+export function removeSavedOrder(orderNumber: number) {
+  if (typeof window === "undefined") return;
+  const next = getSavedOrders().filter((o) => o.orderNumber !== orderNumber);
+  localStorage.setItem(ORDER_HISTORY_KEY, JSON.stringify(next));
+}
+
 export async function logOrderToDatabase(
   items: CartItem[],
   customer: CustomerDetails,
@@ -262,6 +295,7 @@ export async function logOrderToDatabase(
   }
   if (customer.notes) notesParts.push(`Notes: ${customer.notes}`);
 
+  const normalizedPhone = normalizeIndianPhone(customer.phone);
   const payload = {
     items: items.map((i) => ({
       productId: i.productId,
@@ -275,7 +309,7 @@ export async function logOrderToDatabase(
     currency,
     status: "pending" as const,
     customer_name: customer.name,
-    customer_phone: normalizeIndianPhone(customer.phone),
+    customer_phone: normalizedPhone,
     notes: notesParts.join("\n").slice(0, 1000),
   };
   try {
@@ -290,7 +324,11 @@ export async function logOrderToDatabase(
     });
     if (error) throw error;
     const num = typeof data === "number" ? data : null;
-    return { orderNumber: num, orderRef: num != null ? formatOrderRef(num, new Date().toISOString()) : "" };
+    const createdAt = new Date().toISOString();
+    if (num != null) {
+      saveOrderRef({ orderNumber: num, phone: normalizedPhone, createdAt });
+    }
+    return { orderNumber: num, orderRef: num != null ? formatOrderRef(num, createdAt) : "" };
   } catch (err) {
     console.error("Order log failed:", err);
     return { orderNumber: null, orderRef: "" };

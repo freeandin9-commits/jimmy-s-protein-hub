@@ -48,6 +48,9 @@ export function Header() {
           <Link to="/track" {...navLinkProps}>
             Track Order
           </Link>
+          <Link to="/orders" {...navLinkProps}>
+            My Orders
+          </Link>
           <Link to="/about" {...navLinkProps}>
             About
           </Link>
@@ -107,6 +110,7 @@ export function Header() {
               { to: "/", label: "Home" },
               { to: "/products", label: "Shop" },
               { to: "/track", label: "Track Order" },
+              { to: "/orders", label: "My Orders" },
               { to: "/about", label: "About" },
               { to: "/blog", label: "Blog" },
               { to: "/contact", label: "Contact" },
