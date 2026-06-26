@@ -84,28 +84,42 @@ function OrdersPage() {
             All WhatsApp checkout orders are auto-logged here.
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-xs font-bold uppercase tracking-widest text-zinc-500 hidden sm:inline">Status:</span>
-          <Select value={filter} onValueChange={(v) => setFilter(v as any)}>
-            <SelectTrigger className="w-44 bg-zinc-900 border-zinc-800 text-zinc-200 focus:ring-1 focus:ring-amber-400">
-              <SelectValue placeholder="All Orders" />
-            </SelectTrigger>
-            <SelectContent className="bg-zinc-900 border-zinc-800 text-zinc-200">
-              <SelectItem value="all" className="focus:bg-amber-400 focus:text-zinc-950 font-medium">
-                All Orders
-              </SelectItem>
-              {STATUSES.map((s) => (
-                <SelectItem
-                  key={s}
-                  value={s}
-                  className="focus:bg-amber-400 focus:text-zinc-950 uppercase text-xs font-bold"
-                >
-                  {s}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+          <input
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search order #, phone, name, item..."
+            className="w-full sm:w-72 bg-zinc-900 border border-zinc-800 rounded-md px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-amber-400"
+          />
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-bold uppercase tracking-widest text-zinc-500 hidden sm:inline">Status:</span>
+            <Select value={filter} onValueChange={(v) => setFilter(v as any)}>
+              <SelectTrigger className="w-44 bg-zinc-900 border-zinc-800 text-zinc-200 focus:ring-1 focus:ring-amber-400">
+                <SelectValue placeholder="All Orders" />
+              </SelectTrigger>
+              <SelectContent className="bg-zinc-900 border-zinc-800 text-zinc-200">
+                <SelectItem value="all" className="focus:bg-amber-400 focus:text-zinc-950 font-medium">
+                  All Orders
                 </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+                {STATUSES.map((s) => (
+                  <SelectItem
+                    key={s}
+                    value={s}
+                    className="focus:bg-amber-400 focus:text-zinc-950 uppercase text-xs font-bold"
+                  >
+                    {s}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
+      </div>
+
+      {/* Result count */}
+      <div className="text-xs text-zinc-500 uppercase tracking-widest">
+        {isLoading ? "Loading..." : `${filtered.length} order${filtered.length === 1 ? "" : "s"}${search ? ` matching "${search}"` : ""}`}
       </div>
 
       {/* Main Table Container */}
