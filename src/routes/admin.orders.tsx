@@ -7,6 +7,7 @@ import { formatOrderRef } from "@/stores/cartStore";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { toast } from "sonner";
+import { Copy, Share2 } from "lucide-react";
 
 export const Route = createFileRoute("/admin/orders")({
   component: OrdersPage,
