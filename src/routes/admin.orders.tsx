@@ -147,14 +147,14 @@ function OrdersPage() {
                     </div>
                   </td>
                 </tr>
-              ) : (data ?? []).length === 0 ? (
+              ) : filtered.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="p-12 text-center text-zinc-500 font-medium tracking-wide">
                     No orders found.
                   </td>
                 </tr>
               ) : (
-                (data ?? []).map((o: any) => {
+                filtered.map((o: any) => {
                   const items = (o.items as any[]) ?? [];
                   const summary = items.map((i) => `${i.qty}× ${i.title}`).join(", ");
                   const orderRef =
