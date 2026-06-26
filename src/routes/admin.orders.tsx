@@ -201,8 +201,22 @@ function OrdersPage() {
                       className="transition-colors hover:bg-zinc-800/40 cursor-pointer group"
                       onClick={() => setSelected(o)}
                     >
-                      <td className="p-4 font-mono text-xs font-bold text-amber-400 group-hover:text-amber-300">
-                        {orderRef}
+                      <td className="p-4">
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono text-xs font-bold text-amber-400 group-hover:text-amber-300">
+                            {orderRef}
+                          </span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              copyOrderNumber(orderRef);
+                            }}
+                            className="p-1 rounded hover:bg-zinc-800 text-zinc-500 hover:text-amber-400 transition-colors"
+                            title="Copy order number"
+                          >
+                            <Copy className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </td>
                       <td className="p-4 text-xs text-zinc-400">
                         {new Date(o.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric" })} ·{" "}
