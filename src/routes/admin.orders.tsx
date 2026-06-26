@@ -26,6 +26,7 @@ const statusColors: Record<Status, string> = {
 function OrdersPage() {
   const qc = useQueryClient();
   const [filter, setFilter] = useState<Status | "all">("all");
+  const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<any | null>(null);
 
   const { data, isLoading } = useQuery({
@@ -37,6 +38,27 @@ function OrdersPage() {
       if (error) throw error;
       return data ?? [];
     },
+  });
+
+  const normalized = search.trim().toLowerCase();
+  const digitsOnly = normalized.replace(/\D/g, "");
+  const filtered = (data ?? []).filter((o: any) => {
+    if (!normalized) return true;
+    const ref =
+      typeof o.order_number === "number" ? formatOrderRef(o.order_number, o.created_at).toLowerCase() : "";
+    const orderNum = typeof o.order_number === "number" ? String(o.order_number) : "";
+    const phone = (o.customer_phone || "").replace(/\D/g, "");
+    const name = (o.customer_name || "").toLowerCase();
+    const notes = (o.notes || "").toLowerCase();
+    const itemTitles = ((o.items as any[]) ?? []).map((i) => (i.title || "").toLowerCase()).join(" ");
+    return (
+      ref.includes(normalized) ||
+      orderNum.includes(digitsOnly) ||
+      (!!digitsOnly && phone.includes(digitsOnly)) ||
+      name.includes(normalized) ||
+      notes.includes(normalized) ||
+      itemTitles.includes(normalized)
+    );
   });
 
   const updateStatus = async (id: string, status: Status) => {
