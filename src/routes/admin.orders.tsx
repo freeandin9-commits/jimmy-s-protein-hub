@@ -7,6 +7,7 @@ import { formatOrderRef } from "@/stores/cartStore";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { toast } from "sonner";
+import { Copy, Share2 } from "lucide-react";
 
 export const Route = createFileRoute("/admin/orders")({
   component: OrdersPage,
@@ -60,6 +61,39 @@ function OrdersPage() {
       itemTitles.includes(normalized)
     );
   });
+
+  const copyOrderNumber = async (orderRef: string) => {
+    try {
+      await navigator.clipboard.writeText(orderRef);
+      toast.success("Order number copied!");
+    } catch {
+      toast.error("Failed to copy");
+    }
+  };
+
+  const buildStatusMessage = (order: any) => {
+    const ref =
+      typeof order.order_number === "number"
+        ? formatOrderRef(order.order_number, order.created_at)
+        : `#${String(order.id).slice(0, 8).toUpperCase()}`;
+    const name = order.customer_name ? `Hi ${order.customer_name},` : "Hi,";
+    const statusText = order.status?.toUpperCase() || "UPDATED";
+    const items = ((order.items as any[]) ?? [])
+      .map((i) => `${i.qty}× ${i.title}`)
+      .join("\n");
+    return `${name}\n\nYour order *${ref}* is now *${statusText}*.\n\n${items ? `Items:\n${items}\n\n` : ""}Thank you for shopping with Nutrin Sports!`;
+  };
+
+  const shareStatus = (order: any) => {
+    const message = buildStatusMessage(order);
+    const phone = (order.customer_phone || "").replace(/\D/g, "");
+    if (phone) {
+      const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+      window.open(url, "_blank");
+    } else {
+      navigator.clipboard.writeText(message).then(() => toast.success("Status message copied!")).catch(() => toast.error("Failed to copy"));
+    }
+  };
 
   const updateStatus = async (id: string, status: Status) => {
     const { error } = await supabase.from("orders").update({ status }).eq("id", id);
@@ -167,8 +201,22 @@ function OrdersPage() {
                       className="transition-colors hover:bg-zinc-800/40 cursor-pointer group"
                       onClick={() => setSelected(o)}
                     >
-                      <td className="p-4 font-mono text-xs font-bold text-amber-400 group-hover:text-amber-300">
-                        {orderRef}
+                      <td className="p-4">
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono text-xs font-bold text-amber-400 group-hover:text-amber-300">
+                            {orderRef}
+                          </span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              copyOrderNumber(orderRef);
+                            }}
+                            className="p-1 rounded hover:bg-zinc-800 text-zinc-500 hover:text-amber-400 transition-colors"
+                            title="Copy order number"
+                          >
+                            <Copy className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </td>
                       <td className="p-4 text-xs text-zinc-400">
                         {new Date(o.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric" })} ·{" "}
@@ -213,13 +261,37 @@ function OrdersPage() {
           {selected && (
             <>
               <SheetHeader className="border-b border-zinc-800 pb-4 mb-6">
-                <div className="text-amber-400 font-mono text-xs font-bold tracking-widest uppercase mb-1">
-                  ORDER REFERENCE:{" "}
-                  {typeof selected.order_number === "number"
-                    ? formatOrderRef(selected.order_number, selected.created_at)
-                    : String(selected.id).slice(0, 8).toUpperCase()}
+                <div className="flex items-center justify-between">
+                  <div className="text-amber-400 font-mono text-xs font-bold tracking-widest uppercase">
+                    ORDER REFERENCE:{" "}
+                    {typeof selected.order_number === "number"
+                      ? formatOrderRef(selected.order_number, selected.created_at)
+                      : String(selected.id).slice(0, 8).toUpperCase()}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() =>
+                        copyOrderNumber(
+                          typeof selected.order_number === "number"
+                            ? formatOrderRef(selected.order_number, selected.created_at)
+                            : String(selected.id).slice(0, 8).toUpperCase()
+                        )
+                      }
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-amber-400 text-[10px] font-bold uppercase tracking-wider transition-colors border border-zinc-700"
+                      title="Copy order number"
+                    >
+                      <Copy className="w-3 h-3" /> Copy
+                    </button>
+                    <button
+                      onClick={() => shareStatus(selected)}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-amber-400 hover:bg-amber-300 text-zinc-950 text-[10px] font-bold uppercase tracking-wider transition-colors"
+                      title="Share status with customer"
+                    >
+                      <Share2 className="w-3 h-3" /> Share Status
+                    </button>
+                  </div>
                 </div>
-                <SheetTitle className="font-display text-2xl font-black uppercase tracking-wider text-zinc-100">
+                <SheetTitle className="font-display text-2xl font-black uppercase tracking-wider text-zinc-100 mt-3">
                   ORDER DETAILS
                 </SheetTitle>
               </SheetHeader>
