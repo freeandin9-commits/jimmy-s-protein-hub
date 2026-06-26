@@ -62,6 +62,39 @@ function OrdersPage() {
     );
   });
 
+  const copyOrderNumber = async (orderRef: string) => {
+    try {
+      await navigator.clipboard.writeText(orderRef);
+      toast.success("Order number copied!");
+    } catch {
+      toast.error("Failed to copy");
+    }
+  };
+
+  const buildStatusMessage = (order: any) => {
+    const ref =
+      typeof order.order_number === "number"
+        ? formatOrderRef(order.order_number, order.created_at)
+        : `#${String(order.id).slice(0, 8).toUpperCase()}`;
+    const name = order.customer_name ? `Hi ${order.customer_name},` : "Hi,";
+    const statusText = order.status?.toUpperCase() || "UPDATED";
+    const items = ((order.items as any[]) ?? [])
+      .map((i) => `${i.qty}× ${i.title}`)
+      .join("\n");
+    return `${name}\n\nYour order *${ref}* is now *${statusText}*.\n\n${items ? `Items:\n${items}\n\n` : ""}Thank you for shopping with Nutrin Sports!`;
+  };
+
+  const shareStatus = (order: any) => {
+    const message = buildStatusMessage(order);
+    const phone = (order.customer_phone || "").replace(/\D/g, "");
+    if (phone) {
+      const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+      window.open(url, "_blank");
+    } else {
+      navigator.clipboard.writeText(message).then(() => toast.success("Status message copied!")).catch(() => toast.error("Failed to copy"));
+    }
+  };
+
   const updateStatus = async (id: string, status: Status) => {
     const { error } = await supabase.from("orders").update({ status }).eq("id", id);
     if (error) {
