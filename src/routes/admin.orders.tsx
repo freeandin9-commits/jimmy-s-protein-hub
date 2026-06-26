@@ -261,13 +261,37 @@ function OrdersPage() {
           {selected && (
             <>
               <SheetHeader className="border-b border-zinc-800 pb-4 mb-6">
-                <div className="text-amber-400 font-mono text-xs font-bold tracking-widest uppercase mb-1">
-                  ORDER REFERENCE:{" "}
-                  {typeof selected.order_number === "number"
-                    ? formatOrderRef(selected.order_number, selected.created_at)
-                    : String(selected.id).slice(0, 8).toUpperCase()}
+                <div className="flex items-center justify-between">
+                  <div className="text-amber-400 font-mono text-xs font-bold tracking-widest uppercase">
+                    ORDER REFERENCE:{" "}
+                    {typeof selected.order_number === "number"
+                      ? formatOrderRef(selected.order_number, selected.created_at)
+                      : String(selected.id).slice(0, 8).toUpperCase()}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() =>
+                        copyOrderNumber(
+                          typeof selected.order_number === "number"
+                            ? formatOrderRef(selected.order_number, selected.created_at)
+                            : String(selected.id).slice(0, 8).toUpperCase()
+                        )
+                      }
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-amber-400 text-[10px] font-bold uppercase tracking-wider transition-colors border border-zinc-700"
+                      title="Copy order number"
+                    >
+                      <Copy className="w-3 h-3" /> Copy
+                    </button>
+                    <button
+                      onClick={() => shareStatus(selected)}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-amber-400 hover:bg-amber-300 text-zinc-950 text-[10px] font-bold uppercase tracking-wider transition-colors"
+                      title="Share status with customer"
+                    >
+                      <Share2 className="w-3 h-3" /> Share Status
+                    </button>
+                  </div>
                 </div>
-                <SheetTitle className="font-display text-2xl font-black uppercase tracking-wider text-zinc-100">
+                <SheetTitle className="font-display text-2xl font-black uppercase tracking-wider text-zinc-100 mt-3">
                   ORDER DETAILS
                 </SheetTitle>
               </SheetHeader>
