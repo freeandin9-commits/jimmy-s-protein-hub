@@ -26,6 +26,7 @@ const statusColors: Record<Status, string> = {
 function OrdersPage() {
   const qc = useQueryClient();
   const [filter, setFilter] = useState<Status | "all">("all");
+  const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<any | null>(null);
 
   const { data, isLoading } = useQuery({
@@ -37,6 +38,27 @@ function OrdersPage() {
       if (error) throw error;
       return data ?? [];
     },
+  });
+
+  const normalized = search.trim().toLowerCase();
+  const digitsOnly = normalized.replace(/\D/g, "");
+  const filtered = (data ?? []).filter((o: any) => {
+    if (!normalized) return true;
+    const ref =
+      typeof o.order_number === "number" ? formatOrderRef(o.order_number, o.created_at).toLowerCase() : "";
+    const orderNum = typeof o.order_number === "number" ? String(o.order_number) : "";
+    const phone = (o.customer_phone || "").replace(/\D/g, "");
+    const name = (o.customer_name || "").toLowerCase();
+    const notes = (o.notes || "").toLowerCase();
+    const itemTitles = ((o.items as any[]) ?? []).map((i) => (i.title || "").toLowerCase()).join(" ");
+    return (
+      ref.includes(normalized) ||
+      orderNum.includes(digitsOnly) ||
+      (!!digitsOnly && phone.includes(digitsOnly)) ||
+      name.includes(normalized) ||
+      notes.includes(normalized) ||
+      itemTitles.includes(normalized)
+    );
   });
 
   const updateStatus = async (id: string, status: Status) => {
@@ -62,28 +84,42 @@ function OrdersPage() {
             All WhatsApp checkout orders are auto-logged here.
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-xs font-bold uppercase tracking-widest text-zinc-500 hidden sm:inline">Status:</span>
-          <Select value={filter} onValueChange={(v) => setFilter(v as any)}>
-            <SelectTrigger className="w-44 bg-zinc-900 border-zinc-800 text-zinc-200 focus:ring-1 focus:ring-amber-400">
-              <SelectValue placeholder="All Orders" />
-            </SelectTrigger>
-            <SelectContent className="bg-zinc-900 border-zinc-800 text-zinc-200">
-              <SelectItem value="all" className="focus:bg-amber-400 focus:text-zinc-950 font-medium">
-                All Orders
-              </SelectItem>
-              {STATUSES.map((s) => (
-                <SelectItem
-                  key={s}
-                  value={s}
-                  className="focus:bg-amber-400 focus:text-zinc-950 uppercase text-xs font-bold"
-                >
-                  {s}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+          <input
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search order #, phone, name, item..."
+            className="w-full sm:w-72 bg-zinc-900 border border-zinc-800 rounded-md px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-amber-400"
+          />
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-bold uppercase tracking-widest text-zinc-500 hidden sm:inline">Status:</span>
+            <Select value={filter} onValueChange={(v) => setFilter(v as any)}>
+              <SelectTrigger className="w-44 bg-zinc-900 border-zinc-800 text-zinc-200 focus:ring-1 focus:ring-amber-400">
+                <SelectValue placeholder="All Orders" />
+              </SelectTrigger>
+              <SelectContent className="bg-zinc-900 border-zinc-800 text-zinc-200">
+                <SelectItem value="all" className="focus:bg-amber-400 focus:text-zinc-950 font-medium">
+                  All Orders
                 </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+                {STATUSES.map((s) => (
+                  <SelectItem
+                    key={s}
+                    value={s}
+                    className="focus:bg-amber-400 focus:text-zinc-950 uppercase text-xs font-bold"
+                  >
+                    {s}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
+      </div>
+
+      {/* Result count */}
+      <div className="text-xs text-zinc-500 uppercase tracking-widest">
+        {isLoading ? "Loading..." : `${filtered.length} order${filtered.length === 1 ? "" : "s"}${search ? ` matching "${search}"` : ""}`}
       </div>
 
       {/* Main Table Container */}
@@ -111,14 +147,14 @@ function OrdersPage() {
                     </div>
                   </td>
                 </tr>
-              ) : (data ?? []).length === 0 ? (
+              ) : filtered.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="p-12 text-center text-zinc-500 font-medium tracking-wide">
                     No orders found.
                   </td>
                 </tr>
               ) : (
-                (data ?? []).map((o: any) => {
+                filtered.map((o: any) => {
                   const items = (o.items as any[]) ?? [];
                   const summary = items.map((i) => `${i.qty}× ${i.title}`).join(", ");
                   const orderRef =
