@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /login
+
+Sitemap: https://jimmy-s-protein-hub.lovable.app/sitemap.xml
